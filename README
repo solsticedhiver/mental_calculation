@@ -1,0 +1,63 @@
+*Mental calculation* a simple tool made, to practice *anzan* - mental calculation made by visualizing a soroban, the japanese abacus.
+
+http://en.wikipedia.org/wiki/Soroban
+
+Requirements:
+=============
+
+for the source version:
+-----------------------
+- python 2.6
+- PyQt4 4.7
+- qt 4.6 + phonon
+- espeak for the speech synthesis (as an option)
+
+for the Windows version:
+------------------------
+All dependancies are included.
+- espeak for the speech synthesis (as an option)
+
+Downloads:
+==========
+
+Python
+  http://www.python.org/download
+PyQt
+  http://www.riverbankcomputing.co.uk/software/pyqt/download
+eSpeak
+  http://espeak.sourceforge.net/download.html
+
+Usage:
+======
+
+- If you checked 'Speech synthesis + sounds', *mentalcalculation* will attempt to use espeak for speech synthesis. It look for it at a default location: 
+  - /usr/bin/espeak for Linux 
+  - C:\Program Files\eSpeak\command_line\espeak.exe for Windows.
+  It will also use the language defined by your locale.
+  If you want to change the language used by espeak or its location path, add a section in the mentalcalculation.ini file (see below) like this:
+
+    [Espeak]
+    lang=en
+    cmd="D:\\Program Files\\eSpeak\\command_line\\espeak.exe"
+    speed=150 ; words per minute from 80 to 390
+
+ini file
+--------
+*mentalcalculation* saves its settings in a configuration file: 
+On Linux/or any unix-like
+  ~/.config/mentalcalculation/mentalcalculation.ini
+On Windows
+  C:\Documents and Settings\<your_user_name>\Application Data\mentalcalculation\mentalcalculation.ini
+  or C:\Users\<your_user_name>\AppData\Roaming\mentalcalculation\mentalcalculation.ini
+
+Note: It does not do anything to the Windows registry at all !
+
+Fail-safe mechanism:
+--------------------
+There is a fail-safe mechanism that allows *mental calculation* to safely fails when it does not find one of its resources files. So, if you don't like the smileys/emoticons or the sounds, you can safely delete/rename them on your harddisk (img/sound directories), and *mentalcalculation* will continue to work without them.
+
+Attribution:
+============
+I would like to thank the Tango project from which I borrowed some icons and the GNOME project (gnome-media, gnome-audio) for the sound files I use.
+
+vim: set ft=rst:
