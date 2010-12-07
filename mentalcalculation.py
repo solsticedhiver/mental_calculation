@@ -55,7 +55,7 @@ import main, settings
 DIGIT = dict([(i,(int('1'+'0'*(i-1)), int('9'*i))) for i in range(1,10)])
 
 appName = 'mentalcalculation'
-appVersion = '0.3.1.1'
+appVersion = '0.3.1.2'
 
 BELL = 'sound/bell.mp3'
 GOOD = 'sound/good.mp3'
@@ -119,7 +119,9 @@ class Main(QtGui.QDialog):
         self.importSettings()
 
         if SYSTEMRANDOMAVAILABLE:
-            self.rnd = SystemRandom()
+            self.randint = SystemRandom().randint
+        else:
+            self.randint = randint
 
         self.__ui.label.clear()
         self.__ui.le_answer.setInputMask('000009')
@@ -283,18 +285,15 @@ class Main(QtGui.QDialog):
             else:
                 self.__count += 1
                 self.__ui.gb_number.setTitle('#%d' % (self.__count))
-                a,b = digit(self.digits)
-                if SYSTEMRANDOMAVAILABLE:
-                    neg = self.rnd.randint(0,1)
-                    if neg and self.answer > 0:
+                a,b = DIGIT[self.digits]
+                neg = bool(self.randint(0,1))
+                if neg:
+                    if self.answer > 0:
                         b = min(b,self.answer)
-                    n = self.rnd.randint(a,b)
-                else:
-                    neg = randint(0,1)
-                    if neg and self.answer > 0:
-                        b = min(b,self.answer)
-                    n = randint(a,b)
-                if self.neg and neg and self.answer - n >= 0:
+                    else:
+                        neg = False
+                n = self.randint(a,b)
+                if neg and self.answer - n >= 0:
                     n = -n
                 t = '%d' % n
                 if self.neg:
