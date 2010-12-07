@@ -52,7 +52,8 @@ except ImportError:
     sys.exit(1)
 import main, settings
 
-DIGIT = {1:(1,9), 2:(10,99), 3:(100,999), 4:(1000,9999)}
+DIGIT = dict([(i,(int('1'+'0'*(i-1)), int('9'*i))) for i in range(1,10)])
+
 appName = 'mentalcalculation'
 appVersion = '0.3.1.1'
 
@@ -159,7 +160,6 @@ class Main(QtGui.QDialog):
             # test for every option
             if settings.contains('Espeak/cmd'):
                 ESPEAK_CMD = settings.value('Espeak/cmd').toString()
-                print ESPEAK_CMD
                 IS_ESPEAK_INSTALLED = isfile(ESPEAK_CMD)
             if settings.contains('Espeak/lang'):
                 ESPEAK_LANG = settings.value('Espeak/lang').toString()
@@ -327,9 +327,6 @@ class Main(QtGui.QDialog):
 def cleanup(tmpwav):
     if isfile(tmpwav):
         remove(tmpwav)
-
-def digit(n):
-    return (int('1'+'0'*(n-1)), int('9'*n))
 
 if __name__ == '__main__':
     parser = OptionParser(usage='usage: %prog [-v]')
