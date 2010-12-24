@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-# mentalcalculation - version 0.3.1.1
+# mentalcalculation - version 0.3.1.2
 # Copyright (C) 2008-2010, solsTiCe d'Hiver <solstice.dhiver@gmail.com>
 
 # This program is free software; you can redistribute it and/or modify
@@ -141,7 +141,7 @@ class Main(QtGui.QDialog):
         if WINDOWS:
             self.tmpwav = None
         else:
-            fd,self.tmpwav = mkstemp(suffix='.wav', prefix='mentalcalculation_')
+            fd, self.tmpwav = mkstemp(suffix='.wav', prefix='mentalcalculation_')
         self.player = Phonon.createPlayer(Phonon.AccessibilityCategory, Phonon.MediaSource(self.tmpwav))
         self.connect(self.player, QtCore.SIGNAL('finished()'), self.clearLabel)
 
@@ -221,18 +221,11 @@ class Main(QtGui.QDialog):
 
     def pronounceit(self, s):
         p = QtCore.QProcess(self)
-        if WINDOWS:
-            # try the default path
-            p.start(ESPEAK_CMD, ['-v%s' % ESPEAK_LANG, '-s%d' % ESPEAK_SPEED, s])
-            self.connect(p, QtCore.SIGNAL('finished(int, QProcess::ExitStatus)'), self.clearLabel)
-        else:
-            # There is a bug that cause a click sound on linux with french language
-            # Is it espeak bug or alsa ?
-            # Create a tmp wav file that it is later played by Phonon back end
-            p.start(ESPEAK_CMD, ['-v%s' % ESPEAK_LANG, '-s%d' % ESPEAK_SPEED,'-w%s' % self.tmpwav, s])
-            p.waitForFinished()
-            self.player.setCurrentSource(Phonon.MediaSource(self.tmpwav))
-            self.player.play()
+        # Create a tmp wav file that it is later played by Phonon back end
+        p.start(ESPEAK_CMD, ['-v', ESPEAK_LANG, '-s',  '%d' % ESPEAK_SPEED,'-w', self.tmpwav, '--', s])
+        p.waitForFinished()
+        self.player.setCurrentSource(Phonon.MediaSource(self.tmpwav))
+        self.player.play()
 
     def updateAnswer(self):
         if self.__ui.le_answer.isEnabled():
@@ -300,8 +293,10 @@ class Main(QtGui.QDialog):
                     t = '%+d' % n
                 self.__ui.label.setText(t)
                 if self.sound and IS_ESPEAK_INSTALLED:
-                    # BUG: espeak does not recognize - sign for french
-                    self.pronounceit(t.replace('-', 'moins '))
+                    # fix a bug with french not pronouncing the negative sign
+                    if LOCALENAME.startswith('fr'):
+                        t = t.replace('-', 'moins ')
+                    self.pronounceit(t)
                 else:
                     # clear the label after self.flash time
                     QtCore.QTimer.singleShot(self.flash, self.clearLabel)
