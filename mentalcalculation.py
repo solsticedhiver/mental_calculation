@@ -222,8 +222,10 @@ class Main(QtGui.QDialog):
     def pronounceit(self, s):
         p = QtCore.QProcess(self)
         # Create a tmp wav file that it is later played by Phonon back end
-        p.start(ESPEAK_CMD, ['-v', ESPEAK_LANG, '-s',  '%d' % ESPEAK_SPEED,'-w', self.tmpwav, '--', s])
+        #p.start(ESPEAK_CMD, ['-v', ESPEAK_LANG, '-s',  '%d' % ESPEAK_SPEED,'-w', self.tmpwav, '--', s])
+        p.start(ESPEAK_CMD, QtCore.QStringList(['-v', ESPEAK_LANG, '-s',  '%d' % ESPEAK_SPEED,'-w', self.tmpwav, '--', s]))
         p.waitForFinished()
+        self.player.stop()
         self.player.setCurrentSource(Phonon.MediaSource(self.tmpwav))
         self.player.play()
 
@@ -281,7 +283,7 @@ class Main(QtGui.QDialog):
                 a,b = DIGIT[self.digits]
                 neg = bool(self.randint(0,1))
                 if neg:
-                    if self.answer > 0:
+                    if self.answer > a:
                         b = min(b,self.answer)
                     else:
                         neg = False
@@ -293,6 +295,8 @@ class Main(QtGui.QDialog):
                     t = '%+d' % n
                 self.__ui.label.setText(t)
                 if self.sound and IS_ESPEAK_INSTALLED:
+                    # how to make it pronounce one digit at a time
+                    #t = ' '.join(list(t)).replace('- ', '-')
                     # fix a bug with french not pronouncing the negative sign
                     if LOCALENAME.startswith('fr'):
                         t = t.replace('-', 'moins ')

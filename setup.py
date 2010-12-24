@@ -20,12 +20,12 @@ import os
 
 class InnoScript:
     def __init__(self,
-                 name,
-                 lib_dir,
-                 dist_dir,
-                 windows_exe_files = [],
-                 lib_files = [],
-                 version = "1.0"):
+            name,
+            lib_dir,
+            dist_dir,
+            windows_exe_files = [],
+            lib_files = [],
+            version = "0.3.1.2"):
         self.lib_dir = lib_dir
         self.dist_dir = dist_dir
         if not self.dist_dir[-1] in "\\/":
@@ -38,7 +38,7 @@ class InnoScript:
     def chop(self, pathname):
         assert pathname.startswith(self.dist_dir)
         return pathname[len(self.dist_dir):]
-    
+
     def create(self, pathname="dist\\mentalcalculation.iss"):
         self.pathname = pathname
         ofi = self.file = open(pathname, "w")
@@ -63,8 +63,8 @@ Name: French; MessagesFile: "compiler:Languages\French.isl"
         print >> ofi, r"[Icons]"
         for path in self.windows_exe_files:
             print >> ofi, r'Name: "{group}\%s";' \
-                'Filename: "{app}\%s";' \
-                'WorkingDir: "{app}"' % (self.name, path)
+                    'Filename: "{app}\%s";' \
+                    'WorkingDir: "{app}"' % (self.name, path)
         print >> ofi, 'Name: "{group}\Uninstall %s"; Filename: "{uninstallexe}"' % self.name
 
         print >> ofi, r'[UninstallDelete]'
@@ -82,17 +82,17 @@ Name: French; MessagesFile: "compiler:Languages\French.isl"
             else:
                 print "Ok, using win32api."
                 win32api.ShellExecute(0, "compile",
-                                                self.pathname,
-                                                None,
-                                                None,
-                                                0)
+                        self.pathname,
+                        None,
+                        None,
+                        0)
         else:
             print "Cool, you have ctypes installed."
             res = ctypes.windll.shell32.ShellExecuteA(0, "compile",
-                                                      self.pathname,
-                                                      None,
-                                                      None,
-                                                      0)
+                    self.pathname,
+                    None,
+                    None,
+                    0)
             if res < 32:
                 raise RuntimeError, "ShellExecute failed, error %d" % res
 
@@ -110,10 +110,10 @@ class build_installer(py2exe):
 
         # create the Installer, using the files py2exe has created.
         script = InnoScript("Mental Calculation",
-                            self.lib_dir,
-                            self.dist_dir,
-                            self.windows_exe_files,
-                            self.lib_files)
+                self.lib_dir,
+                self.dist_dir,
+                self.windows_exe_files,
+                self.lib_files)
         print "*** creating the inno setup script***"
         script.create()
         print "*** compiling the inno setup script***"
@@ -123,28 +123,28 @@ class build_installer(py2exe):
 ################################################################
 
 setup(
-    windows = [{"script" : "mentalcalculation.pyw",
+        windows = [{"script" : "mentalcalculation.pyw",
             "icon_resources": [(1, "img/mentalcalculation.ico")]}],
-    options = {"py2exe" : {"includes" : ["sip"], "compressed": 1, "optimize": 2}},
-    zipfile = "lib/library.zip",
-    data_files = [
-        ('phonon_backend', [
-            'C:\Python26\Lib\site-packages\PyQt4\plugins\phonon_backend\phonon_ds94.dll'
-            ]),
-        ('.', ['mentalcalculation_fr.qm', 'README', 'LISEZMOI', 'COPYING',
-            'Changelog', 'setup.py']),
-        ('img', [
-            'img/soro.jpg',
-            'img/face-smile.png',
-            'img/face-sad.png',
-            'img/calculator.png'
-            ]),
-        ('sound', [
-            'sound/bad.mp3',
-            'sound/good.mp3',
-            'sound/bell.mp3'
-            ])
-        ],
-    # use out build_installer class as extended py2exe build command
-    cmdclass = {"py2exe": build_installer},
-    )
+        options = {"py2exe" : {"includes" : ["sip"], "compressed": 1, "optimize": 2}},
+        zipfile = "lib/library.zip",
+        data_files = [
+            ('phonon_backend', [
+                'C:\Python27\Lib\site-packages\PyQt4\plugins\phonon_backend\phonon_ds94.dll'
+                ]),
+            ('.', ['mentalcalculation_fr.qm', 'README', 'LISEZMOI', 'COPYING',
+                'Changelog', 'setup.py']),
+            ('img', [
+                'img/soro.jpg',
+                'img/face-smile.png',
+                'img/face-sad.png',
+                'img/calculator.png'
+                ]),
+            ('sound', [
+                'sound/bad.mp3',
+                'sound/good.mp3',
+                'sound/bell.mp3'
+                ])
+            ],
+        # use out build_installer class as extended py2exe build command
+        cmdclass = {"py2exe": build_installer},
+        )

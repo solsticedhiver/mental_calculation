@@ -5,9 +5,9 @@ Dépendances:
 
 pour la version *source*
 ------------------------
-- python 2.6
-- PyQt4 4.7
-- qt 4.6 + phonon
+- python 2.6 (ou plus récent)
+- PyQt4 4.7 (ou plus récent)
+- qt 4.6 + phonon (ou plus récent)
 - espeak pour la synthèse vocale (en option)
 
 pour la version Windows

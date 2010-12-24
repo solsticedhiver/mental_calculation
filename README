@@ -7,9 +7,9 @@ Requirements:
 
 for the source version:
 -----------------------
-- python 2.6
-- PyQt4 4.7
-- qt 4.6 + phonon
+- python 2.6 (or higher)
+- PyQt4 4.7 (or higher)
+- qt 4.6 + phonon (or higher)
 - espeak for the speech synthesis (as an option)
 
 for the Windows version:

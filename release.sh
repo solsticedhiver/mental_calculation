@@ -157,6 +157,8 @@ echo "
 ./mentalcalculation/sound/bell.mp3" | apack ./mentalcalculation/$archive
 
 cd mentalcalculation
+# use the build made by py2exe with InnoSetup
+# run the follwoing command in windows: python.exe setup.py py2exe
 if [ -d dist ] ; then
 	if [ -f dist/Output/setup.exe ] ;then
 		mv -f dist/Output/setup.exe mentalcalculation-${version}-setup.exe
@@ -169,4 +171,4 @@ if [ -d dist ] ; then
 	rm -rf mentalcalculation-${version} build
 fi
 
-lftp -e "orange; cd data; glob rm mentalcalculation-*; mput mentalcalculation-${version}*;"
+#lftp -e "orange; cd data; glob rm mentalcalculation-*; mput mentalcalculation-${version}*;"
