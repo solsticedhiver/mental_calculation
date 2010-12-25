@@ -132,9 +132,10 @@ setup(
                 'C:\Python27\Lib\site-packages\PyQt4\plugins\phonon_backend\phonon_ds94.dll'
                 ]),
             ('.', ['mentalcalculation_fr.qm', 'README', 'LISEZMOI', 'COPYING',
-                'Changelog', 'setup.py']),
+                'Changelog', 'setup.py',
+                'C:\WINDOWS\system32\msvcp90.dll']),
             ('img', [
-                'img/soro.jpg',
+                'img/soro.png',
                 'img/face-smile.png',
                 'img/face-sad.png',
                 'img/calculator.png'
