@@ -35,7 +35,7 @@
 import sys
 from optparse import OptionParser
 from platform import system
-from tempfile import mkstemp
+from tempfile import mkstemp, NamedTemporaryFile
 from os import remove, sep
 from os.path import isfile, abspath
 try:
@@ -116,6 +116,7 @@ class Main(QtGui.QDialog):
         self.timeout = 1500
         self.neg = False
         self.sound = False
+        self.tmpwav= None
         self.importSettings()
 
         if SYSTEMRANDOMAVAILABLE:
@@ -138,11 +139,7 @@ class Main(QtGui.QDialog):
         # TODO: add a welcome message; this would be more explicit that this
         self.__ui.label.setPixmap(QtGui.QPixmap(WELCOME))
 
-        if WINDOWS:
-            self.tmpwav = None
-        else:
-            fd, self.tmpwav = mkstemp(suffix='.wav', prefix='mentalcalculation_')
-        self.player = Phonon.createPlayer(Phonon.AccessibilityCategory, Phonon.MediaSource(self.tmpwav))
+        self.player = Phonon.createPlayer(Phonon.AccessibilityCategory, Phonon.MediaSource(''))
         self.connect(self.player, QtCore.SIGNAL('finished()'), self.clearLabel)
 
     def importSettings(self):
@@ -210,6 +207,8 @@ class Main(QtGui.QDialog):
             QtCore.QTimer.singleShot(1000, self.updateLabel)
             # change pb_start to 'Stop' when starting display
             self.__ui.pb_start.setText(self.tr('&Stop'))
+            if self.sound:
+                self.player.stop()
         else:
             # then stop it
             self.started = False
@@ -218,15 +217,27 @@ class Main(QtGui.QDialog):
             self.__ui.label.clear()
             if options.verbose:
                 print
+            if self.sound:
+                self.player.stop()
+
+    def cleanup(self, newstate, oldstate):
+        if oldstate == Phonon.PlayingState:
+            if self.tmpwav is not None:
+                self.tmpwav.close()
+                remove(self.tmpwav.name)
+                self.tmpwav = None
 
     def pronounceit(self, s):
         p = QtCore.QProcess(self)
         # Create a tmp wav file that it is later played by Phonon back end
-        #p.start(ESPEAK_CMD, ['-v', ESPEAK_LANG, '-s',  '%d' % ESPEAK_SPEED,'-w', self.tmpwav, '--', s])
-        p.start(ESPEAK_CMD, QtCore.QStringList(['-v', ESPEAK_LANG, '-s',  '%d' % ESPEAK_SPEED,'-w', self.tmpwav, '--', s]))
+        self.tmpwav = NamedTemporaryFile(suffix='.wav', prefix='mentalcalculation', delete=False)
+        p.start(ESPEAK_CMD, ['-v', ESPEAK_LANG, '-s',  '%d' % ESPEAK_SPEED,'-w', self.tmpwav.name, "'%s'" % s])
         p.waitForFinished()
-        self.player.stop()
-        self.player.setCurrentSource(Phonon.MediaSource(self.tmpwav))
+        # so that it works also on Windows ! wtf !
+        self.tmpwav.close()
+        # make sure to use the tmp wav
+        self.player.setCurrentSource(Phonon.MediaSource(self.tmpwav.name))
+        self.connect(self.player, QtCore.SIGNAL('stateChanged(Phonon::State, Phonon::State)'), self.cleanup)
         self.player.play()
 
     def updateAnswer(self):
@@ -312,6 +323,8 @@ class Main(QtGui.QDialog):
 
     def closeEvent(self, event):
         QtGui.QDialog.closeEvent(self, event)
+        # stop the player
+        self.player.stop()
         # always save settings when closing the app
         settings = QtCore.QSettings(QtCore.QSettings.IniFormat,
                 QtCore.QSettings.UserScope, '%s' % appName, '%s' % appName)
@@ -321,10 +334,6 @@ class Main(QtGui.QDialog):
         settings.setValue('flash', QtCore.QVariant(self.flash))
         settings.setValue('sound', QtCore.QVariant(self.sound))
         settings.setValue('neg', QtCore.QVariant(self.neg))
-
-def cleanup(tmpwav):
-    if isfile(tmpwav):
-        remove(tmpwav)
 
 if __name__ == '__main__':
     parser = OptionParser(usage='usage: %prog [-v]')
@@ -361,10 +370,6 @@ if __name__ == '__main__':
     f = Main(flag=QtCore.Qt.WindowTitleHint|QtCore.Qt.WindowSystemMenuHint)
     f.show()
     f.mysettings()
-
-    if not WINDOWS:
-        from atexit import register
-        register(cleanup, f.tmpwav)
 
     sys.exit(app.exec_())
 
