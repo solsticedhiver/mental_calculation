@@ -291,13 +291,15 @@ class Main(QtGui.QDialog):
                 self.__count += 1
                 self.__ui.gb_number.setTitle('#%d' % (self.__count))
                 a,b = DIGIT[self.digits]
-                neg = bool(self.randint(0,1))
+                neg = False
+                if self.neg:
+                    neg = bool(self.randint(0,1))
                 if neg:
                     if self.answer > a:
-                        b = min(b,self.answer)
+                        b = min(b, self.answer)
                     else:
                         neg = False
-                n = self.randint(a,b)
+                n = self.randint(a, b)
                 if neg and self.answer - n >= 0:
                     n = -n
                 t = '%d' % n
