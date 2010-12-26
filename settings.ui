@@ -153,10 +153,10 @@
    <item row="3" column="0">
     <widget class="QCheckBox" name="cb_neg">
      <property name="toolTip">
-      <string>Allow/disallow negative numbers</string>
+      <string>Allow/disallow subtractions</string>
      </property>
      <property name="text">
-      <string>&amp;Negative numbers</string>
+      <string>&amp;Subtractions</string>
      </property>
     </widget>
    </item>

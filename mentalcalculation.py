@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-# mentalcalculation - version 0.3.1.4
+# mentalcalculation - version 0.3.1.5
 # Copyright (C) 2008-2010, solsTiCe d'Hiver <solstice.dhiver@gmail.com>
 
 # This program is free software; you can redistribute it and/or modify
@@ -55,7 +55,7 @@ import main, settings
 DIGIT = dict([(i,(int('1'+'0'*(i-1)), int('9'*i))) for i in range(1,10)])
 
 appName = 'mentalcalculation'
-appVersion = '0.3.1.4'
+appVersion = '0.3.1.5'
 
 BELL = 'sound/bell.mp3'
 GOOD = 'sound/good.mp3'
@@ -303,7 +303,7 @@ class Main(QtGui.QDialog):
                 if neg and self.answer - n >= 0:
                     n = -n
                 t = '%d' % n
-                if self.neg:
+                if self.neg and self.__count > 1:
                     t = '%+d' % n
                 self.__ui.label.setText(t)
                 if self.sound and IS_ESPEAK_INSTALLED:

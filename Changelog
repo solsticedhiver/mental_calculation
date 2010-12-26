@@ -1,3 +1,21 @@
+0.3.1.5
+* No sign for first number
+* Update gui to use subtractions instead of negative numbers
+
+0.3.1.4
+* Thank burlie for the soroban image
+* Fix bug where there is always negative number
+
+0.3.1.3
+* Unify the way to handle sound. Use a tmp file for every sound !
+* Stop sound when clicking stop or exiting
+* Fix a bug in random number generation
+* Update README and LISEZMOI
+* Fix a bug with synthesis sound
+
+0.3.1.2
+* Rework random generation
+
 0.3.1.1
 * finally found how to translate a QDialogButtonBox
 
@@ -11,6 +29,6 @@ in ini file
 0.3
 * gui has been recreated. use a small dialog for the settings.
 * use espeak for speech synthesis and add some sounds for bad/good answer 
-	and bell for end of serie
+and bell for end of serie
 * add some smileys
 
