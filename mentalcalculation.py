@@ -145,6 +145,7 @@ class Main(QtGui.QDialog):
         # restore settings from the settings file if the settings exist
         settings = QtCore.QSettings(QtCore.QSettings.IniFormat,
                 QtCore.QSettings.UserScope, '%s' % appName, '%s' % appName)
+
         if settings.contains('digits'):
             # these value have been written by the program, so then should be ok
             self.digits = settings.value('digits').toInt()[0]
@@ -191,6 +192,16 @@ class Main(QtGui.QDialog):
                 self.rows = mysettings['rows']
                 self.sound = mysettings['sound']
                 self.neg = mysettings['neg']
+                # always save settings when closing the settings dialog
+                settings = QtCore.QSettings(QtCore.QSettings.IniFormat,
+                        QtCore.QSettings.UserScope, '%s' % appName, '%s' % appName)
+                settings.setValue('digits', QtCore.QVariant(self.digits))
+                settings.setValue('rows', QtCore.QVariant(self.rows))
+                settings.setValue('timeout', QtCore.QVariant(self.timeout))
+                settings.setValue('flash', QtCore.QVariant(self.flash))
+                settings.setValue('sound', QtCore.QVariant(self.sound))
+                settings.setValue('neg', QtCore.QVariant(self.neg))
+
 
     def start(self):
         if not self.started:
@@ -326,15 +337,6 @@ class Main(QtGui.QDialog):
         QtGui.QDialog.closeEvent(self, event)
         # stop the player
         self.player.stop()
-        # always save settings when closing the app
-        settings = QtCore.QSettings(QtCore.QSettings.IniFormat,
-                QtCore.QSettings.UserScope, '%s' % appName, '%s' % appName)
-        settings.setValue('digits', QtCore.QVariant(self.digits))
-        settings.setValue('rows', QtCore.QVariant(self.rows))
-        settings.setValue('timeout', QtCore.QVariant(self.timeout))
-        settings.setValue('flash', QtCore.QVariant(self.flash))
-        settings.setValue('sound', QtCore.QVariant(self.sound))
-        settings.setValue('neg', QtCore.QVariant(self.neg))
 
 if __name__ == '__main__':
     parser = OptionParser(usage='usage: %prog [-v]')
