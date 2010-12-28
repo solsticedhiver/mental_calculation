@@ -40,7 +40,7 @@ from os import remove, sep
 from os.path import isfile, abspath
 try:
     from random import SystemRandom
-    SYSTEMRANDOMAVAILABLE = True
+    IS_SYSTEMRANDOM_AVAILABLE = True
 except ImportError:
     from random import randint
 
@@ -118,7 +118,7 @@ class Main(QtGui.QDialog):
         self.tmpwav= None
         self.importSettings()
 
-        if SYSTEMRANDOMAVAILABLE:
+        if IS_SYSTEMRANDOM_AVAILABLE:
             self.randint = SystemRandom().randint
         else:
             self.randint = randint
@@ -140,6 +140,7 @@ class Main(QtGui.QDialog):
 
         self.player = Phonon.createPlayer(Phonon.AccessibilityCategory, Phonon.MediaSource(''))
         self.connect(self.player, QtCore.SIGNAL('finished()'), self.clearLabel)
+        self.connect(self.player, QtCore.SIGNAL('stateChanged(Phonon::State, Phonon::State)'), self.cleanup)
 
     def importSettings(self):
         # restore settings from the settings file if the settings exist
@@ -240,14 +241,13 @@ class Main(QtGui.QDialog):
     def pronounceit(self, s):
         p = QtCore.QProcess(self)
         # Create a tmp wav file that it is later played by Phonon back end
-        self.tmpwav = NamedTemporaryFile(suffix='.wav', prefix='mentalcalculation', delete=False)
+        self.tmpwav = NamedTemporaryFile(suffix='.wav', prefix='mentalcalculation_', delete=False)
         p.start(ESPEAK_CMD, ['-v', ESPEAK_LANG, '-s',  '%d' % ESPEAK_SPEED,'-w', self.tmpwav.name, "'%s'" % s])
         p.waitForFinished()
         # so that it works also on Windows ! wtf !
         self.tmpwav.close()
         # make sure to use the tmp wav
         self.player.setCurrentSource(Phonon.MediaSource(self.tmpwav.name))
-        self.connect(self.player, QtCore.SIGNAL('stateChanged(Phonon::State, Phonon::State)'), self.cleanup)
         self.player.play()
 
     def updateAnswer(self):
