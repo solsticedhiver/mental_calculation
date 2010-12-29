@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-# mentalcalculation - version 0.3.1.5
+# mentalcalculation - version 0.3.1.6
 # Copyright (C) 2008-2010, solsTiCe d'Hiver <solstice.dhiver@gmail.com>
 
 # This program is free software; you can redistribute it and/or modify
@@ -55,7 +55,7 @@ import main, settings
 DIGIT = dict([(i,(int('1'+'0'*(i-1)), int('9'*i))) for i in range(1,10)])
 
 appName = 'mentalcalculation'
-appVersion = '0.3.1.5'
+appVersion = '0.3.1.6'
 
 BELL = 'sound/bell.mp3'
 GOOD = 'sound/good.mp3'
