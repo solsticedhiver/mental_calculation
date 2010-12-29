@@ -159,10 +159,10 @@ class Main(QtGui.QDialog):
             global ESPEAK_CMD, ESPEAK_LANG, ESPEAK_SPEED, IS_ESPEAK_INSTALLED
             # test for every option
             if settings.contains('Espeak/cmd'):
-                ESPEAK_CMD = settings.value('Espeak/cmd').toString()
+                ESPEAK_CMD = str(settings.value('Espeak/cmd').toString()).strip('"')
                 IS_ESPEAK_INSTALLED = isfile(ESPEAK_CMD)
             if settings.contains('Espeak/lang'):
-                ESPEAK_LANG = settings.value('Espeak/lang').toString()
+                ESPEAK_LANG = str(settings.value('Espeak/lang').toString())
             if settings.contains('Espeak/speed'):
                 a,b = settings.value('Espeak/speed').toInt()
                 # check if it's good
@@ -213,6 +213,8 @@ class Main(QtGui.QDialog):
             #self.__ui.l_answer.setText('Your answer')
             self.__ui.le_answer.clear()
             self.__ui.le_answer.setEnabled(False)
+            self.__ui.pb_check.setEnabled(False)
+            self.__ui.pb_settings.setEnabled(False)
             self.__count = 0
             # wait 1s before starting the display
             QtCore.QTimer.singleShot(1000, self.updateLabel)
@@ -223,6 +225,7 @@ class Main(QtGui.QDialog):
         else:
             # then stop it
             self.started = False
+            self.__ui.pb_settings.setEnabled(True)
             self.__ui.gb_number.setTitle('#')
             self.__ui.pb_start.setText(self.tr('&Start'))
             self.__ui.label.clear()
@@ -270,6 +273,7 @@ class Main(QtGui.QDialog):
             self.__ui.l_total.show()
             self.__ui.l_total.setText(self.tr('The correct answer is %1').arg(self.answer))
             self.__ui.le_answer.setDisabled(True)
+            self.__ui.pb_check.setDisabled(True)
             #self.__ui.pb_start.setFocus(QtCore.Qt.OtherFocusReason)
             self.__ui.label.setPixmap(QtGui.QPixmap(img))
             if self.sound:
@@ -293,6 +297,8 @@ class Main(QtGui.QDialog):
                 self.__ui.gb_number.setTitle('#')
                 self.__ui.pb_start.setText(self.tr('&Start'))
                 self.__ui.le_answer.setEnabled(True)
+                self.__ui.pb_check.setEnabled(True)
+                self.__ui.pb_settings.setEnabled(True)
                 self.__ui.le_answer.setFocus(QtCore.Qt.OtherFocusReason)
                 self.__ui.pb_check.setDefault(True)
                 self.__ui.pb_start.setDefault(False)
@@ -321,7 +327,7 @@ class Main(QtGui.QDialog):
                     # how to make it pronounce one digit at a time
                     #t = ' '.join(list(t)).replace('- ', '-')
                     # fix a bug with french not pronouncing the negative sign
-                    if LOCALENAME.startswith('fr'):
+                    if ESPEAK_LANG.startswith('fr'):
                         t = t.replace('-', 'moins ')
                     self.pronounceit(t)
                 else:

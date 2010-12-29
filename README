@@ -38,7 +38,7 @@ Usage:
 
     [Espeak]
     lang=en
-    cmd="D:\\Program Files\\eSpeak\\command_line\\espeak.exe"
+    cmd=D:\\Program Files\\eSpeak\\command_line\\espeak.exe
     speed=150 ; words per minute from 80 to 390
 
 ini file
