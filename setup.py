@@ -136,6 +136,7 @@ setup(
                 'C:\WINDOWS\system32\msvcp90.dll']),
             ('img', [
                 'img/soro.png',
+                'img/warning.png',
                 'img/face-smile.png',
                 'img/face-sad.png',
                 'img/calculator.png'

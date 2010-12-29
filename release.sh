@@ -18,6 +18,7 @@ echo "
 ./mentalcalculation/LISEZMOI
 ./mentalcalculation/Changelog
 ./mentalcalculation/img/soro.jpg
+./mentalcalculation/img/warning.png
 ./mentalcalculation/img/face-sad.png
 ./mentalcalculation/img/face-smile.png
 ./mentalcalculation/img/calculator.png

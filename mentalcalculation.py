@@ -73,6 +73,9 @@ class Settings(QtGui.QDialog):
         self.__ui.sb_flash.setEnabled(not self.__ui.cb_sound.isChecked())
         self.connect(self, QtCore.SIGNAL('accepted()'), self.exportSettings)
         self.connect(self.__ui.cb_sound, QtCore.SIGNAL('clicked()'), self.updateSound)
+        if IS_ESPEAK_INSTALLED:
+            self.__ui.cb_sound.setEnabled(True)
+            self.__ui.pm_warning.hide()
 
     def importSettings(self, mysettings):
         self.__ui.sb_flash.setValue(mysettings['flash'])
@@ -80,6 +83,8 @@ class Settings(QtGui.QDialog):
         self.__ui.sb_digits.setValue(mysettings['digits'])
         self.__ui.sb_rows.setValue(mysettings['rows'])
         self.__ui.cb_sound.setChecked(mysettings['sound'])
+        if not IS_ESPEAK_INSTALLED:
+            self.__ui.cb_sound.setChecked(False)
         self.__ui.cb_neg.setChecked(mysettings['neg'])
         self.mysettings = mysettings
 
