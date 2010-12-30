@@ -389,9 +389,10 @@ class Main(QtGui.QDialog):
                     QtCore.QTimer.singleShot(self.flash, self.clearLabel)
 
     def closeEvent(self, event):
-        QtGui.QDialog.closeEvent(self, event)
         # stop the player
         self.player.stop()
+        self.player = None
+        QtGui.QDialog.closeEvent(self, event)
 
 if __name__ == '__main__':
     parser = OptionParser(usage='usage: %prog [-v]')
