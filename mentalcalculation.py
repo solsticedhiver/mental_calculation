@@ -123,6 +123,7 @@ class Main(QtGui.QDialog):
         self.tmpwav= None
         self.pb_replay = False
         self.replay = False
+        self.noscore = False
         self.history = []
         self.importSettings()
 
@@ -250,6 +251,7 @@ class Main(QtGui.QDialog):
                 self.replay = False
             else:
                 self.makeHistory()
+                self.noscore = False
             # wait 1s before starting the display
             QtCore.QTimer.singleShot(1000, self.updateLabel)
             # change pb_start to 'Stop' when starting display
@@ -307,7 +309,11 @@ class Main(QtGui.QDialog):
                 msg = ':-('
                 img = SAD
                 sound = BAD
-            self.score = u,v+1
+            # Don't score twice if replay
+            if not self.noscore:
+                self.score = u,v+1
+            if msg == ':-)':
+                self.noscore = True
             self.__ui.l_total.show()
             self.__ui.l_total.setText(self.tr('The correct answer is %1').arg(self.answer))
             self.__ui.le_answer.setDisabled(True)
