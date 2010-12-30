@@ -24,6 +24,13 @@ PyQt
 eSpeak
   http://espeak.sourceforge.net/download.html
 
+Astuces:
+========
+
+Vous pouvez relancer/revoir une séquence (d'addtions/soustractions):
+- Si vous avez déjà vérifié votre réponse, appuyez juste sur 'Shift' et le bouton 'Lancer' deviendra 'Relancer'. Cliquer le bouton en appyant toujours sur 'Shift'
+- Si vous n'avez pas vérifié votre réponse, appuyez sur 'Tab' pour mettre le 'focus' sur le bouton 'Start'. Comme expliquer précedemment, appuyez sur 'Shift' et sur le bouton 'Relancer'. Dans ce cas précis, ça ne marche si vous n'appuyez pas d'abord sur 'Tab'.
+
 Usage
 =====
 

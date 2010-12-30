@@ -145,7 +145,7 @@
        <item>
         <widget class="QPushButton" name="pb_start">
          <property name="toolTip">
-          <string>Start the &quot;game&quot;</string>
+          <string>Start a sequence</string>
          </property>
          <property name="text">
           <string>&amp;Start</string>
@@ -154,6 +154,9 @@
        </item>
        <item>
         <widget class="QPushButton" name="pb_check">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
          <property name="toolTip">
           <string>Check your answer</string>
          </property>

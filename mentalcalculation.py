@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-# mentalcalculation - version 0.3.1.6
+# mentalcalculation - version 0.3.2
 # Copyright (C) 2008-2010, solsTiCe d'Hiver <solstice.dhiver@gmail.com>
 
 # This program is free software; you can redistribute it and/or modify
@@ -55,7 +55,7 @@ import main, settings
 DIGIT = dict([(i,(int('1'+'0'*(i-1)), int('9'*i))) for i in range(1,10)])
 
 appName = 'mentalcalculation'
-appVersion = '0.3.1.6'
+appVersion = '0.3.2'
 
 BELL = 'sound/bell.mp3'
 GOOD = 'sound/good.mp3'
@@ -121,6 +121,9 @@ class Main(QtGui.QDialog):
         self.neg = False
         self.sound = False
         self.tmpwav= None
+        self.pb_replay = False
+        self.replay = False
+        self.history = []
         self.importSettings()
 
         if IS_SYSTEMRANDOM_AVAILABLE:
@@ -146,6 +149,28 @@ class Main(QtGui.QDialog):
         self.player = Phonon.createPlayer(Phonon.AccessibilityCategory, Phonon.MediaSource(''))
         self.connect(self.player, QtCore.SIGNAL('finished()'), self.clearLabel)
         self.connect(self.player, QtCore.SIGNAL('stateChanged(Phonon::State, Phonon::State)'), self.cleanup)
+
+        self.__ui.pb_start.installEventFilter(self)
+
+    def eventFilter(self, obj, event):
+        if not self.started and self.history:
+            if event.type() == QtCore.QEvent.KeyPress and event.key() == QtCore.Qt.Key_Shift:
+                self.pb_replay = True
+                self.__ui.pb_start.setText(self.tr('&Replay'))
+                self.__ui.pb_start.setToolTip(self.tr('Replay the previous sequence'))
+                return True
+            elif event.type() == QtCore.QEvent.KeyRelease and event.key() == QtCore.Qt.Key_Shift:
+                self.pb_replay = False
+                self.__ui.pb_start.setText(self.tr('&Start'))
+                self.__ui.pb_start.setToolTip(self.tr('Start a sequence'))
+                return True
+            elif event.type() == QtCore.QEvent.MouseButtonPress and event.button() == QtCore.Qt.LeftButton:
+                self.replay = self.pb_replay
+                self.pb_replay = False
+            elif event.type() == QtCore.QEvent.KeyPress and event.key() == QtCore.Qt.Key_Enter:
+                self.replay = self.pb_replay
+                self.pb_replay = False
+        return QtGui.QPushButton.eventFilter(self, obj, event)
 
     def importSettings(self):
         # restore settings from the settings file if the settings exist
@@ -211,7 +236,6 @@ class Main(QtGui.QDialog):
 
     def start(self):
         if not self.started:
-            self.answer = 0
             self.started = True
             self.__ui.label.clear()
             self.__ui.l_total.hide()
@@ -221,10 +245,16 @@ class Main(QtGui.QDialog):
             self.__ui.pb_check.setEnabled(False)
             self.__ui.pb_settings.setEnabled(False)
             self.__count = 0
+            # generate sequence
+            if self.replay:
+                self.replay = False
+            else:
+                self.makeHistory()
             # wait 1s before starting the display
             QtCore.QTimer.singleShot(1000, self.updateLabel)
             # change pb_start to 'Stop' when starting display
             self.__ui.pb_start.setText(self.tr('&Stop'))
+            self.__ui.pb_start.setToolTip(self.tr('Stop the sequence'))
             if self.sound:
                 self.player.stop()
         else:
@@ -233,11 +263,14 @@ class Main(QtGui.QDialog):
             self.__ui.pb_settings.setEnabled(True)
             self.__ui.gb_number.setTitle('#')
             self.__ui.pb_start.setText(self.tr('&Start'))
+            self.__ui.pb_start.setToolTip(self.tr('Start a sequence'))
             self.__ui.label.clear()
             if options.verbose:
                 print
             if self.sound:
                 self.player.stop()
+            # reset history
+            self.history = []
 
     def cleanup(self, newstate, oldstate):
         if oldstate == Phonon.PlayingState:
@@ -279,7 +312,7 @@ class Main(QtGui.QDialog):
             self.__ui.l_total.setText(self.tr('The correct answer is %1').arg(self.answer))
             self.__ui.le_answer.setDisabled(True)
             self.__ui.pb_check.setDisabled(True)
-            #self.__ui.pb_start.setFocus(QtCore.Qt.OtherFocusReason)
+            self.__ui.pb_start.setFocus(QtCore.Qt.OtherFocusReason)
             self.__ui.label.setPixmap(QtGui.QPixmap(img))
             if self.sound:
                 self.player.setCurrentSource(Phonon.MediaSource(sound))
@@ -290,6 +323,26 @@ class Main(QtGui.QDialog):
 
             if options.verbose:
                 sys.stdout.flush()
+
+    def makeHistory(self):
+        answer = 0
+        self.history = []
+        for i in range(self.rows):
+            a,b = DIGIT[self.digits]
+            neg = False
+            if self.neg:
+                neg = bool(self.randint(0,1))
+            if neg:
+                if answer > a:
+                    b = min(b, answer)
+                else:
+                    neg = False
+            n = self.randint(a, b)
+            if neg and answer - n >= 0:
+                n = -n
+            answer += n
+            self.history.append(n)
+        self.answer = answer
 
     def updateLabel(self):
         if self.started:
@@ -312,22 +365,15 @@ class Main(QtGui.QDialog):
             else:
                 self.__count += 1
                 self.__ui.gb_number.setTitle('#%d' % (self.__count))
-                a,b = DIGIT[self.digits]
-                neg = False
-                if self.neg:
-                    neg = bool(self.randint(0,1))
-                if neg:
-                    if self.answer > a:
-                        b = min(b, self.answer)
-                    else:
-                        neg = False
-                n = self.randint(a, b)
-                if neg and self.answer - n >= 0:
-                    n = -n
+                n = self.history[self.__count-1]
                 t = '%d' % n
                 if self.neg and self.__count > 1:
                     t = '%+d' % n
                 self.__ui.label.setText(t)
+                # print the sequence in the console
+                if options.verbose:
+                    print t,
+
                 if self.sound and IS_ESPEAK_INSTALLED:
                     # how to make it pronounce one digit at a time
                     #t = ' '.join(list(t)).replace('- ', '-')
@@ -338,11 +384,6 @@ class Main(QtGui.QDialog):
                 else:
                     # clear the label after self.flash time
                     QtCore.QTimer.singleShot(self.flash, self.clearLabel)
-
-                # print the sequence in the console
-                if options.verbose:
-                    print '%+d' % n,
-                self.answer += n
 
     def closeEvent(self, event):
         QtGui.QDialog.closeEvent(self, event)
