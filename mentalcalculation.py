@@ -338,6 +338,9 @@ class Main(QtGui.QDialog):
                 else:
                     neg = False
             n = self.randint(a, b)
+            # avoid a n - n situation
+            while neg and n == self.history[-1]:
+                n = self.randint(a, b)
             if neg and answer - n >= 0:
                 n = -n
             answer += n
