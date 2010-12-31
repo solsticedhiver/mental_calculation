@@ -71,11 +71,13 @@ class Settings(QtGui.QDialog):
         self.__ui.setupUi(self)
         self.importSettings(mysettings)
         self.__ui.sb_flash.setEnabled(not self.__ui.cb_sound.isChecked())
+        self.__ui.cb_onedigit.setEnabled(self.__ui.cb_sound.isChecked())
         self.connect(self, QtCore.SIGNAL('accepted()'), self.exportSettings)
         self.connect(self.__ui.cb_sound, QtCore.SIGNAL('clicked()'), self.updateSound)
         if IS_ESPEAK_INSTALLED:
             self.__ui.cb_sound.setEnabled(True)
             self.__ui.pm_warning.hide()
+        self.adjustSize()
 
     def importSettings(self, mysettings):
         self.__ui.sb_flash.setValue(mysettings['flash'])
@@ -83,6 +85,7 @@ class Settings(QtGui.QDialog):
         self.__ui.sb_digits.setValue(mysettings['digits'])
         self.__ui.sb_rows.setValue(mysettings['rows'])
         self.__ui.cb_sound.setChecked(mysettings['sound'])
+        self.__ui.cb_onedigit.setChecked(mysettings['onedigit'])
         if not IS_ESPEAK_INSTALLED:
             self.__ui.cb_sound.setChecked(False)
         self.__ui.cb_neg.setChecked(mysettings['neg'])
@@ -95,12 +98,14 @@ class Settings(QtGui.QDialog):
         mysettings['digits'] = self.__ui.sb_digits.value()
         mysettings['rows'] = self.__ui.sb_rows.value()
         mysettings['sound'] = self.__ui.cb_sound.isChecked()
+        mysettings['onedigit'] = self.__ui.cb_onedigit.isChecked()
         mysettings['neg'] = self.__ui.cb_neg.isChecked()
         self.mysettings = mysettings
 
     def updateSound(self):
         sound = self.__ui.sb_flash.isEnabled()
         self.__ui.sb_flash.setEnabled(not sound)
+        self.__ui.cb_onedigit.setEnabled(sound)
 
     def exec_(self):
         ok = QtGui.QDialog.exec_(self)
@@ -120,6 +125,7 @@ class Main(QtGui.QDialog):
         self.timeout = 1500
         self.neg = False
         self.sound = False
+        self.onedigit = False
         self.tmpwav= None
         self.pb_replay = False
         self.replay = False
@@ -185,6 +191,7 @@ class Main(QtGui.QDialog):
             self.timeout = settings.value('timeout').toInt()[0]
             self.flash = settings.value('flash').toInt()[0]
             self.sound = settings.value('sound').toBool()
+            self.onedigit = settings.value('onedigit').toBool()
             self.neg = settings.value('neg').toBool()
         if 'Espeak' in settings.childGroups():
             global ESPEAK_CMD, ESPEAK_LANG, ESPEAK_SPEED, IS_ESPEAK_INSTALLED
@@ -214,6 +221,7 @@ class Main(QtGui.QDialog):
             mysettings['digits'] = self.digits
             mysettings['rows'] = self.rows
             mysettings['sound'] = self.sound
+            mysettings['onedigit'] = self.onedigit
             mysettings['neg'] = self.neg
             s = Settings(mysettings, parent=self)
             ok, mysettings = s.exec_()
@@ -223,6 +231,7 @@ class Main(QtGui.QDialog):
                 self.digits = mysettings['digits']
                 self.rows = mysettings['rows']
                 self.sound = mysettings['sound']
+                self.onedigit = mysettings['onedigit']
                 self.neg = mysettings['neg']
                 # always save settings when closing the settings dialog
                 settings = QtCore.QSettings(QtCore.QSettings.IniFormat,
@@ -232,6 +241,7 @@ class Main(QtGui.QDialog):
                 settings.setValue('timeout', QtCore.QVariant(self.timeout))
                 settings.setValue('flash', QtCore.QVariant(self.flash))
                 settings.setValue('sound', QtCore.QVariant(self.sound))
+                settings.setValue('onedigit', QtCore.QVariant(self.onedigit))
                 settings.setValue('neg', QtCore.QVariant(self.neg))
 
 
@@ -382,10 +392,11 @@ class Main(QtGui.QDialog):
                 # print the sequence in the console
                 if options.verbose:
                     print t,
-
+                # say it aloud
                 if self.sound and IS_ESPEAK_INSTALLED:
-                    # how to make it pronounce one digit at a time
-                    #t = ' '.join(list(t)).replace('- ', '-')
+                    # pronounce one digit at a time
+                    if self.onedigit:
+                        t = ' '.join(list(t)).replace('- ', '-')
                     # fix a bug with french not pronouncing the negative sign
                     if ESPEAK_LANG.startswith('fr'):
                         t = t.replace('-', 'moins ')
