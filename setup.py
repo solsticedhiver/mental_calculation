@@ -25,7 +25,7 @@ class InnoScript:
             dist_dir,
             windows_exe_files = [],
             lib_files = [],
-            version = "0.3.2"):
+            version = "0.3.3"):
         self.lib_dir = lib_dir
         self.dist_dir = dist_dir
         if not self.dist_dir[-1] in "\\/":
@@ -131,8 +131,7 @@ setup(
             ('phonon_backend', [
                 'C:\Python27\Lib\site-packages\PyQt4\plugins\phonon_backend\phonon_ds94.dll'
                 ]),
-            ('.', ['mentalcalculation_fr.qm', 'README', 'LISEZMOI', 'COPYING',
-                'Changelog', 'setup.py',
+            ('.', ['mentalcalculation_fr.qm', 'README', 'LISEZMOI', 'COPYING', 'Changelog',
                 'C:\WINDOWS\system32\msvcp90.dll']),
             ('img', [
                 'img/soro.png',

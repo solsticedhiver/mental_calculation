@@ -38,9 +38,9 @@ if [ -d dist ] ; then
 		mv -f dist/Output/setup.exe mentalcalculation-${version}-setup.exe
 		rmdir dist/Output
 	fi
+	rm -f dist/mentalcalculation.iss dist/setup.py
 	mv dist mentalcalculation-${version}
 	rm -f mentalcalculation-${version}.zip
-	rm -f dist/mentalcalculation.iss
 	apack mentalcalculation-${version}.zip mentalcalculation-${version}
 	rm -rf mentalcalculation-${version} build
 fi
