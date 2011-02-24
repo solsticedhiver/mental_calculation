@@ -46,9 +46,13 @@ except ImportError:
 
 try:
     from PyQt4 import QtGui,QtCore
-    from PyQt4.phonon import Phonon
 except ImportError:
     print 'Error: you need PyQt4 to run this software'
+    sys.exit(1)
+try:
+    from PyQt4.phonon import Phonon
+except ImportError:
+    print 'Error: you need phonon support in PyQt4 to run this software'
     sys.exit(1)
 import main, settings
 
@@ -445,6 +449,7 @@ if __name__ == '__main__':
     # create main gui and display settings dialog
     f = Main(flag=QtCore.Qt.WindowTitleHint|QtCore.Qt.WindowSystemMenuHint)
     f.show()
+    f.raise_() # for Mac Os X
     f.mysettings()
 
     sys.exit(app.exec_())
