@@ -136,7 +136,6 @@ class Main(QtGui.QDialog):
         self.onedigit = False
         self.handsfree = False
         self.tmpwav= None
-        self.pb_replay = False
         self.replay = False
         self.noscore = False
         self.__isLabelClearable = True
@@ -168,6 +167,7 @@ class Main(QtGui.QDialog):
         self.connect(self.__ui.pb_settings, QtCore.SIGNAL('clicked()'), self.changeSettings)
         self.connect(self.__ui.pb_exit, QtCore.SIGNAL('clicked()'), self.close)
         self.connect(self.__ui.pb_start, QtCore.SIGNAL('clicked()'), self.startPlay)
+        self.connect(self.__ui.pb_replay, QtCore.SIGNAL('clicked()'), self.redisplaySequence)
 
         # TODO: add a welcome message; this would be more explicit that this
         self.__ui.label.setPixmap(QtGui.QPixmap(WELCOME))
@@ -177,26 +177,6 @@ class Main(QtGui.QDialog):
         self.connect(self.player, QtCore.SIGNAL('stateChanged(Phonon::State, Phonon::State)'), self.cleanup)
 
         self.__ui.pb_start.installEventFilter(self)
-
-    def eventFilter(self, obj, event):
-        if not self.started and self.history:
-            if event.type() == QtCore.QEvent.KeyPress and event.key() == QtCore.Qt.Key_Shift:
-                self.pb_replay = True
-                self.__ui.pb_start.setText(self.tr('&Replay'))
-                self.__ui.pb_start.setToolTip(self.tr('Replay the previous sequence'))
-                return True
-            elif event.type() == QtCore.QEvent.KeyRelease and event.key() == QtCore.Qt.Key_Shift:
-                self.pb_replay = False
-                self.__ui.pb_start.setText(self.tr('&Start'))
-                self.__ui.pb_start.setToolTip(self.tr('Start a sequence'))
-                return True
-            elif event.type() == QtCore.QEvent.MouseButtonPress and event.button() == QtCore.Qt.LeftButton:
-                self.replay = self.pb_replay
-                self.pb_replay = False
-            elif event.type() == QtCore.QEvent.KeyPress and (event.key() == QtCore.Qt.Key_Enter or event.key() == QtCore.Qt.Key_Return):
-                self.replay = self.pb_replay
-                self.pb_replay = False
-        return QtGui.QPushButton.eventFilter(self, obj, event)
 
     def importSettings(self):
         # restore settings from the settings file if the settings exist
@@ -275,8 +255,21 @@ class Main(QtGui.QDialog):
                 self.player.play()
             self.__isLabelClearable = False
             self.started = False
+            self.__ui.pb_replay.setEnabled(False)
             self.__ui.label.setText('...')
             QtCore.QTimer.singleShot(self.timeout, self.startPlay)
+
+    def redisplaySequence(self):
+        self.__isLabelClearable = False
+        self.started = False
+        self.replay = True
+        self.__ui.pb_replay.setEnabled(False)
+        self.timerUpdateLabel.stop()
+        if self.handsfree:
+            self.timerShowAnswer.stop()
+            self.timerHandsFreeRestart.stop()
+            self.__ui.l_total.hide()
+        self.startPlay()
 
     def startPlay(self):
         if not self.started:
@@ -438,6 +431,7 @@ class Main(QtGui.QDialog):
 
                 self.__ui.label.setText('?')
                 self.__ui.gb_number.setTitle('#')
+                self.__ui.pb_replay.setEnabled(True)
                 if self.handsfree:
                     self.timerShowAnswer.setInterval(2*self.timeout)
                     self.timerShowAnswer.start()
