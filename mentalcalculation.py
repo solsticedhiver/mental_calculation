@@ -150,7 +150,7 @@ class Main(QtGui.QDialog):
         self.__ui.l_total.hide()
 
         self.connect(self.__ui.pb_check, QtCore.SIGNAL('clicked()'), self.updateAnswer)
-        self.connect(self.__ui.pb_settings, QtCore.SIGNAL('clicked()'), self.mysettings)
+        self.connect(self.__ui.pb_settings, QtCore.SIGNAL('clicked()'), self.changeSettings)
         self.connect(self.__ui.pb_exit, QtCore.SIGNAL('clicked()'), self.close)
         self.connect(self.__ui.pb_start, QtCore.SIGNAL('clicked()'), self.start)
 
@@ -178,7 +178,7 @@ class Main(QtGui.QDialog):
             elif event.type() == QtCore.QEvent.MouseButtonPress and event.button() == QtCore.Qt.LeftButton:
                 self.replay = self.pb_replay
                 self.pb_replay = False
-            elif event.type() == QtCore.QEvent.KeyPress and event.key() == QtCore.Qt.Key_Enter:
+            elif event.type() == QtCore.QEvent.KeyPress and (event.key() == QtCore.Qt.Key_Enter or event.key() == QtCore.Qt.Key_Return):
                 self.replay = self.pb_replay
                 self.pb_replay = False
         return QtGui.QPushButton.eventFilter(self, obj, event)
@@ -217,7 +217,7 @@ class Main(QtGui.QDialog):
             # display the next number after timeout
             QtCore.QTimer.singleShot(self.timeout, self.updateLabel)
 
-    def mysettings(self):
+    def changeSettings(self):
         if not self.started:
             mysettings = {}
             mysettings['flash'] = self.flash
@@ -450,7 +450,7 @@ if __name__ == '__main__':
     f = Main(flag=QtCore.Qt.WindowTitleHint|QtCore.Qt.WindowSystemMenuHint)
     f.show()
     f.raise_() # for Mac Os X
-    f.mysettings()
+    f.changeSettings()
 
     sys.exit(app.exec_())
 
