@@ -13,22 +13,23 @@ archive="mentalcalculation-${version}.tar.gz"
 rm -f $archive
 cd ..
 echo "
-./mentalcalculation/COPYING
-./mentalcalculation/README
-./mentalcalculation/LISEZMOI
-./mentalcalculation/Changelog
-./mentalcalculation/img/soro.jpg
-./mentalcalculation/img/warning.png
-./mentalcalculation/img/face-sad.png
-./mentalcalculation/img/face-smile.png
-./mentalcalculation/img/calculator.png
-./mentalcalculation/main.py
-./mentalcalculation/settings.py
-./mentalcalculation/mentalcalculation.py
-./mentalcalculation/mentalcalculation_fr.qm
-./mentalcalculation/sound/bad.mp3
-./mentalcalculation/sound/good.mp3
-./mentalcalculation/sound/bell.mp3" | apack ./mentalcalculation/$archive
+mentalcalculation/COPYING
+mentalcalculation/README
+mentalcalculation/LISEZMOI
+mentalcalculation/Changelog
+mentalcalculation/img/soro.jpg
+mentalcalculation/img/warning.png
+mentalcalculation/img/face-sad.png
+mentalcalculation/img/face-smile.png
+mentalcalculation/img/calculator.png
+mentalcalculation/main.py
+mentalcalculation/settings.py
+mentalcalculation/mentalcalculation.py
+mentalcalculation/mentalcalculation_fr.qm
+mentalcalculation/sound/bad.mp3
+mentalcalculation/sound/good.mp3
+mentalcalculation/sound/bell.mp3
+mentalcalculation/sound/3bells.mp3" | apack ./mentalcalculation/$archive
 
 cd mentalcalculation
 # use the build made by py2exe with InnoSetup

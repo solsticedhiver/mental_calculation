@@ -7,12 +7,12 @@
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation; either version 2 of the License, or
 # (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -59,9 +59,10 @@ import main, settings
 DIGIT = dict([(i,(int('1'+'0'*(i-1)), int('9'*i))) for i in range(1,10)])
 
 appName = 'mentalcalculation'
-appVersion = '0.3.3'
+appVersion = '0.3.4'
 
 BELL = 'sound/bell.mp3'
+THREEBELLS = 'sound/3bells.mp3'
 GOOD = 'sound/good.mp3'
 BAD = 'sound/bad.mp3'
 WELCOME = 'img/soro.png'
@@ -90,6 +91,7 @@ class Settings(QtGui.QDialog):
         self.__ui.sb_rows.setValue(mysettings['rows'])
         self.__ui.cb_sound.setChecked(mysettings['sound'])
         self.__ui.cb_onedigit.setChecked(mysettings['onedigit'])
+        self.__ui.cb_handsfree.setChecked(mysettings['handsfree'])
         if not IS_ESPEAK_INSTALLED:
             self.__ui.cb_sound.setChecked(False)
         self.__ui.cb_neg.setChecked(mysettings['neg'])
@@ -102,6 +104,7 @@ class Settings(QtGui.QDialog):
         mysettings['digits'] = self.__ui.sb_digits.value()
         mysettings['rows'] = self.__ui.sb_rows.value()
         mysettings['sound'] = self.__ui.cb_sound.isChecked()
+        mysettings['handsfree'] = self.__ui.cb_handsfree.isChecked()
         mysettings['onedigit'] = self.__ui.cb_onedigit.isChecked()
         mysettings['neg'] = self.__ui.cb_neg.isChecked()
         self.mysettings = mysettings
@@ -130,11 +133,22 @@ class Main(QtGui.QDialog):
         self.neg = False
         self.sound = False
         self.onedigit = False
+        self.handsfree = False
         self.tmpwav= None
         self.pb_replay = False
         self.replay = False
         self.noscore = False
+        self.__isLabelClearable = True
         self.history = []
+        self.timerUpdateLabel = QtCore.QTimer()
+        self.timerUpdateLabel.setSingleShot(True)
+        self.connect(self.timerUpdateLabel, QtCore.SIGNAL('timeout()'), self.updateLabel)
+        self.timerShowAnswer = QtCore.QTimer()
+        self.timerShowAnswer.setSingleShot(True)
+        self.connect(self.timerShowAnswer, QtCore.SIGNAL('timeout()'), self.showAnswer)
+        self.timerHandsFreeRestart = QtCore.QTimer()
+        self.timerHandsFreeRestart.setSingleShot(True)
+        self.connect(self.timerHandsFreeRestart, QtCore.SIGNAL('timeout()'), self.restartPlay)
         self.importSettings()
 
         if IS_SYSTEMRANDOM_AVAILABLE:
@@ -152,7 +166,7 @@ class Main(QtGui.QDialog):
         self.connect(self.__ui.pb_check, QtCore.SIGNAL('clicked()'), self.updateAnswer)
         self.connect(self.__ui.pb_settings, QtCore.SIGNAL('clicked()'), self.changeSettings)
         self.connect(self.__ui.pb_exit, QtCore.SIGNAL('clicked()'), self.close)
-        self.connect(self.__ui.pb_start, QtCore.SIGNAL('clicked()'), self.start)
+        self.connect(self.__ui.pb_start, QtCore.SIGNAL('clicked()'), self.startPlay)
 
         # TODO: add a welcome message; this would be more explicit that this
         self.__ui.label.setPixmap(QtGui.QPixmap(WELCOME))
@@ -196,6 +210,7 @@ class Main(QtGui.QDialog):
             self.flash = settings.value('flash').toInt()[0]
             self.sound = settings.value('sound').toBool()
             self.onedigit = settings.value('onedigit').toBool()
+            self.handsfree = settings.value('handsfree').toBool()
             self.neg = settings.value('neg').toBool()
         if 'Espeak' in settings.childGroups():
             global ESPEAK_CMD, ESPEAK_LANG, ESPEAK_SPEED, IS_ESPEAK_INSTALLED
@@ -212,10 +227,11 @@ class Main(QtGui.QDialog):
                     ESPEAK_SPEED = a
 
     def clearLabel(self):
-        if self.started:
+        if self.__isLabelClearable:
             self.__ui.label.clear()
             # display the next number after timeout
-            QtCore.QTimer.singleShot(self.timeout, self.updateLabel)
+            self.timerUpdateLabel.setInterval(self.timeout)
+            self.timerUpdateLabel.start()
 
     def changeSettings(self):
         if not self.started:
@@ -225,6 +241,7 @@ class Main(QtGui.QDialog):
             mysettings['digits'] = self.digits
             mysettings['rows'] = self.rows
             mysettings['sound'] = self.sound
+            mysettings['handsfree'] = self.handsfree
             mysettings['onedigit'] = self.onedigit
             mysettings['neg'] = self.neg
             s = Settings(mysettings, parent=self)
@@ -236,6 +253,7 @@ class Main(QtGui.QDialog):
                 self.rows = mysettings['rows']
                 self.sound = mysettings['sound']
                 self.onedigit = mysettings['onedigit']
+                self.handsfree = mysettings['handsfree']
                 self.neg = mysettings['neg']
                 # always save settings when closing the settings dialog
                 settings = QtCore.QSettings(QtCore.QSettings.IniFormat,
@@ -245,13 +263,24 @@ class Main(QtGui.QDialog):
                 settings.setValue('timeout', QtCore.QVariant(self.timeout))
                 settings.setValue('flash', QtCore.QVariant(self.flash))
                 settings.setValue('sound', QtCore.QVariant(self.sound))
+                settings.setValue('handsfree', QtCore.QVariant(self.handsfree))
                 settings.setValue('onedigit', QtCore.QVariant(self.onedigit))
                 settings.setValue('neg', QtCore.QVariant(self.neg))
 
+    def restartPlay(self):
+        if self.started:
+            if self.sound:
+                self.player.setCurrentSource(Phonon.MediaSource(THREEBELLS))
+                self.player.play()
+            self.__isLabelClearable = False
+            self.started = False
+            self.__ui.label.setText('...')
+            QtCore.QTimer.singleShot(self.timeout, self.startPlay)
 
-    def start(self):
+    def startPlay(self):
         if not self.started:
             self.started = True
+            self.__isLabelClearable = True
             self.__ui.label.clear()
             self.__ui.l_total.hide()
             #self.__ui.l_answer.setText('Your answer')
@@ -267,7 +296,8 @@ class Main(QtGui.QDialog):
                 self.makeHistory()
                 self.noscore = False
             # wait 1s before starting the display
-            QtCore.QTimer.singleShot(1000, self.updateLabel)
+            self.timerUpdateLabel.setInterval(1000)
+            self.timerUpdateLabel.start()
             # change pb_start to 'Stop' when starting display
             self.__ui.pb_start.setText(self.tr('&Stop'))
             self.__ui.pb_start.setToolTip(self.tr('Stop the sequence'))
@@ -276,6 +306,11 @@ class Main(QtGui.QDialog):
         else:
             # then stop it
             self.started = False
+            self.__isLabelClearable = False
+            self.timerUpdateLabel.stop()
+            if self.handsfree:
+                self.timerShowAnswer.stop()
+                self.timerHandsFreeRestart.stop()
             self.__ui.pb_settings.setEnabled(True)
             self.__ui.gb_number.setTitle('#')
             self.__ui.pb_start.setText(self.tr('&Start'))
@@ -367,22 +402,46 @@ class Main(QtGui.QDialog):
             self.history.append(n)
         self.answer = answer
 
+    def showAnswer(self):
+        if self.started:
+            self.__ui.label.setText('<u>%d</u>' % self.answer)
+            QtCore.QTimer.singleShot(2*self.flash, self.__ui.label.clear)
+            if self.sound and IS_ESPEAK_INSTALLED:
+                # pronounce one digit at a time
+                t = '%d' % self.answer
+                if self.onedigit:
+                    t = ' '.join(list(t)).replace('- ', '-')
+                # fix a bug with french not pronouncing the negative sign
+                if ESPEAK_LANG.startswith('fr'):
+                    t = t.replace('-', 'moins ')
+                self.pronounceit(t)
+            self.timerHandsFreeRestart.setInterval(2*self.flash+self.timeout)
+            self.timerHandsFreeRestart.start()
+
     def updateLabel(self):
         if self.started:
             if self.__count == self.rows:
-                self.started = False
+                self.__isLabelClearable = False
+                if not self.handsfree:
+                    self.started = False
                 if self.sound:
                     self.player.setCurrentSource(Phonon.MediaSource(BELL))
                     self.player.play()
+
                 self.__ui.label.setText('?')
                 self.__ui.gb_number.setTitle('#')
-                self.__ui.pb_start.setText(self.tr('&Start'))
-                self.__ui.le_answer.setEnabled(True)
-                self.__ui.pb_check.setEnabled(True)
-                self.__ui.pb_settings.setEnabled(True)
-                self.__ui.le_answer.setFocus(QtCore.Qt.OtherFocusReason)
-                self.__ui.pb_check.setDefault(True)
-                self.__ui.pb_start.setDefault(False)
+                if self.handsfree:
+                    self.timerShowAnswer.setInterval(2*self.timeout)
+                    self.timerShowAnswer.start()
+                else:
+                    self.__ui.pb_start.setText(self.tr('&Start'))
+                    self.__ui.pb_start.setToolTip(self.tr('Start a sequence'))
+                    self.__ui.le_answer.setEnabled(True)
+                    self.__ui.pb_check.setEnabled(True)
+                    self.__ui.pb_settings.setEnabled(True)
+                    self.__ui.le_answer.setFocus(QtCore.Qt.OtherFocusReason)
+                    self.__ui.pb_check.setDefault(True)
+                    self.__ui.pb_start.setDefault(False)
                 if options.verbose:
                     print
             else:
