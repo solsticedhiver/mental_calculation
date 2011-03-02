@@ -68,6 +68,7 @@ BAD = 'sound/bad.mp3'
 WELCOME = 'img/soro.png'
 SMILE = 'img/face-smile.png'
 SAD = 'img/face-sad.png'
+ANSWER_COLOR = "#006204"
 
 class Settings(QtGui.QDialog):
     def __init__(self, mysettings, parent=None):
@@ -303,6 +304,8 @@ class Main(QtGui.QDialog):
             self.__ui.pb_start.setToolTip(self.tr('Stop the sequence'))
             if self.sound:
                 self.player.stop()
+            if self.handsfree:
+                self.__ui.l_answer.setEnabled(False)
         else:
             # then stop it
             self.started = False
@@ -311,6 +314,8 @@ class Main(QtGui.QDialog):
             if self.handsfree:
                 self.timerShowAnswer.stop()
                 self.timerHandsFreeRestart.stop()
+                self.__ui.l_answer.setEnabled(True)
+                self.__ui.l_total.hide()
             self.__ui.pb_settings.setEnabled(True)
             self.__ui.gb_number.setTitle('#')
             self.__ui.pb_start.setText(self.tr('&Start'))
@@ -404,8 +409,11 @@ class Main(QtGui.QDialog):
 
     def showAnswer(self):
         if self.started:
-            self.__ui.label.setText('<u>%d</u>' % self.answer)
+            self.__ui.l_total.show()
+            self.__ui.l_total.setText(self.tr('The correct answer is %1').arg(self.answer))
+            self.__ui.label.setText('<span style="color:%s">%d</span>' % (ANSWER_COLOR, self.answer))
             QtCore.QTimer.singleShot(2*self.flash, self.__ui.label.clear)
+            QtCore.QTimer.singleShot(2*self.flash, self.__ui.l_total.hide)
             if self.sound and IS_ESPEAK_INSTALLED:
                 # pronounce one digit at a time
                 t = '%d' % self.answer

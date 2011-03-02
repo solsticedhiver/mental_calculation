@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>403</width>
+    <width>409</width>
     <height>173</height>
    </rect>
   </property>
@@ -355,7 +355,7 @@ the solution is displayed, and a new sequence begins,
 and so on ...</string>
        </property>
        <property name="text">
-        <string>&quot;No &amp;score&quot; mode</string>
+        <string>&amp;Continuous &quot;hands-free&quot; mode</string>
        </property>
       </widget>
      </item>
