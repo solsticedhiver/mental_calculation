@@ -27,14 +27,6 @@ PyQt
 eSpeak
   http://espeak.sourceforge.net/download.html
 
-Tips:
-=====
-
-You can replay a sequence (or addition/subtraction):
-- If You have checked your answer already (by clicking 'Check' button), just press 'Shift' and the 'Start' button will
-  become a 'Replay' button. Just click it, STILL holding the shift key!
-- If you have not checked for an answer, just press the 'Tab' key to put the focus on the 'Start' button. This way, when you will press the 'Shift' key, the 'Start' button will become a 'Replay' button too. In this case, it does not work without pressing 'Tab'
-
 Usage:
 ======
 

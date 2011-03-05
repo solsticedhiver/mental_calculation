@@ -1,4 +1,5 @@
 #!/usr/bin/python
+# -*- coding: utf-8 -*-
 
 # mentalcalculation - version 0.3.3
 # Copyright (C) 2008-2010, solsTiCe d'Hiver <solstice.dhiver@gmail.com>
@@ -62,13 +63,15 @@ appName = 'mentalcalculation'
 appVersion = '0.3.4'
 
 BELL = 'sound/bell.mp3'
+BELL_DURATION = 500
 THREEBELLS = 'sound/3bells.mp3'
+THREEBELLS_DURATION = 1000
 GOOD = 'sound/good.mp3'
 BAD = 'sound/bad.mp3'
 WELCOME = 'img/soro.png'
 SMILE = 'img/face-smile.png'
 SAD = 'img/face-sad.png'
-ANSWER_COLOR = "#006204"
+RESTART = 'img/restart.png'
 
 class Settings(QtGui.QDialog):
     def __init__(self, mysettings, parent=None):
@@ -146,9 +149,9 @@ class Main(QtGui.QDialog):
         self.timerShowAnswer = QtCore.QTimer()
         self.timerShowAnswer.setSingleShot(True)
         self.connect(self.timerShowAnswer, QtCore.SIGNAL('timeout()'), self.showAnswer)
-        self.timerHandsFreeRestart = QtCore.QTimer()
-        self.timerHandsFreeRestart.setSingleShot(True)
-        self.connect(self.timerHandsFreeRestart, QtCore.SIGNAL('timeout()'), self.restartPlay)
+        self.timerRestartPlay = QtCore.QTimer()
+        self.timerRestartPlay.setSingleShot(True)
+        self.connect(self.timerRestartPlay, QtCore.SIGNAL('timeout()'), self.restartPlay)
         self.importSettings()
 
         if IS_SYSTEMRANDOM_AVAILABLE:
@@ -247,17 +250,25 @@ class Main(QtGui.QDialog):
                 settings.setValue('handsfree', QtCore.QVariant(self.handsfree))
                 settings.setValue('onedigit', QtCore.QVariant(self.onedigit))
                 settings.setValue('neg', QtCore.QVariant(self.neg))
+                # disable replay button
+                self.__ui.pb_replay.setEnabled(False)
 
     def restartPlay(self):
         if self.started:
+            duration = self.timeout
             if self.sound:
+                self.disconnect(self.player, QtCore.SIGNAL('finished()'), self.restartPlay)
+                self.connect(self.player, QtCore.SIGNAL('finished()'), self.clearLabel)
                 self.player.setCurrentSource(Phonon.MediaSource(THREEBELLS))
+                duration = THREEBELLS_DURATION
                 self.player.play()
             self.__isLabelClearable = False
             self.started = False
+            self.__ui.label.clear()
+            self.__ui.l_total.hide()
             self.__ui.pb_replay.setEnabled(False)
-            self.__ui.label.setText('...')
-            QtCore.QTimer.singleShot(self.timeout, self.startPlay)
+            self.__ui.label.setPixmap(QtGui.QPixmap(RESTART))
+            QtCore.QTimer.singleShot(duration, self.startPlay)
 
     def redisplaySequence(self):
         self.__isLabelClearable = False
@@ -266,8 +277,10 @@ class Main(QtGui.QDialog):
         self.__ui.pb_replay.setEnabled(False)
         self.timerUpdateLabel.stop()
         if self.handsfree:
+            self.disconnect(self.player, QtCore.SIGNAL('finished()'), self.restartPlay)
+            self.connect(self.player, QtCore.SIGNAL('finished()'), self.clearLabel)
             self.timerShowAnswer.stop()
-            self.timerHandsFreeRestart.stop()
+            self.timerRestartPlay.stop()
             self.__ui.l_total.hide()
         self.startPlay()
 
@@ -298,6 +311,7 @@ class Main(QtGui.QDialog):
             if self.sound:
                 self.player.stop()
             if self.handsfree:
+                self.__ui.pb_replay.setEnabled(False)
                 self.__ui.l_answer.setEnabled(False)
         else:
             # then stop it
@@ -305,8 +319,10 @@ class Main(QtGui.QDialog):
             self.__isLabelClearable = False
             self.timerUpdateLabel.stop()
             if self.handsfree:
+                self.disconnect(self.player, QtCore.SIGNAL('finished()'), self.restartPlay)
+                self.connect(self.player, QtCore.SIGNAL('finished()'), self.clearLabel)
                 self.timerShowAnswer.stop()
-                self.timerHandsFreeRestart.stop()
+                self.timerRestartPlay.stop()
                 self.__ui.l_answer.setEnabled(True)
                 self.__ui.l_total.hide()
             self.__ui.pb_settings.setEnabled(True)
@@ -318,8 +334,9 @@ class Main(QtGui.QDialog):
                 print
             if self.sound:
                 self.player.stop()
-            # reset history
-            self.history = []
+            if not self.handsfree:
+                # reset history
+                self.history = []
 
     def cleanup(self, newstate, oldstate):
         if oldstate == Phonon.PlayingState:
@@ -404,20 +421,22 @@ class Main(QtGui.QDialog):
         if self.started:
             self.__ui.l_total.show()
             self.__ui.l_total.setText(self.tr('The correct answer is %1').arg(self.answer))
-            self.__ui.label.setText('<span style="color:%s">%d</span>' % (ANSWER_COLOR, self.answer))
-            QtCore.QTimer.singleShot(2*self.flash, self.__ui.label.clear)
-            QtCore.QTimer.singleShot(2*self.flash, self.__ui.l_total.hide)
+            self.__ui.label.setText('=%d' % self.answer)
             if self.sound and IS_ESPEAK_INSTALLED:
                 # pronounce one digit at a time
-                t = '%d' % self.answer
+                t = '= %d' % self.answer
+                if ESPEAK_LANG.startswith('fr'):
+                    t = t.replace('=', u'égal ')
                 if self.onedigit:
                     t = ' '.join(list(t)).replace('- ', '-')
-                # fix a bug with french not pronouncing the negative sign
-                if ESPEAK_LANG.startswith('fr'):
-                    t = t.replace('-', 'moins ')
+                self.disconnect(self.player, QtCore.SIGNAL('finished()'), self.clearLabel)
+                self.connect(self.player, QtCore.SIGNAL('finished()'), self.restartPlay)
                 self.pronounceit(t)
-            self.timerHandsFreeRestart.setInterval(2*self.flash+self.timeout)
-            self.timerHandsFreeRestart.start()
+            else:
+                QtCore.QTimer.singleShot(2*self.flash, self.__ui.label.clear)
+                QtCore.QTimer.singleShot(2*self.flash, self.__ui.l_total.hide)
+                self.timerRestartPlay.setInterval(2*self.flash+self.timeout)
+                self.timerRestartPlay.start()
 
     def updateLabel(self):
         if self.started:
@@ -425,15 +444,17 @@ class Main(QtGui.QDialog):
                 self.__isLabelClearable = False
                 if not self.handsfree:
                     self.started = False
+                duration = self.timeout
                 if self.sound:
                     self.player.setCurrentSource(Phonon.MediaSource(BELL))
                     self.player.play()
+                    duration += BELL_DURATION
 
                 self.__ui.label.setText('?')
                 self.__ui.gb_number.setTitle('#')
                 self.__ui.pb_replay.setEnabled(True)
                 if self.handsfree:
-                    self.timerShowAnswer.setInterval(2*self.timeout)
+                    self.timerShowAnswer.setInterval(duration)
                     self.timerShowAnswer.start()
                 else:
                     self.__ui.pb_start.setText(self.tr('&Start'))
