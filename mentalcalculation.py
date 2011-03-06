@@ -95,6 +95,7 @@ class Settings(QtGui.QDialog):
         self.__ui.sb_rows.setValue(mysettings['rows'])
         self.__ui.cb_sound.setChecked(mysettings['sound'])
         self.__ui.cb_onedigit.setChecked(mysettings['onedigit'])
+        self.__ui.cb_fullscreen.setChecked(mysettings['fullscreen'])
         self.__ui.cb_handsfree.setChecked(mysettings['handsfree'])
         if not IS_ESPEAK_INSTALLED:
             self.__ui.cb_sound.setChecked(False)
@@ -108,6 +109,7 @@ class Settings(QtGui.QDialog):
         mysettings['digits'] = self.__ui.sb_digits.value()
         mysettings['rows'] = self.__ui.sb_rows.value()
         mysettings['sound'] = self.__ui.cb_sound.isChecked()
+        mysettings['fullscreen'] = self.__ui.cb_fullscreen.isChecked()
         mysettings['handsfree'] = self.__ui.cb_handsfree.isChecked()
         mysettings['onedigit'] = self.__ui.cb_onedigit.isChecked()
         mysettings['neg'] = self.__ui.cb_neg.isChecked()
@@ -137,12 +139,14 @@ class Main(QtGui.QDialog):
         self.neg = False
         self.sound = False
         self.onedigit = False
+        self.fullscreen = False
         self.handsfree = False
         self.tmpwav= None
         self.replay = False
         self.noscore = False
         self.__isLabelClearable = True
         self.history = []
+
         self.timerUpdateLabel = QtCore.QTimer()
         self.timerUpdateLabel.setSingleShot(True)
         self.connect(self.timerUpdateLabel, QtCore.SIGNAL('timeout()'), self.updateLabel)
@@ -152,7 +156,6 @@ class Main(QtGui.QDialog):
         self.timerRestartPlay = QtCore.QTimer()
         self.timerRestartPlay.setSingleShot(True)
         self.connect(self.timerRestartPlay, QtCore.SIGNAL('timeout()'), self.restartPlay)
-        self.importSettings()
 
         if IS_SYSTEMRANDOM_AVAILABLE:
             self.randint = SystemRandom().randint
@@ -179,7 +182,8 @@ class Main(QtGui.QDialog):
         self.connect(self.player, QtCore.SIGNAL('finished()'), self.clearLabel)
         self.connect(self.player, QtCore.SIGNAL('stateChanged(Phonon::State, Phonon::State)'), self.cleanup)
 
-        self.__ui.pb_start.installEventFilter(self)
+        self.importSettings()
+        self.reDisplayWindow()
 
     def importSettings(self):
         # restore settings from the settings file if the settings exist
@@ -194,6 +198,7 @@ class Main(QtGui.QDialog):
             self.flash = settings.value('flash').toInt()[0]
             self.sound = settings.value('sound').toBool()
             self.onedigit = settings.value('onedigit').toBool()
+            self.fullscreen = settings.value('fullscreen').toBool()
             self.handsfree = settings.value('handsfree').toBool()
             self.neg = settings.value('neg').toBool()
         if 'Espeak' in settings.childGroups():
@@ -210,6 +215,17 @@ class Main(QtGui.QDialog):
                 if b:
                     ESPEAK_SPEED = a
 
+    def reDisplayWindow(self):
+        self.show()
+        font = self.__ui.label.font()
+        if self.fullscreen:
+            font.setPointSize(144)
+            self.showFullScreen()
+        else:
+            font.setPointSize(72)
+            self.showNormal()
+        self.__ui.label.setFont(font)
+
     def clearLabel(self):
         if self.__isLabelClearable:
             self.__ui.label.clear()
@@ -225,6 +241,7 @@ class Main(QtGui.QDialog):
             mysettings['digits'] = self.digits
             mysettings['rows'] = self.rows
             mysettings['sound'] = self.sound
+            mysettings['fullscreen'] = self.fullscreen
             mysettings['handsfree'] = self.handsfree
             mysettings['onedigit'] = self.onedigit
             mysettings['neg'] = self.neg
@@ -237,6 +254,7 @@ class Main(QtGui.QDialog):
                 self.rows = mysettings['rows']
                 self.sound = mysettings['sound']
                 self.onedigit = mysettings['onedigit']
+                self.fullscreen = mysettings['fullscreen']
                 self.handsfree = mysettings['handsfree']
                 self.neg = mysettings['neg']
                 # always save settings when closing the settings dialog
@@ -247,11 +265,14 @@ class Main(QtGui.QDialog):
                 settings.setValue('timeout', QtCore.QVariant(self.timeout))
                 settings.setValue('flash', QtCore.QVariant(self.flash))
                 settings.setValue('sound', QtCore.QVariant(self.sound))
+                settings.setValue('fullscreen', QtCore.QVariant(self.fullscreen))
                 settings.setValue('handsfree', QtCore.QVariant(self.handsfree))
                 settings.setValue('onedigit', QtCore.QVariant(self.onedigit))
                 settings.setValue('neg', QtCore.QVariant(self.neg))
                 # disable replay button
                 self.__ui.pb_replay.setEnabled(False)
+                # go to full screen if needed
+                self.reDisplayWindow()
 
     def restartPlay(self):
         if self.started:
@@ -529,7 +550,7 @@ if __name__ == '__main__':
     ESPEAK_SPEED = 170 # the default of espeak
 
     # create main gui and display settings dialog
-    f = Main(flag=QtCore.Qt.WindowTitleHint|QtCore.Qt.WindowSystemMenuHint)
+    f = Main(flag=QtCore.Qt.Window|QtCore.Qt.WindowTitleHint|QtCore.Qt.WindowSystemMenuHint)
     f.show()
     f.raise_() # for Mac Os X
     f.changeSettings()

@@ -74,27 +74,27 @@
         <translation>&amp;Quitter</translation>
     </message>
     <message>
-        <location filename="settings.py" line="154"/>
+        <location filename="settings.py" line="160"/>
         <source>Settings</source>
         <translation>Préférences</translation>
     </message>
     <message>
-        <location filename="settings.py" line="155"/>
+        <location filename="settings.py" line="161"/>
         <source>Number of digits for each number</source>
         <translation>Nombre de chiffres pour chaque nombre</translation>
     </message>
     <message>
-        <location filename="settings.py" line="156"/>
+        <location filename="settings.py" line="162"/>
         <source>Number of &amp;digits</source>
         <translation>Nombre de &amp;chiffres</translation>
     </message>
     <message>
-        <location filename="settings.py" line="157"/>
+        <location filename="settings.py" line="163"/>
         <source>How many to add ?</source>
         <translation>Combien de nombres ajouter ?</translation>
     </message>
     <message>
-        <location filename="settings.py" line="158"/>
+        <location filename="settings.py" line="164"/>
         <source>Number of &amp;rows</source>
         <translation>Nombre de &amp;ligne</translation>
     </message>
@@ -124,22 +124,22 @@
         <translation type="obsolete">Temps en ms entre la disparition du nombre et le prochain nombre</translation>
     </message>
     <message>
-        <location filename="settings.py" line="162"/>
+        <location filename="settings.py" line="168"/>
         <source>&amp;Timeout (ms)</source>
         <translation>&amp;Temps mort (ms)</translation>
     </message>
     <message>
-        <location filename="settings.py" line="163"/>
+        <location filename="settings.py" line="169"/>
         <source>Time the number is displayed</source>
         <translation>Durée de visibilité du nombre</translation>
     </message>
     <message>
-        <location filename="settings.py" line="164"/>
+        <location filename="settings.py" line="170"/>
         <source>&amp;Flash (ms)</source>
         <translation>&amp;Flash (ms)</translation>
     </message>
     <message>
-        <location filename="settings.py" line="160"/>
+        <location filename="settings.py" line="166"/>
         <source>&amp;Subtractions</source>
         <translation>&amp;Soustractions</translation>
     </message>
@@ -149,12 +149,12 @@
         <translation></translation>
     </message>
     <message>
-        <location filename="settings.py" line="159"/>
+        <location filename="settings.py" line="165"/>
         <source>Allow/disallow subtractions</source>
         <translation>Active/désactive les soustractions</translation>
     </message>
     <message>
-        <location filename="settings.py" line="165"/>
+        <location filename="settings.py" line="171"/>
         <source> &lt;p style=&apos;white-space:pre&apos;&gt;&lt;em&gt;&lt;strong&gt;espeak&lt;/strong&gt;&lt;/em&gt; is needed for speech synthesis&lt;/p&gt;</source>
         <translation>&lt;p style=&apos;white-space:pre&apos;&gt;&lt;em&gt;&lt;strong&gt;espeak&lt;/strong&gt;&lt;/em&gt; est obligatoire pour la synthèse vocale&lt;/p&gt;</translation>
     </message>
@@ -164,12 +164,12 @@
         <translation type="obsolete">Lance une série</translation>
     </message>
     <message>
-        <location filename="settings.py" line="166"/>
+        <location filename="settings.py" line="172"/>
         <source>S&amp;peech Synthesis</source>
         <translation>S&amp;ynthèse vocale</translation>
     </message>
     <message>
-        <location filename="settings.py" line="167"/>
+        <location filename="settings.py" line="173"/>
         <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
@@ -193,17 +193,17 @@ p, li { white-space: pre-wrap; }
         <translation>Lance une série</translation>
     </message>
     <message>
-        <location filename="settings.py" line="175"/>
+        <location filename="settings.py" line="181"/>
         <source>Pronounce each digit of a number</source>
         <translation>Prononce un chiffre à la fois</translation>
     </message>
     <message>
-        <location filename="settings.py" line="176"/>
+        <location filename="settings.py" line="182"/>
         <source>One digit at a time</source>
         <translation>Un chiffre à la fois</translation>
     </message>
     <message>
-        <location filename="settings.py" line="177"/>
+        <location filename="settings.py" line="183"/>
         <source>In this mode, you don&apos;t have to enter an answer, it&apos;s &quot;hands free&quot;;
 the solution is displayed, and a new sequence begins,
 and so on ...</source>
@@ -217,13 +217,13 @@ ainsi de suite ...</translation>
         <translation type="obsolete">Mode &quot;pas de &amp;score&quot;</translation>
     </message>
     <message>
-        <location filename="settings.py" line="161"/>
+        <location filename="settings.py" line="167"/>
         <source>Timeout in ms between number disappearing and next number appearing</source>
         <translation>Temps en ms entre le moment où le nombre disparaît et
 où le prochain nombre apparaït</translation>
     </message>
     <message>
-        <location filename="settings.py" line="180"/>
+        <location filename="settings.py" line="186"/>
         <source>&amp;Continuous &quot;hands-free&quot; mode</source>
         <translation>Mode &amp;continu (sans &quot;les mains&quot;)</translation>
     </message>
@@ -237,26 +237,31 @@ où le prochain nombre apparaït</translation>
         <source>Replay</source>
         <translation>Relancer</translation>
     </message>
+    <message>
+        <location filename="settings.py" line="187"/>
+        <source>Full screen</source>
+        <translation>Plein écran</translation>
+    </message>
 </context>
 <context>
     <name>Main</name>
     <message>
-        <location filename="mentalcalculation.py" line="406"/>
+        <location filename="mentalcalculation.py" line="444"/>
         <source>The correct answer is %1</source>
         <translation>La réponse correcte est %1</translation>
     </message>
     <message>
-        <location filename="mentalcalculation.py" line="296"/>
+        <location filename="mentalcalculation.py" line="330"/>
         <source>&amp;Stop</source>
         <translation>&amp;Stop</translation>
     </message>
     <message>
-        <location filename="mentalcalculation.py" line="439"/>
+        <location filename="mentalcalculation.py" line="481"/>
         <source>&amp;Start</source>
         <translation>&amp;Lancer</translation>
     </message>
     <message>
-        <location filename="mentalcalculation.py" line="373"/>
+        <location filename="mentalcalculation.py" line="411"/>
         <source>Mental Calculation %1/%2</source>
         <translation>Calcul Mental %1/%2</translation>
     </message>
@@ -271,12 +276,12 @@ où le prochain nombre apparaït</translation>
         <translation type="obsolete">Relance la séquence précédente</translation>
     </message>
     <message>
-        <location filename="mentalcalculation.py" line="440"/>
+        <location filename="mentalcalculation.py" line="482"/>
         <source>Start a sequence</source>
         <translation>Lance une série</translation>
     </message>
     <message>
-        <location filename="mentalcalculation.py" line="297"/>
+        <location filename="mentalcalculation.py" line="331"/>
         <source>Stop the sequence</source>
         <translation>Arrête la séquence</translation>
     </message>
