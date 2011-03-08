@@ -63,7 +63,7 @@ appName = 'mentalcalculation'
 appVersion = '0.3.4'
 
 BELL = 'sound/bell.mp3'
-BELL_DURATION = 500
+BELL_DURATION = 600
 THREEBELLS = 'sound/3bells.mp3'
 THREEBELLS_DURATION = 1000
 GOOD = 'sound/good.mp3'
@@ -277,7 +277,7 @@ class Main(QtGui.QDialog):
     def restartPlay(self):
         if self.started:
             duration = self.timeout
-            if self.sound:
+            if self.sound and IS_ESPEAK_INSTALLED:
                 self.disconnect(self.player, QtCore.SIGNAL('finished()'), self.restartPlay)
                 self.connect(self.player, QtCore.SIGNAL('finished()'), self.clearLabel)
                 self.player.setCurrentSource(Phonon.MediaSource(THREEBELLS))
@@ -329,7 +329,7 @@ class Main(QtGui.QDialog):
             # change pb_start to 'Stop' when starting display
             self.__ui.pb_start.setText(self.tr('&Stop'))
             self.__ui.pb_start.setToolTip(self.tr('Stop the sequence'))
-            if self.sound:
+            if self.sound and IS_ESPEAK_INSTALLED:
                 self.player.stop()
             if self.handsfree:
                 self.__ui.pb_replay.setEnabled(False)
@@ -353,14 +353,14 @@ class Main(QtGui.QDialog):
             self.__ui.label.clear()
             if options.verbose:
                 print
-            if self.sound:
+            if self.sound and IS_ESPEAK_INSTALLED:
                 self.player.stop()
             if not self.handsfree:
                 # reset history
                 self.history = []
 
     def cleanup(self, newstate, oldstate):
-        if oldstate == Phonon.PlayingState:
+        if (newstate == Phonon.PausedState or newstate == Phonon.StoppedState) and oldstate == Phonon.PlayingState:
             if self.tmpwav is not None:
                 self.tmpwav.close()
                 remove(self.tmpwav.name)
@@ -374,6 +374,7 @@ class Main(QtGui.QDialog):
         p.waitForFinished()
         # so that it works also on Windows ! wtf !
         self.tmpwav.close()
+        self.player.stop()
         # make sure to use the tmp wav
         self.player.setCurrentSource(Phonon.MediaSource(self.tmpwav.name))
         self.player.play()
@@ -405,7 +406,7 @@ class Main(QtGui.QDialog):
             self.__ui.pb_check.setDisabled(True)
             self.__ui.pb_start.setFocus(QtCore.Qt.OtherFocusReason)
             self.__ui.label.setPixmap(QtGui.QPixmap(img))
-            if self.sound:
+            if self.sound and IS_ESPEAK_INSTALLED:
                 self.player.setCurrentSource(Phonon.MediaSource(sound))
                 self.player.play()
             self.setWindowTitle(self.tr('Mental Calculation %1/%2').arg(self.score[0]).arg(self.score[1]))
@@ -466,7 +467,8 @@ class Main(QtGui.QDialog):
                 if not self.handsfree:
                     self.started = False
                 duration = self.timeout
-                if self.sound:
+                if self.sound and IS_ESPEAK_INSTALLED:
+                    self.player.stop()
                     self.player.setCurrentSource(Phonon.MediaSource(BELL))
                     self.player.play()
                     duration += BELL_DURATION
