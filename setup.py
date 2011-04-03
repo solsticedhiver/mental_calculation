@@ -46,7 +46,8 @@ class InnoScript:
         print >> ofi, "; will be overwritten the next time py2exe is run!"
         print >> ofi, """
 [Languages]
-Name: French; MessagesFile: "compiler:Languages\French.isl"
+Name: fr; MessagesFile: "compiler:Languages\French.isl"
+Name: en; MessagesFile: "compiler:Default.isl"
 """
         print >> ofi, r"[Setup]"
         print >> ofi, r"AppName=%s" % self.name
