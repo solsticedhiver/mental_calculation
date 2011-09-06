@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python2
 # -*- coding: utf-8 -*-
 
 # mentalcalculation - version 0.3.3
@@ -60,7 +60,7 @@ import main, settings
 DIGIT = dict([(i,(int('1'+'0'*(i-1)), int('9'*i))) for i in range(1,10)])
 
 appName = 'mentalcalculation'
-appVersion = '0.3.4'
+appVersion = '0.3.4.1'
 
 BELL = 'sound/bell.mp3'
 BELL_DURATION = 600

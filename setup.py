@@ -9,7 +9,7 @@
 # script for InnoSetup, which can be compiled with the InnoSetup compiler
 # to a single file windows installer.
 #
-# By default, the installer will be created as dist\Output\setup.exe.
+# By default, the installer will be created as dist\\Output\\setup.exe.
 
 from distutils.core import setup
 import py2exe
@@ -18,6 +18,8 @@ import sys
 ################################################################
 import os
 
+sys.path.append("C:\\WINDOWS\\WinSxS\\x86_Microsoft.VC90.CRT_1fc8b3b9a1e18e3b_9.0.30729.1_x-ww_6f74963e")
+
 class InnoScript:
     def __init__(self,
             name,
@@ -25,7 +27,7 @@ class InnoScript:
             dist_dir,
             windows_exe_files = [],
             lib_files = [],
-            version = "0.3.4"):
+            version = "0.3.4.1"):
         self.lib_dir = lib_dir
         self.dist_dir = dist_dir
         if not self.dist_dir[-1] in "\\/":
@@ -130,10 +132,11 @@ setup(
         zipfile = "lib/library.zip",
         data_files = [
             ('phonon_backend', [
-                'C:\Python27\Lib\site-packages\PyQt4\plugins\phonon_backend\phonon_ds94.dll'
+                'C:\\Python27\\Lib\\site-packages\\PyQt4\\plugins\\phonon_backend\\phonon_ds94.dll'
                 ]),
             ('.', ['mentalcalculation_fr.qm', 'README', 'LISEZMOI', 'COPYING', 'Changelog',
-                'C:\WINDOWS\system32\msvcp90.dll']),
+                #'C:\\WINDOWS\\system32\\msvcp90.dll']),
+                'C:\\WINDOWS\\WinSxS\\x86_Microsoft.VC90.CRT_1fc8b3b9a1e18e3b_9.0.30729.1_x-ww_6f74963e\\msvcp90.dll']),
             ('img', [
                 'img/soro.png',
                 'img/warning.png',
