@@ -1,7 +1,7 @@
 #!/usr/bin/python2
 # -*- coding: utf-8 -*-
 
-# mentalcalculation - version 0.3.3
+# mentalcalculation - version 0.3.4.2
 # Copyright (C) 2008-2010, solsTiCe d'Hiver <solstice.dhiver@gmail.com>
 
 # This program is free software; you can redistribute it and/or modify
@@ -60,7 +60,7 @@ import main, settings
 DIGIT = dict([(i,(int('1'+'0'*(i-1)), int('9'*i))) for i in range(1,10)])
 
 appName = 'mentalcalculation'
-appVersion = '0.3.4.1'
+appVersion = '0.3.4.2'
 
 BELL = 'sound/bell.mp3'
 BELL_DURATION = 600
@@ -552,7 +552,10 @@ if __name__ == '__main__':
     ESPEAK_SPEED = 170 # the default of espeak
 
     # create main gui and display settings dialog
-    f = Main(flag=QtCore.Qt.Window|QtCore.Qt.WindowTitleHint|QtCore.Qt.WindowSystemMenuHint)
+    window_flags = QtCore.Qt.Window|QtCore.Qt.WindowTitleHint|QtCore.Qt.WindowSystemMenuHint
+    if WINDOWS:
+        window_flags |= QtCore.Qt.WindowMinimizeButtonHint
+    f = Main(flag=window_flags)
     f.show()
     f.raise_() # for Mac Os X
     f.changeSettings()

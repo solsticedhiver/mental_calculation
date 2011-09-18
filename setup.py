@@ -27,7 +27,7 @@ class InnoScript:
             dist_dir,
             windows_exe_files = [],
             lib_files = [],
-            version = "0.3.4.1"):
+            version = "0.3.4.2"):
         self.lib_dir = lib_dir
         self.dist_dir = dist_dir
         if not self.dist_dir[-1] in "\\/":
