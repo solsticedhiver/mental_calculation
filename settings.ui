@@ -290,7 +290,7 @@
           <item row="0" column="0">
            <layout class="QHBoxLayout" name="horizontalLayout_2">
             <item>
-             <widget class="QCheckBox" name="cb_sound">
+             <widget class="QCheckBox" name="cb_speech">
               <property name="enabled">
                <bool>false</bool>
               </property>

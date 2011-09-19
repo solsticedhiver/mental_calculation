@@ -1,7 +1,7 @@
 #!/usr/bin/python2
 # -*- coding: utf-8 -*-
 
-# mentalcalculation - version 0.3.4.2
+# mentalcalculation - version 0.3.4.3
 # Copyright (C) 2008-2010, solsTiCe d'Hiver <solstice.dhiver@gmail.com>
 
 # This program is free software; you can redistribute it and/or modify
@@ -60,12 +60,14 @@ import main, settings
 DIGIT = dict([(i,(int('1'+'0'*(i-1)), int('9'*i))) for i in range(1,10)])
 
 appName = 'mentalcalculation'
-appVersion = '0.3.4.2'
+appVersion = '0.3.4.3'
 
 BELL = 'sound/bell.mp3'
 BELL_DURATION = 600
 THREEBELLS = 'sound/3bells.mp3'
 THREEBELLS_DURATION = 1000
+ANNOYING_SOUND = 'sound/annoying-sound.mp3'
+ANNOYING_SOUND_DURATION = 150
 GOOD = 'sound/good.mp3'
 BAD = 'sound/bad.mp3'
 WELCOME = 'img/soro.png'
@@ -79,12 +81,12 @@ class Settings(QtGui.QDialog):
         self.__ui = settings.Ui_Dialog()
         self.__ui.setupUi(self)
         self.importSettings(mysettings)
-        self.__ui.sb_flash.setEnabled(not self.__ui.cb_sound.isChecked())
-        self.__ui.cb_onedigit.setEnabled(self.__ui.cb_sound.isChecked())
+        self.__ui.sb_flash.setEnabled(not self.__ui.cb_speech.isChecked())
+        self.__ui.cb_onedigit.setEnabled(self.__ui.cb_speech.isChecked())
         self.connect(self, QtCore.SIGNAL('accepted()'), self.exportSettings)
-        self.connect(self.__ui.cb_sound, QtCore.SIGNAL('clicked()'), self.updateSound)
+        self.connect(self.__ui.cb_speech, QtCore.SIGNAL('clicked()'), self.updateSound)
         if IS_ESPEAK_INSTALLED:
-            self.__ui.cb_sound.setEnabled(True)
+            self.__ui.cb_speech.setEnabled(True)
             self.__ui.pm_warning.hide()
         self.adjustSize()
 
@@ -93,12 +95,12 @@ class Settings(QtGui.QDialog):
         self.__ui.sb_timeout.setValue(mysettings['timeout'])
         self.__ui.sb_digits.setValue(mysettings['digits'])
         self.__ui.sb_rows.setValue(mysettings['rows'])
-        self.__ui.cb_sound.setChecked(mysettings['sound'])
-        self.__ui.cb_onedigit.setChecked(mysettings['onedigit'])
+        self.__ui.cb_speech.setChecked(mysettings['speech'])
+        self.__ui.cb_onedigit.setChecked(mysettings['one_digit'])
         self.__ui.cb_fullscreen.setChecked(mysettings['fullscreen'])
-        self.__ui.cb_handsfree.setChecked(mysettings['handsfree'])
+        self.__ui.cb_handsfree.setChecked(mysettings['hands_free'])
         if not IS_ESPEAK_INSTALLED:
-            self.__ui.cb_sound.setChecked(False)
+            self.__ui.cb_speech.setChecked(False)
         self.__ui.cb_neg.setChecked(mysettings['neg'])
         self.mysettings = mysettings
 
@@ -108,10 +110,10 @@ class Settings(QtGui.QDialog):
         mysettings['timeout'] = self.__ui.sb_timeout.value()
         mysettings['digits'] = self.__ui.sb_digits.value()
         mysettings['rows'] = self.__ui.sb_rows.value()
-        mysettings['sound'] = self.__ui.cb_sound.isChecked()
+        mysettings['speech'] = self.__ui.cb_speech.isChecked()
         mysettings['fullscreen'] = self.__ui.cb_fullscreen.isChecked()
-        mysettings['handsfree'] = self.__ui.cb_handsfree.isChecked()
-        mysettings['onedigit'] = self.__ui.cb_onedigit.isChecked()
+        mysettings['hands_free'] = self.__ui.cb_handsfree.isChecked()
+        mysettings['one_digit'] = self.__ui.cb_onedigit.isChecked()
         mysettings['neg'] = self.__ui.cb_neg.isChecked()
         self.mysettings = mysettings
 
@@ -137,15 +139,20 @@ class Main(QtGui.QDialog):
         self.flash = 500
         self.timeout = 1500
         self.neg = False
-        self.sound = False
-        self.onedigit = False
+        self.speech = False
+        self.one_digit = False
         self.fullscreen = False
-        self.handsfree = False
+        self.hands_free = False
         self.tmpwav= None
         self.replay = False
         self.noscore = False
-        self.__isLabelClearable = True
         self.history = []
+        self.font_color = None
+        self.background_color = None
+        self.annoying_sound = False
+        self.no_plus_sign = False
+
+        self.__isLabelClearable = True
 
         self.timerUpdateLabel = QtCore.QTimer()
         self.timerUpdateLabel.setSingleShot(True)
@@ -183,6 +190,15 @@ class Main(QtGui.QDialog):
         self.connect(self.player, QtCore.SIGNAL('stateChanged(Phonon::State, Phonon::State)'), self.cleanup)
 
         self.importSettings()
+        # change background and foreground color if needed
+        stylesheet = []
+        if self.background_color is not None:
+            stylesheet.append('background-color: %s' % self.background_color)
+        if self.font_color is not None:
+            stylesheet.append('color: %s' % self.font_color)
+        if stylesheet != []:
+            self.__ui.label.setStyleSheet(';'.join(stylesheet))
+
         self.reDisplayWindow()
 
     def importSettings(self):
@@ -196,11 +212,10 @@ class Main(QtGui.QDialog):
             self.rows = settings.value('rows').toInt()[0]
             self.timeout = settings.value('timeout').toInt()[0]
             self.flash = settings.value('flash').toInt()[0]
-            self.sound = settings.value('sound').toBool()
-            self.onedigit = settings.value('onedigit').toBool()
-            self.fullscreen = settings.value('fullscreen').toBool()
-            self.handsfree = settings.value('handsfree').toBool()
+            self.hands_free = settings.value('hands_free').toBool()
             self.neg = settings.value('neg').toBool()
+            if settings.contains('no_plus_sign'):
+                self.no_plus_sign = settings.value('no_plus_sign').toBool()
         if 'Espeak' in settings.childGroups():
             global ESPEAK_CMD, ESPEAK_LANG, ESPEAK_SPEED, IS_ESPEAK_INSTALLED
             # test for every option
@@ -209,18 +224,41 @@ class Main(QtGui.QDialog):
                 IS_ESPEAK_INSTALLED = isfile(ESPEAK_CMD)
             if settings.contains('Espeak/lang'):
                 ESPEAK_LANG = str(settings.value('Espeak/lang').toString())
+                if ESPEAK_LANG.find('_') > 0:
+                    ESPEAK_LANG = ESPEAK_LANG[:ESPEAK_LANG.index('_')]
             if settings.contains('Espeak/speed'):
                 a,b = settings.value('Espeak/speed').toInt()
                 # check if it's good
                 if b:
                     ESPEAK_SPEED = a
 
+        # GUI settings
+        self.fullscreen = settings.value('GUI/fullscreen').toBool()
+        if settings.contains('GUI/font'):
+            font = str(settings.value('GUI/font').toString())
+            self.__ui.label.setFont(QtGui.QFont(font, 72, QtGui.QFont.Bold))
+        if settings.contains('GUI/font_color'):
+            self.font_color = str(settings.value('GUI/font_color').toString())
+        if settings.contains('GUI/background_color'):
+            self.background_color = str(settings.value('GUI/background_color').toString())
+
+        # Sound settings
+        self.speech = settings.value('Sound/speech').toBool()
+        self.one_digit = settings.value('Sound/one_digit').toBool()
+        if settings.contains('Sound/annoying_sound'):
+            self.annoying_sound = settings.value('Sound/annoying_sound').toBool()
+
     def reDisplayWindow(self):
-        self.show()
+        if not self.isVisible():
+            self.show()
         font = self.__ui.label.font()
         if self.fullscreen:
-            font.setPointSize(144)
             self.showFullScreen()
+            # width is the size of of '+9999' in the current font
+            width = QtGui.QFontMetrics(font).width('+'+'9'*(self.digits+2))
+            # the factor to multiply by to use the max. space
+            factor = float(self.__ui.gb_number.width()-10)/width
+            font.setPointSize(min(int(font.pointSize()*factor), self.__ui.gb_number.height()-10))
         else:
             font.setPointSize(72)
             self.showNormal()
@@ -240,10 +278,10 @@ class Main(QtGui.QDialog):
             mysettings['timeout'] = self.timeout
             mysettings['digits'] = self.digits
             mysettings['rows'] = self.rows
-            mysettings['sound'] = self.sound
+            mysettings['speech'] = self.speech
             mysettings['fullscreen'] = self.fullscreen
-            mysettings['handsfree'] = self.handsfree
-            mysettings['onedigit'] = self.onedigit
+            mysettings['hands_free'] = self.hands_free
+            mysettings['one_digit'] = self.one_digit
             mysettings['neg'] = self.neg
             s = Settings(mysettings, parent=self)
             ok, mysettings = s.exec_()
@@ -252,10 +290,10 @@ class Main(QtGui.QDialog):
                 self.timeout = mysettings['timeout']
                 self.digits = mysettings['digits']
                 self.rows = mysettings['rows']
-                self.sound = mysettings['sound']
-                self.onedigit = mysettings['onedigit']
+                self.speech = mysettings['speech']
+                self.one_digit = mysettings['one_digit']
                 self.fullscreen = mysettings['fullscreen']
-                self.handsfree = mysettings['handsfree']
+                self.hands_free = mysettings['hands_free']
                 self.neg = mysettings['neg']
                 # always save settings when closing the settings dialog
                 settings = QtCore.QSettings(QtCore.QSettings.IniFormat,
@@ -264,11 +302,23 @@ class Main(QtGui.QDialog):
                 settings.setValue('rows', QtCore.QVariant(self.rows))
                 settings.setValue('timeout', QtCore.QVariant(self.timeout))
                 settings.setValue('flash', QtCore.QVariant(self.flash))
-                settings.setValue('sound', QtCore.QVariant(self.sound))
-                settings.setValue('fullscreen', QtCore.QVariant(self.fullscreen))
-                settings.setValue('handsfree', QtCore.QVariant(self.handsfree))
-                settings.setValue('onedigit', QtCore.QVariant(self.onedigit))
+                settings.setValue('hands_free', QtCore.QVariant(self.hands_free))
                 settings.setValue('neg', QtCore.QVariant(self.neg))
+                settings.setValue('no_plus_sign', QtCore.QVariant(self.no_plus_sign))
+
+                settings.setValue('GUI/fullscreen', QtCore.QVariant(self.fullscreen))
+                settings.setValue('GUI/font_color', QtCore.QVariant(self.font_color if self.font_color is not None else '#000000'))
+                settings.setValue('GUI/background_color', QtCore.QVariant(self.background_color \
+                        if self.background_color is not None else 'transparent'))
+
+                settings.setValue('Espeak/cmd', QtCore.QVariant(ESPEAK_CMD))
+                settings.setValue('Espeak/lang', QtCore.QVariant(ESPEAK_LANG))
+                settings.setValue('Espeak/speed', QtCore.QVariant(ESPEAK_SPEED))
+
+                settings.setValue('Sound/one_digit', QtCore.QVariant(self.one_digit))
+                settings.setValue('Sound/speech', QtCore.QVariant(self.speech))
+                settings.setValue('Sound/annoying_sound', QtCore.QVariant(self.annoying_sound))
+
                 # disable replay button
                 self.__ui.pb_replay.setEnabled(False)
                 # go to full screen if needed
@@ -277,7 +327,7 @@ class Main(QtGui.QDialog):
     def restartPlay(self):
         if self.started:
             duration = self.timeout
-            if self.sound and IS_ESPEAK_INSTALLED:
+            if self.speech and IS_ESPEAK_INSTALLED:
                 self.disconnect(self.player, QtCore.SIGNAL('finished()'), self.restartPlay)
                 self.connect(self.player, QtCore.SIGNAL('finished()'), self.clearLabel)
                 self.player.setCurrentSource(Phonon.MediaSource(THREEBELLS))
@@ -297,7 +347,7 @@ class Main(QtGui.QDialog):
         self.replay = True
         self.__ui.pb_replay.setEnabled(False)
         self.timerUpdateLabel.stop()
-        if self.handsfree:
+        if self.hands_free:
             self.disconnect(self.player, QtCore.SIGNAL('finished()'), self.restartPlay)
             self.connect(self.player, QtCore.SIGNAL('finished()'), self.clearLabel)
             self.timerShowAnswer.stop()
@@ -323,23 +373,25 @@ class Main(QtGui.QDialog):
             else:
                 self.makeHistory()
                 self.noscore = False
-            # wait 1s before starting the display
-            self.timerUpdateLabel.setInterval(1000)
-            self.timerUpdateLabel.start()
+                self.__ui.pb_replay.setEnabled(False)
             # change pb_start to 'Stop' when starting display
             self.__ui.pb_start.setText(self.tr('&Stop'))
             self.__ui.pb_start.setToolTip(self.tr('Stop the sequence'))
-            if self.sound and IS_ESPEAK_INSTALLED:
+            if self.speech and IS_ESPEAK_INSTALLED:
                 self.player.stop()
-            if self.handsfree:
-                self.__ui.pb_replay.setEnabled(False)
+            elif self.annoying_sound:
+                self.disconnect(self.player, QtCore.SIGNAL('finished()'), self.clearLabel)
+            if self.hands_free:
                 self.__ui.l_answer.setEnabled(False)
+            # wait 1s before starting the display
+            self.timerUpdateLabel.setInterval(1000)
+            self.timerUpdateLabel.start()
         else:
             # then stop it
             self.started = False
             self.__isLabelClearable = False
             self.timerUpdateLabel.stop()
-            if self.handsfree:
+            if self.hands_free:
                 self.disconnect(self.player, QtCore.SIGNAL('finished()'), self.restartPlay)
                 self.connect(self.player, QtCore.SIGNAL('finished()'), self.clearLabel)
                 self.timerShowAnswer.stop()
@@ -353,9 +405,11 @@ class Main(QtGui.QDialog):
             self.__ui.label.clear()
             if options.verbose:
                 print
-            if self.sound and IS_ESPEAK_INSTALLED:
+            if self.speech and IS_ESPEAK_INSTALLED:
                 self.player.stop()
-            if not self.handsfree:
+            elif self.annoying_sound and not self.hands_free:
+                self.connect(self.player, QtCore.SIGNAL('finished()'), self.clearLabel)
+            if not self.hands_free:
                 # reset history
                 self.history = []
 
@@ -406,7 +460,7 @@ class Main(QtGui.QDialog):
             self.__ui.pb_check.setDisabled(True)
             self.__ui.pb_start.setFocus(QtCore.Qt.OtherFocusReason)
             self.__ui.label.setPixmap(QtGui.QPixmap(img))
-            if self.sound and IS_ESPEAK_INSTALLED:
+            if self.speech and IS_ESPEAK_INSTALLED:
                 self.player.setCurrentSource(Phonon.MediaSource(sound))
                 self.player.play()
             self.setWindowTitle(self.tr('Mental Calculation %1/%2').arg(self.score[0]).arg(self.score[1]))
@@ -444,13 +498,14 @@ class Main(QtGui.QDialog):
             self.__ui.l_total.show()
             self.__ui.l_total.setText(self.tr('The correct answer is %1').arg(self.answer))
             self.__ui.label.setText('=%d' % self.answer)
-            if self.sound and IS_ESPEAK_INSTALLED:
+            if self.speech and IS_ESPEAK_INSTALLED:
                 # pronounce one digit at a time
                 t = '= %d' % self.answer
+                if self.one_digit:
+                    t = ' '.join(list(t)).replace('- ', '-')
                 if ESPEAK_LANG.startswith('fr'):
                     t = t.replace('=', u'égal ')
-                if self.onedigit:
-                    t = ' '.join(list(t)).replace('- ', '-')
+                print t
                 self.disconnect(self.player, QtCore.SIGNAL('finished()'), self.clearLabel)
                 self.connect(self.player, QtCore.SIGNAL('finished()'), self.restartPlay)
                 self.pronounceit(t)
@@ -464,10 +519,10 @@ class Main(QtGui.QDialog):
         if self.started:
             if self.__count == self.rows:
                 self.__isLabelClearable = False
-                if not self.handsfree:
+                if not self.hands_free:
                     self.started = False
                 duration = self.timeout
-                if self.sound and IS_ESPEAK_INSTALLED:
+                if self.speech and IS_ESPEAK_INSTALLED:
                     self.player.stop()
                     self.player.setCurrentSource(Phonon.MediaSource(BELL))
                     self.player.play()
@@ -476,7 +531,7 @@ class Main(QtGui.QDialog):
                 self.__ui.label.setText('?')
                 self.__ui.gb_number.setTitle('#')
                 self.__ui.pb_replay.setEnabled(True)
-                if self.handsfree:
+                if self.hands_free:
                     self.timerShowAnswer.setInterval(duration)
                     self.timerShowAnswer.start()
                 else:
@@ -488,23 +543,27 @@ class Main(QtGui.QDialog):
                     self.__ui.le_answer.setFocus(QtCore.Qt.OtherFocusReason)
                     self.__ui.pb_check.setDefault(True)
                     self.__ui.pb_start.setDefault(False)
+                if self.annoying_sound:
+                    self.connect(self.player, QtCore.SIGNAL('finished()'), self.clearLabel)
                 if options.verbose:
                     print
             else:
                 self.__count += 1
-                self.__ui.gb_number.setTitle('#%d' % (self.__count))
+                self.__ui.gb_number.setTitle('#%d / %s' % (self.__count, self.rows))
                 n = self.history[self.__count-1]
                 t = '%d' % n
                 if self.neg and self.__count > 1:
                     t = '%+d' % n
+                if self.no_plus_sign and t.startswith('+'):
+                    t = t[1:]
                 self.__ui.label.setText(t)
                 # print the sequence in the console
                 if options.verbose:
                     print t,
                 # say it aloud
-                if self.sound and IS_ESPEAK_INSTALLED:
+                if self.speech and IS_ESPEAK_INSTALLED:
                     # pronounce one digit at a time
-                    if self.onedigit:
+                    if self.one_digit:
                         t = ' '.join(list(t)).replace('- ', '-')
                     # fix a bug with french not pronouncing the negative sign
                     if ESPEAK_LANG.startswith('fr'):
@@ -512,6 +571,10 @@ class Main(QtGui.QDialog):
                     self.pronounceit(t)
                 else:
                     # clear the label after self.flash time
+                    if self.annoying_sound:
+                        self.player.stop()
+                        self.player.setCurrentSource(Phonon.MediaSource(ANNOYING_SOUND))
+                        self.player.play()
                     QtCore.QTimer.singleShot(self.flash, self.clearLabel)
 
     def closeEvent(self, event):
@@ -545,7 +608,7 @@ if __name__ == '__main__':
     translator.load('mentalcalculation_%s' % LOCALENAME, '.')
     app.installTranslator(translator)
 
-    if LOCALENAME.find('_'):
+    if LOCALENAME.find('_') > 0:
         ESPEAK_LANG = LOCALENAME[:LOCALENAME.index('_')]
     else:
         ESPEAK_LANG = LOCALENAME

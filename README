@@ -5,6 +5,11 @@ http://en.wikipedia.org/wiki/Soroban
 Requirements:
 =============
 
+for the Windows version:
+------------------------
+All dependancies are included.
+- espeak for the speech synthesis (as an option)
+
 for the source version:
 -----------------------
 - python 2.6 (or higher)
@@ -12,49 +17,90 @@ for the source version:
 - qt 4.6 + phonon (or higher)
 - espeak for the speech synthesis (as an option)
 
-for the Windows version:
-------------------------
-All dependancies are included.
-- espeak for the speech synthesis (as an option)
-
 Downloads:
-==========
+----------
 
 Python
   http://www.python.org/download
+Qt
+  http://qt.nokia.com/downloads/downloads#qt-lib
 PyQt
   http://www.riverbankcomputing.co.uk/software/pyqt/download
 eSpeak
   http://espeak.sourceforge.net/download.html
 
-Usage:
+Espeak
 ======
 
-- If you checked 'Speech synthesis + sounds', *mentalcalculation* will attempt to use espeak for speech synthesis. It look for it at a default location: 
-  - /usr/bin/espeak for Linux 
-  - C:\Program Files\eSpeak\command_line\espeak.exe for Windows.
-  It will also use the language defined by your locale.
-  If you want to change the language used by espeak or its location path, add a section in the mentalcalculation.ini file (see below) like this:
+*mentalcalculation* will look for *espeak* executable at its default location:
+    - C:\Program Files\eSpeak\command_line\espeak.exe for Windows
+    - /usr/bin/espeak for Linux
+
+If it is found, you will be able to use Speach synthesis option to get the number spoken out automatically.
+
+If, for any reason, *espeak* is installed in an unusual location, you can specify its path in the configuration file. See below to see how to do that.
+
+*Espeak* will also use the language defined by your locale.
+If you want to change the language used by espeak, add a section in the mentalcalculation.ini file (see below) like this:
 
     [Espeak]
     lang=en
     cmd=D:\\Program Files\\eSpeak\\command_line\\espeak.exe
     speed=150 ; words per minute from 80 to 390
 
-ini file
---------
+Each of the 3 lines are optionals
+    - *cmd* specify the path to the *espeak* binary
+    - *lang* speciy the language to be used by *espeak*
+    - *speed* is the number of word per second for *espeak* (between 80 and 390)
+
+Configuration file
+------------------
 *mentalcalculation* saves its settings in a configuration file: 
 On Linux/or any unix-like
   ~/.config/mentalcalculation/mentalcalculation.ini
 On Windows
-  C:\Documents and Settings\<your_user_name>\Application Data\mentalcalculation\mentalcalculation.ini
-  or C:\Users\<your_user_name>\AppData\Roaming\mentalcalculation\mentalcalculation.ini
+  C:\Documents and Settings\<your_user_name>\Application Data\mentalcalculation\mentalcalculation.ini for Windows XP
+  or
+  C:\Users\<your_user_name>\AppData\Roaming\mentalcalculation\mentalcalculation.ini for Windows Vista and above
+
+You need to run *mentalcalculation*, at least once so that the configuration file is written to disk.
 
 Note: It does not do anything to the Windows registry at all !
 
+Custom options
+==============
+The colors of the foreground (i.e. the font color) and background of the display area can be changed.
+Use a section like the following one in the conf. file
+
+    [GUI]
+    font_color=#F9F41C
+    background_color=#000000
+
+You must specify the colors by using HTML color codes or by explicit name. For more details, look at http://doc.qt.nokia.com/latest/qcolor.html#setNamedColor
+If you look for a way to choose a color, you could use the color picker of your favorite graphic software, or go online at http://www.colorpicker.com/, or http://html-color-codes.info/. A search for "color picker" or "visual color picker" on your search engine gives you plenty of solutions too.
+
+Sound
+=====
+You can have a sound played when each number is displayed on screen. You must include the following section in the conf. file
+
+    [Sound]
+    annoying_sound=true
+
+By default, the file called annoying-sound.mp3 in the sound directory of *mentalcalculation* is used. You can change it to any sound you like. If possible, choose a file that does not last longer than 50ms, else you may encouter problem with a desynchronisation between sound and display.
+
+The sound is played only if you don't use the speak synthesis system.
+
+Plus sign
+=========
+One can remove the + sign in front of numbers if using subtraction by using this snippet in conf. file
+
+    noplussign=true
+
+in the [General] section of the mentalcalculation.ini
+
 Fail-safe mechanism:
 --------------------
-There is a fail-safe mechanism that allows *mental calculation* to safely fails when it does not find one of its resources files. So, if you don't like the smileys/emoticons or the sounds, you can safely delete/rename them on your harddisk (img/sound directories), and *mentalcalculation* will continue to work without them.
+There is a fail-safe mechanism that allows *mental calculation* to safely fail when it does not find one of its resources files. So, if you don't like the smileys/emoticons or the sounds, you can safely delete/rename them on your harddisk (img/sound directories), and *mentalcalculation* will continue to work without them.
 
 Attribution:
 ============

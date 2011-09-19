@@ -44,6 +44,8 @@ if [ -d dist ] ; then
 	mv dist mentalcalculation-${version}
 	rm -f mentalcalculation-${version}.zip
 	apack mentalcalculation-${version}.zip mentalcalculation-${version}
+	#apack mentalcalculation-${version}.tar.xz mentalcalculation-${version}
+	apack mentalcalculation-${version}.7z mentalcalculation-${version}
 	rm -rf mentalcalculation-${version} build
 fi
 

@@ -27,7 +27,7 @@ class InnoScript:
             dist_dir,
             windows_exe_files = [],
             lib_files = [],
-            version = "0.3.4.2"):
+            version = "0.3.4.3"):
         self.lib_dir = lib_dir
         self.dist_dir = dist_dir
         if not self.dist_dir[-1] in "\\/":
@@ -149,7 +149,8 @@ setup(
                 'sound/bad.mp3',
                 'sound/good.mp3',
                 'sound/bell.mp3',
-                'sound/3bells.mp3'
+                'sound/3bells.mp3',
+                'sound/annoying-sound.mp3'
                 ])
             ],
         # use out build_installer class as extended py2exe build command
