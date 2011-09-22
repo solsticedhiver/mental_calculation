@@ -138,7 +138,7 @@ setup(
                 #'C:\\WINDOWS\\system32\\msvcp90.dll']),
                 'C:\\WINDOWS\\WinSxS\\x86_Microsoft.VC90.CRT_1fc8b3b9a1e18e3b_9.0.30729.1_x-ww_6f74963e\\msvcp90.dll']),
             ('img', [
-                'img/soro.png',
+                'img/soroban.png',
                 'img/warning.png',
                 'img/restart.png',
                 'img/face-smile.png',

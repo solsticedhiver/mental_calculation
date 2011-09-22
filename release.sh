@@ -42,7 +42,7 @@ if [ -d dist ] ; then
 	fi
 	rm -f dist/mentalcalculation.iss dist/setup.py
 	mv dist mentalcalculation-${version}
-	rm -f mentalcalculation-${version}.zip
+	rm -f mentalcalculation-${version}.{7z,zip}
 	apack mentalcalculation-${version}.zip mentalcalculation-${version}
 	#apack mentalcalculation-${version}.tar.xz mentalcalculation-${version}
 	apack mentalcalculation-${version}.7z mentalcalculation-${version}
