@@ -153,6 +153,7 @@ class Main(QtGui.QDialog):
         self.no_plus_sign = False
 
         self.__isLabelClearable = True
+        self.__geometryLabel = None
 
         self.timerUpdateLabel = QtCore.QTimer()
         self.timerUpdateLabel.setSingleShot(True)
@@ -253,6 +254,8 @@ class Main(QtGui.QDialog):
             self.show()
         font = self.__ui.label.font()
         if self.fullscreen:
+            if self.__geometryLabel is None:
+                self.__geometryLabel = self.__ui.label.geometry()
             self.showFullScreen()
             # width is the size of of '+9999' in the current font
             width = QtGui.QFontMetrics(font).width('+'+'9'*(self.digits+2))
@@ -262,6 +265,9 @@ class Main(QtGui.QDialog):
         else:
             font.setPointSize(72)
             self.showNormal()
+            if self.__geometryLabel is not None:
+                self.__ui.label.setGeometry(self.__geometryLabel)
+                self.__geometryLabel = None
         self.__ui.label.setFont(font)
 
     def clearLabel(self):
@@ -591,12 +597,22 @@ if __name__ == '__main__':
 
     WINDOWS = system() == 'Windows'
     if WINDOWS:
-        ESPEAK_CMD = 'C:\Program Files\eSpeak\command_line\espeak.exe'
+        ESPEAK_CMD_LIST = ['C:\Program Files\eSpeak\command_line\espeak.exe', 'C:\Program Files (x86)\eSpeak\command_line\espeak.exe']
     else:
-        ESPEAK_CMD = '/usr/bin/espeak'
+        ESPEAK_CMD_LIST = ['/usr/bin/espeak']
+
 
     # check espeak in the default location
-    IS_ESPEAK_INSTALLED = isfile(ESPEAK_CMD)
+    ESPEAK_CMD = ESPEAK_CMD_LIST[0]
+    IS_ESPEAK_INSTALLED = found = False
+    i = 0
+    while not found and i < len(ESPEAK_CMD_LIST):
+        if isfile(ESPEAK_CMD_LIST[i]):
+            found = True
+            ESPEAK_CMD = ESPEAK_CMD_LIST[i]
+            break
+        i += 1
+    IS_ESPEAK_INSTALLED = found
 
     app = QtGui.QApplication(sys.argv)
     app.setApplicationName('Mental Calculation')
