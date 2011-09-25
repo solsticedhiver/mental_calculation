@@ -270,6 +270,15 @@ class Main(QtGui.QDialog):
                 self.__geometryLabel = None
         self.__ui.label.setFont(font)
 
+    def resizeEvent(self, event):
+        QtGui.QDialog.resizeEvent(self, event)
+        font = self.__ui.label.font()
+        width = QtGui.QFontMetrics(font).width('+'+'9'*(self.digits+2))
+        # the factor to multiply by to use the max. space
+        factor = float(self.__ui.gb_number.width()-10)/width
+        font.setPointSize(min(int(font.pointSize()*factor), self.__ui.gb_number.height()-10))
+        self.__ui.label.setFont(font)
+
     def clearLabel(self):
         if self.__isLabelClearable:
             self.__ui.label.clear()
