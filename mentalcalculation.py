@@ -55,7 +55,7 @@ try:
 except ImportError:
     print 'Error: you need phonon support in PyQt4 to run this software'
     sys.exit(1)
-import main, settings
+import settings, main
 
 DIGIT = dict([(i,(int('1'+'0'*(i-1)), int('9'*i))) for i in range(1,10)])
 
@@ -78,59 +78,59 @@ RESTART = 'img/restart.png'
 class Settings(QtGui.QDialog):
     def __init__(self, mysettings, parent=None):
         QtGui.QDialog.__init__(self, parent)
-        self.__ui = settings.Ui_Dialog()
-        self.__ui.setupUi(self)
+        self.ui = settings.Ui_Dialog()
+        self.ui.setupUi(self)
         self.importSettings(mysettings)
-        self.__ui.sb_flash.setEnabled(not self.__ui.cb_speech.isChecked())
-        self.__ui.cb_onedigit.setEnabled(self.__ui.cb_speech.isChecked())
+        self.ui.sb_flash.setEnabled(not self.ui.cb_speech.isChecked())
+        self.ui.cb_onedigit.setEnabled(self.ui.cb_speech.isChecked())
         self.connect(self, QtCore.SIGNAL('accepted()'), self.exportSettings)
-        self.connect(self.__ui.cb_speech, QtCore.SIGNAL('clicked()'), self.updateSound)
+        self.connect(self.ui.cb_speech, QtCore.SIGNAL('clicked()'), self.updateSound)
         if IS_ESPEAK_INSTALLED:
-            self.__ui.cb_speech.setEnabled(True)
-            self.__ui.pm_warning.hide()
+            self.ui.cb_speech.setEnabled(True)
+            self.ui.pm_warning.hide()
         self.adjustSize()
 
     def importSettings(self, mysettings):
-        self.__ui.sb_flash.setValue(mysettings['flash'])
-        self.__ui.sb_timeout.setValue(mysettings['timeout'])
-        self.__ui.sb_digits.setValue(mysettings['digits'])
-        self.__ui.sb_rows.setValue(mysettings['rows'])
-        self.__ui.cb_speech.setChecked(mysettings['speech'])
-        self.__ui.cb_onedigit.setChecked(mysettings['one_digit'])
-        self.__ui.cb_fullscreen.setChecked(mysettings['fullscreen'])
-        self.__ui.cb_handsfree.setChecked(mysettings['hands_free'])
+        self.ui.sb_flash.setValue(mysettings['flash'])
+        self.ui.sb_timeout.setValue(mysettings['timeout'])
+        self.ui.sb_digits.setValue(mysettings['digits'])
+        self.ui.sb_rows.setValue(mysettings['rows'])
+        self.ui.cb_speech.setChecked(mysettings['speech'])
+        self.ui.cb_onedigit.setChecked(mysettings['one_digit'])
+        self.ui.cb_fullscreen.setChecked(mysettings['fullscreen'])
+        self.ui.cb_handsfree.setChecked(mysettings['hands_free'])
         if not IS_ESPEAK_INSTALLED:
-            self.__ui.cb_speech.setChecked(False)
-        self.__ui.cb_neg.setChecked(mysettings['neg'])
+            self.ui.cb_speech.setChecked(False)
+        self.ui.cb_neg.setChecked(mysettings['neg'])
         self.mysettings = mysettings
 
     def exportSettings(self):
         mysettings = {}
-        mysettings['flash'] = self.__ui.sb_flash.value()
-        mysettings['timeout'] = self.__ui.sb_timeout.value()
-        mysettings['digits'] = self.__ui.sb_digits.value()
-        mysettings['rows'] = self.__ui.sb_rows.value()
-        mysettings['speech'] = self.__ui.cb_speech.isChecked()
-        mysettings['fullscreen'] = self.__ui.cb_fullscreen.isChecked()
-        mysettings['hands_free'] = self.__ui.cb_handsfree.isChecked()
-        mysettings['one_digit'] = self.__ui.cb_onedigit.isChecked()
-        mysettings['neg'] = self.__ui.cb_neg.isChecked()
+        mysettings['flash'] = self.ui.sb_flash.value()
+        mysettings['timeout'] = self.ui.sb_timeout.value()
+        mysettings['digits'] = self.ui.sb_digits.value()
+        mysettings['rows'] = self.ui.sb_rows.value()
+        mysettings['speech'] = self.ui.cb_speech.isChecked()
+        mysettings['fullscreen'] = self.ui.cb_fullscreen.isChecked()
+        mysettings['hands_free'] = self.ui.cb_handsfree.isChecked()
+        mysettings['one_digit'] = self.ui.cb_onedigit.isChecked()
+        mysettings['neg'] = self.ui.cb_neg.isChecked()
         self.mysettings = mysettings
 
     def updateSound(self):
-        sound = self.__ui.sb_flash.isEnabled()
-        self.__ui.sb_flash.setEnabled(not sound)
-        self.__ui.cb_onedigit.setEnabled(sound)
+        sound = self.ui.sb_flash.isEnabled()
+        self.ui.sb_flash.setEnabled(not sound)
+        self.ui.cb_onedigit.setEnabled(sound)
 
     def exec_(self):
         ok = QtGui.QDialog.exec_(self)
         return (ok, self.mysettings)
 
-class Main(QtGui.QDialog):
-    def __init__(self, parent=None, flag=0):
-        QtGui.QDialog.__init__(self, parent, flag)
-        self.__ui = main.Ui_Dialog()
-        self.__ui.setupUi(self)
+class Main(QtGui.QMainWindow):
+    def __init__(self, parent=None, flag=QtCore.Qt.Widget):
+        QtGui.QMainWindow.__init__(self, parent, flag)
+        self.ui = main.Ui_MainWindow()
+        self.ui.setupUi(self)
         self.score = (0,0)
         self.started = False
         # default settings
@@ -151,9 +151,10 @@ class Main(QtGui.QDialog):
         self.background_color = None
         self.annoying_sound = False
         self.no_plus_sign = False
+        self.oldPointSize = 72
 
-        self.__isLabelClearable = True
-        self.__geometryLabel = None
+        self.isLabelClearable = True
+        self.geometryLabel = None
 
         self.timerUpdateLabel = QtCore.QTimer()
         self.timerUpdateLabel.setSingleShot(True)
@@ -170,21 +171,27 @@ class Main(QtGui.QDialog):
         else:
             self.randint = randint
 
-        self.__ui.label.clear()
-        self.__ui.le_answer.setInputMask('000009')
-        #self.__ui.pb_start.setFocus(QtCore.Qt.OtherFocusReason)
-        self.__ui.pb_start.setDefault(True)
-        #self.__ui.pb_exit.setAutoDefault(False)
-        self.__ui.l_total.hide()
+        self.ui.label.clear()
+        self.ui.le_answer.setInputMask('000009')
+        self.ui.l_total.hide()
 
-        self.connect(self.__ui.pb_check, QtCore.SIGNAL('clicked()'), self.updateAnswer)
-        self.connect(self.__ui.pb_settings, QtCore.SIGNAL('clicked()'), self.changeSettings)
-        self.connect(self.__ui.pb_exit, QtCore.SIGNAL('clicked()'), self.close)
-        self.connect(self.__ui.pb_start, QtCore.SIGNAL('clicked()'), self.startPlay)
-        self.connect(self.__ui.pb_replay, QtCore.SIGNAL('clicked()'), self.redisplaySequence)
+        self.shortcut_bigger_font = QtGui.QShortcut(QtGui.QKeySequence('CTRL++'), self)
+        self.connect(self.shortcut_bigger_font, QtCore.SIGNAL('activated()'), self.increaseFontSize)
+        self.shortcut_smaller_font = QtGui.QShortcut(QtGui.QKeySequence('CTRL+-'), self)
+        self.connect(self.shortcut_smaller_font, QtCore.SIGNAL('activated()'), self.decreaseFontSize)
+        self.shortcut_F11 = QtGui.QShortcut(QtGui.QKeySequence('F11'), self)
+        self.connect(self.shortcut_F11, QtCore.SIGNAL('activated()'), self.updateFullScreen)
+        self.shortcut_Enter = QtGui.QShortcut(QtGui.QKeySequence('Enter'), self)
+        self.connect(self.shortcut_Enter, QtCore.SIGNAL('activated()'), self.ui.pb_start.click)
+
+        self.connect(self.ui.pb_check, QtCore.SIGNAL('clicked()'), self.updateAnswer)
+        self.connect(self.ui.pb_settings, QtCore.SIGNAL('clicked()'), self.changeSettings)
+        self.connect(self.ui.pb_exit, QtCore.SIGNAL('clicked()'), self.close)
+        self.connect(self.ui.pb_start, QtCore.SIGNAL('clicked()'), self.startPlay)
+        self.connect(self.ui.pb_replay, QtCore.SIGNAL('clicked()'), self.redisplaySequence)
 
         # TODO: add a welcome message; this would be more explicit that this
-        self.__ui.label.setPixmap(QtGui.QPixmap(WELCOME))
+        self.ui.label.setPixmap(QtGui.QPixmap(WELCOME))
 
         self.player = Phonon.createPlayer(Phonon.AccessibilityCategory, Phonon.MediaSource(''))
         self.connect(self.player, QtCore.SIGNAL('finished()'), self.clearLabel)
@@ -198,9 +205,9 @@ class Main(QtGui.QDialog):
         if self.font_color is not None:
             stylesheet.append('color: %s' % self.font_color)
         if stylesheet != []:
-            self.__ui.label.setStyleSheet(';'.join(stylesheet))
+            self.ui.label.setStyleSheet(';'.join(stylesheet))
 
-        self.reDisplayWindow()
+        self.displayWindow()
 
     def importSettings(self):
         # restore settings from the settings file if the settings exist
@@ -237,7 +244,7 @@ class Main(QtGui.QDialog):
         self.fullscreen = settings.value('GUI/fullscreen').toBool()
         if settings.contains('GUI/font'):
             font = str(settings.value('GUI/font').toString())
-            self.__ui.label.setFont(QtGui.QFont(font, 72, QtGui.QFont.Bold))
+            self.ui.label.setFont(QtGui.QFont(font, 72, QtGui.QFont.Bold))
         if settings.contains('GUI/font_color'):
             self.font_color = str(settings.value('GUI/font_color').toString())
         if settings.contains('GUI/background_color'):
@@ -249,39 +256,51 @@ class Main(QtGui.QDialog):
         if settings.contains('Sound/annoying_sound'):
             self.annoying_sound = settings.value('Sound/annoying_sound').toBool()
 
-    def reDisplayWindow(self):
-        if not self.isVisible():
-            self.show()
-        font = self.__ui.label.font()
+    def updateFullScreen(self):
+        self.fullscreen = not self.fullscreen
+        self.displayWindow()
+
+    def displayWindow(self):
+        font = self.ui.label.font()
         if self.fullscreen:
-            if self.__geometryLabel is None:
-                self.__geometryLabel = self.__ui.label.geometry()
+            self.oldPointSize = font.pointSize()
             self.showFullScreen()
             # width is the size of of '+9999' in the current font
             width = QtGui.QFontMetrics(font).width('+'+'9'*(self.digits+2))
             # the factor to multiply by to use the max. space
-            factor = float(self.__ui.gb_number.width()-10)/width
-            font.setPointSize(min(int(font.pointSize()*factor), self.__ui.gb_number.height()-10))
+            factor = float(self.ui.gb_number.width()-10)/width
+            newPointSize = min(int(font.pointSize()*factor), self.ui.gb_number.height()-10)
         else:
-            font.setPointSize(72)
+            newPointSize = self.oldPointSize
             self.showNormal()
-            if self.__geometryLabel is not None:
-                self.__ui.label.setGeometry(self.__geometryLabel)
-                self.__geometryLabel = None
-        self.__ui.label.setFont(font)
+        font.setPointSize(newPointSize)
+        self.ui.label.setFont(font)
 
-    def resizeEvent(self, event):
-        QtGui.QDialog.resizeEvent(self, event)
-        font = self.__ui.label.font()
+        settings = QtCore.QSettings(QtCore.QSettings.IniFormat, QtCore.QSettings.UserScope, '%s' % appName, '%s' % appName)
+        settings.setValue('GUI/fullscreen', QtCore.QVariant(self.fullscreen))
+
+    def increaseFontSize(self):
+        font = self.ui.label.font()
+        font.setPointSize(font.pointSize()+10)
         width = QtGui.QFontMetrics(font).width('+'+'9'*(self.digits+2))
-        # the factor to multiply by to use the max. space
-        factor = float(self.__ui.gb_number.width()-10)/width
-        font.setPointSize(min(int(font.pointSize()*factor), self.__ui.gb_number.height()-10))
-        self.__ui.label.setFont(font)
+        if width < self.ui.gb_number.width():
+            if self.ui.label.text() == '':
+                self.ui.label.setText('9'*self.digits)
+            self.ui.label.setFont(font)
+            QtCore.QTimer.singleShot(250, self.ui.label.clear)
+
+    def decreaseFontSize(self):
+        font = self.ui.label.font()
+        if font.pointSize()-10 >= 32:
+            font.setPointSize(font.pointSize()-10)
+            if self.ui.label.text() == '':
+                self.ui.label.setText('9'*self.digits)
+            self.ui.label.setFont(font)
+            QtCore.QTimer.singleShot(250, self.ui.label.clear)
 
     def clearLabel(self):
-        if self.__isLabelClearable:
-            self.__ui.label.clear()
+        if self.isLabelClearable:
+            self.ui.label.clear()
             # display the next number after timeout
             self.timerUpdateLabel.setInterval(self.timeout)
             self.timerUpdateLabel.start()
@@ -299,6 +318,7 @@ class Main(QtGui.QDialog):
             mysettings['one_digit'] = self.one_digit
             mysettings['neg'] = self.neg
             s = Settings(mysettings, parent=self)
+            s.connect(s.ui.cb_fullscreen, QtCore.SIGNAL('stateChanged(int)'), self.updateFullScreen)
             ok, mysettings = s.exec_()
             if ok:
                 self.flash = mysettings['flash']
@@ -307,7 +327,6 @@ class Main(QtGui.QDialog):
                 self.rows = mysettings['rows']
                 self.speech = mysettings['speech']
                 self.one_digit = mysettings['one_digit']
-                self.fullscreen = mysettings['fullscreen']
                 self.hands_free = mysettings['hands_free']
                 self.neg = mysettings['neg']
                 # always save settings when closing the settings dialog
@@ -321,7 +340,6 @@ class Main(QtGui.QDialog):
                 settings.setValue('neg', QtCore.QVariant(self.neg))
                 settings.setValue('no_plus_sign', QtCore.QVariant(self.no_plus_sign))
 
-                settings.setValue('GUI/fullscreen', QtCore.QVariant(self.fullscreen))
                 settings.setValue('GUI/font_color', QtCore.QVariant(self.font_color if self.font_color is not None else '#000000'))
                 settings.setValue('GUI/background_color', QtCore.QVariant(self.background_color \
                         if self.background_color is not None else 'transparent'))
@@ -335,9 +353,8 @@ class Main(QtGui.QDialog):
                 settings.setValue('Sound/annoying_sound', QtCore.QVariant(self.annoying_sound))
 
                 # disable replay button
-                self.__ui.pb_replay.setEnabled(False)
+                self.ui.pb_replay.setEnabled(False)
                 # go to full screen if needed
-                self.reDisplayWindow()
 
     def restartPlay(self):
         if self.started:
@@ -348,76 +365,76 @@ class Main(QtGui.QDialog):
                 self.player.setCurrentSource(Phonon.MediaSource(THREEBELLS))
                 duration = THREEBELLS_DURATION
                 self.player.play()
-            self.__isLabelClearable = False
+            self.isLabelClearable = False
             self.started = False
-            self.__ui.label.clear()
-            self.__ui.l_total.hide()
-            self.__ui.pb_replay.setEnabled(False)
-            self.__ui.label.setPixmap(QtGui.QPixmap(RESTART))
+            self.ui.label.clear()
+            self.ui.l_total.hide()
+            self.ui.pb_replay.setEnabled(False)
+            self.ui.label.setPixmap(QtGui.QPixmap(RESTART))
             QtCore.QTimer.singleShot(duration, self.startPlay)
 
     def redisplaySequence(self):
-        self.__isLabelClearable = False
+        self.isLabelClearable = False
         self.started = False
         self.replay = True
-        self.__ui.pb_replay.setEnabled(False)
+        self.ui.pb_replay.setEnabled(False)
         self.timerUpdateLabel.stop()
         if self.hands_free:
             self.disconnect(self.player, QtCore.SIGNAL('finished()'), self.restartPlay)
             self.connect(self.player, QtCore.SIGNAL('finished()'), self.clearLabel)
             self.timerShowAnswer.stop()
             self.timerRestartPlay.stop()
-            self.__ui.l_total.hide()
+            self.ui.l_total.hide()
         self.startPlay()
 
     def startPlay(self):
         if not self.started:
             self.started = True
-            self.__isLabelClearable = True
-            self.__ui.label.clear()
-            self.__ui.l_total.hide()
-            #self.__ui.l_answer.setText('Your answer')
-            self.__ui.le_answer.clear()
-            self.__ui.le_answer.setEnabled(False)
-            self.__ui.pb_check.setEnabled(False)
-            self.__ui.pb_settings.setEnabled(False)
-            self.__count = 0
+            self.isLabelClearable = True
+            self.ui.label.clear()
+            self.ui.l_total.hide()
+            #self.ui.l_answer.setText('Your answer')
+            self.ui.le_answer.clear()
+            self.ui.le_answer.setEnabled(False)
+            self.ui.pb_check.setEnabled(False)
+            self.ui.pb_settings.setEnabled(False)
+            self.count = 0
             # generate sequence
             if self.replay:
                 self.replay = False
             else:
                 self.makeHistory()
                 self.noscore = False
-                self.__ui.pb_replay.setEnabled(False)
+                self.ui.pb_replay.setEnabled(False)
             # change pb_start to 'Stop' when starting display
-            self.__ui.pb_start.setText(self.tr('&Stop'))
-            self.__ui.pb_start.setToolTip(self.tr('Stop the sequence'))
+            self.ui.pb_start.setText(self.tr('&Stop'))
+            self.ui.pb_start.setToolTip(self.tr('Stop the sequence'))
             if self.speech and IS_ESPEAK_INSTALLED:
                 self.player.stop()
             elif self.annoying_sound:
                 self.disconnect(self.player, QtCore.SIGNAL('finished()'), self.clearLabel)
             if self.hands_free:
-                self.__ui.l_answer.setEnabled(False)
+                self.ui.l_answer.setEnabled(False)
             # wait 1s before starting the display
             self.timerUpdateLabel.setInterval(1000)
             self.timerUpdateLabel.start()
         else:
             # then stop it
             self.started = False
-            self.__isLabelClearable = False
+            self.isLabelClearable = False
             self.timerUpdateLabel.stop()
             if self.hands_free:
                 self.disconnect(self.player, QtCore.SIGNAL('finished()'), self.restartPlay)
                 self.connect(self.player, QtCore.SIGNAL('finished()'), self.clearLabel)
                 self.timerShowAnswer.stop()
                 self.timerRestartPlay.stop()
-                self.__ui.l_answer.setEnabled(True)
-                self.__ui.l_total.hide()
-            self.__ui.pb_settings.setEnabled(True)
-            self.__ui.gb_number.setTitle('#')
-            self.__ui.pb_start.setText(self.tr('&Start'))
-            self.__ui.pb_start.setToolTip(self.tr('Start a sequence'))
-            self.__ui.label.clear()
+                self.ui.l_answer.setEnabled(True)
+                self.ui.l_total.hide()
+            self.ui.pb_settings.setEnabled(True)
+            self.ui.gb_number.setTitle('#')
+            self.ui.pb_start.setText(self.tr('&Start'))
+            self.ui.pb_start.setToolTip(self.tr('Start a sequence'))
+            self.ui.label.clear()
             if options.verbose:
                 print
             if self.speech and IS_ESPEAK_INSTALLED:
@@ -449,9 +466,9 @@ class Main(QtGui.QDialog):
         self.player.play()
 
     def updateAnswer(self):
-        if self.__ui.le_answer.isEnabled():
+        if self.ui.le_answer.isEnabled():
             try:
-                a = int(self.__ui.le_answer.text())
+                a = int(self.ui.le_answer.text())
             except ValueError:
                 a = -100
             u,v = self.score
@@ -469,18 +486,18 @@ class Main(QtGui.QDialog):
                 self.score = u,v+1
             if msg == ':-)':
                 self.noscore = True
-            self.__ui.l_total.show()
-            self.__ui.l_total.setText(self.tr('The correct answer is %1').arg(self.answer))
-            self.__ui.le_answer.setDisabled(True)
-            self.__ui.pb_check.setDisabled(True)
-            self.__ui.pb_start.setFocus(QtCore.Qt.OtherFocusReason)
-            self.__ui.label.setPixmap(QtGui.QPixmap(img))
+            self.ui.l_total.show()
+            self.ui.l_total.setText(self.tr('The correct answer is %1').arg(self.answer))
+            self.ui.le_answer.setDisabled(True)
+            self.ui.pb_check.setDisabled(True)
+            self.ui.pb_start.setFocus(QtCore.Qt.OtherFocusReason)
+            self.ui.label.setPixmap(QtGui.QPixmap(img))
             if self.speech and IS_ESPEAK_INSTALLED:
                 self.player.setCurrentSource(Phonon.MediaSource(sound))
                 self.player.play()
             self.setWindowTitle(self.tr('Mental Calculation %1/%2').arg(self.score[0]).arg(self.score[1]))
-            self.__ui.pb_check.setDefault(False)
-            self.__ui.pb_start.setDefault(True)
+            self.disconnect(self.shortcut_Enter, QtCore.SIGNAL('activated()'), self.ui.pb_check.click)
+            self.connect(self.shortcut_Enter, QtCore.SIGNAL('activated()'), self.ui.pb_start.click)
 
             if options.verbose:
                 sys.stdout.flush()
@@ -510,9 +527,9 @@ class Main(QtGui.QDialog):
 
     def showAnswer(self):
         if self.started:
-            self.__ui.l_total.show()
-            self.__ui.l_total.setText(self.tr('The correct answer is %1').arg(self.answer))
-            self.__ui.label.setText('=%d' % self.answer)
+            self.ui.l_total.show()
+            self.ui.l_total.setText(self.tr('The correct answer is %1').arg(self.answer))
+            self.ui.label.setText('=%d' % self.answer)
             if self.speech and IS_ESPEAK_INSTALLED:
                 # pronounce one digit at a time
                 t = '= %d' % self.answer
@@ -525,15 +542,15 @@ class Main(QtGui.QDialog):
                 self.connect(self.player, QtCore.SIGNAL('finished()'), self.restartPlay)
                 self.pronounceit(t)
             else:
-                QtCore.QTimer.singleShot(2*self.flash, self.__ui.label.clear)
-                QtCore.QTimer.singleShot(2*self.flash, self.__ui.l_total.hide)
+                QtCore.QTimer.singleShot(2*self.flash, self.ui.label.clear)
+                QtCore.QTimer.singleShot(2*self.flash, self.ui.l_total.hide)
                 self.timerRestartPlay.setInterval(2*self.flash+self.timeout)
                 self.timerRestartPlay.start()
 
     def updateLabel(self):
         if self.started:
-            if self.__count == self.rows:
-                self.__isLabelClearable = False
+            if self.count == self.rows:
+                self.isLabelClearable = False
                 if not self.hands_free:
                     self.started = False
                 duration = self.timeout
@@ -543,35 +560,35 @@ class Main(QtGui.QDialog):
                     self.player.play()
                     duration += BELL_DURATION
 
-                self.__ui.label.setText('?')
-                self.__ui.gb_number.setTitle('#')
-                self.__ui.pb_replay.setEnabled(True)
+                self.ui.label.setText('?')
+                self.ui.gb_number.setTitle('#')
+                self.ui.pb_replay.setEnabled(True)
                 if self.hands_free:
                     self.timerShowAnswer.setInterval(duration)
                     self.timerShowAnswer.start()
                 else:
-                    self.__ui.pb_start.setText(self.tr('&Start'))
-                    self.__ui.pb_start.setToolTip(self.tr('Start a sequence'))
-                    self.__ui.le_answer.setEnabled(True)
-                    self.__ui.pb_check.setEnabled(True)
-                    self.__ui.pb_settings.setEnabled(True)
-                    self.__ui.le_answer.setFocus(QtCore.Qt.OtherFocusReason)
-                    self.__ui.pb_check.setDefault(True)
-                    self.__ui.pb_start.setDefault(False)
+                    self.ui.pb_start.setText(self.tr('&Start'))
+                    self.ui.pb_start.setToolTip(self.tr('Start a sequence'))
+                    self.ui.le_answer.setEnabled(True)
+                    self.ui.pb_check.setEnabled(True)
+                    self.ui.pb_settings.setEnabled(True)
+                    self.ui.le_answer.setFocus(QtCore.Qt.OtherFocusReason)
+                    self.disconnect(self.shortcut_Enter, QtCore.SIGNAL('activated()'), self.ui.pb_start.click)
+                    self.connect(self.shortcut_Enter, QtCore.SIGNAL('activated()'), self.ui.pb_check.click)
                 if self.annoying_sound:
                     self.connect(self.player, QtCore.SIGNAL('finished()'), self.clearLabel)
                 if options.verbose:
                     print
             else:
-                self.__count += 1
-                self.__ui.gb_number.setTitle('#%d / %s' % (self.__count, self.rows))
-                n = self.history[self.__count-1]
+                self.count += 1
+                self.ui.gb_number.setTitle('#%d / %s' % (self.count, self.rows))
+                n = self.history[self.count-1]
                 t = '%d' % n
-                if self.neg and self.__count > 1:
+                if self.neg and self.count > 1:
                     t = '%+d' % n
                 if self.no_plus_sign and t.startswith('+'):
                     t = t[1:]
-                self.__ui.label.setText(t)
+                self.ui.label.setText(t)
                 # print the sequence in the console
                 if options.verbose:
                     print t,
@@ -594,9 +611,10 @@ class Main(QtGui.QDialog):
 
     def closeEvent(self, event):
         # stop the player
-        self.player.stop()
-        self.player = None
-        QtGui.QDialog.closeEvent(self, event)
+        if self.player:
+            self.player.stop()
+            self.player = None
+        QtGui.QMainWindow.closeEvent(self, event)
 
 if __name__ == '__main__':
     parser = OptionParser(usage='usage: %prog [-v]')
@@ -610,18 +628,16 @@ if __name__ == '__main__':
     else:
         ESPEAK_CMD_LIST = ['/usr/bin/espeak']
 
-
     # check espeak in the default location
     ESPEAK_CMD = ESPEAK_CMD_LIST[0]
-    IS_ESPEAK_INSTALLED = found = False
+    IS_ESPEAK_INSTALLED = False
     i = 0
-    while not found and i < len(ESPEAK_CMD_LIST):
+    while not IS_ESPEAK_INSTALLED and i < len(ESPEAK_CMD_LIST):
         if isfile(ESPEAK_CMD_LIST[i]):
-            found = True
+            IS_ESPEAK_INSTALLED = True
             ESPEAK_CMD = ESPEAK_CMD_LIST[i]
             break
         i += 1
-    IS_ESPEAK_INSTALLED = found
 
     app = QtGui.QApplication(sys.argv)
     app.setApplicationName('Mental Calculation')
@@ -640,10 +656,7 @@ if __name__ == '__main__':
     ESPEAK_SPEED = 170 # the default of espeak
 
     # create main gui and display settings dialog
-    window_flags = QtCore.Qt.Window|QtCore.Qt.WindowTitleHint|QtCore.Qt.WindowSystemMenuHint
-    if WINDOWS:
-        window_flags |= QtCore.Qt.WindowMinimizeButtonHint
-    f = Main(flag=window_flags)
+    f = Main()
     f.show()
     f.raise_() # for Mac Os X
     f.changeSettings()
