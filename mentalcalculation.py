@@ -194,7 +194,6 @@ class Main(QtGui.QMainWindow):
         self.ui.label.setPixmap(QtGui.QPixmap(WELCOME))
 
         self.player = Phonon.createPlayer(Phonon.AccessibilityCategory, Phonon.MediaSource(''))
-        self.connect(self.player, QtCore.SIGNAL('finished()'), self.clearLabel)
         self.connect(self.player, QtCore.SIGNAL('stateChanged(Phonon::State, Phonon::State)'), self.cleanup)
 
         self.importSettings()
@@ -411,8 +410,10 @@ class Main(QtGui.QMainWindow):
             self.ui.pb_start.setToolTip(self.tr('Stop the sequence'))
             if self.speech and IS_ESPEAK_INSTALLED:
                 self.player.stop()
+                self.connect(self.player, QtCore.SIGNAL('finished()'), self.clearLabel)
             elif self.annoying_sound:
                 self.disconnect(self.player, QtCore.SIGNAL('finished()'), self.clearLabel)
+                self.player.setCurrentSource(Phonon.MediaSource(ANNOYING_SOUND))
             if self.hands_free:
                 self.ui.l_answer.setEnabled(False)
             # wait 1s before starting the display
@@ -439,8 +440,6 @@ class Main(QtGui.QMainWindow):
                 print
             if self.speech and IS_ESPEAK_INSTALLED:
                 self.player.stop()
-            elif self.annoying_sound and not self.hands_free:
-                self.connect(self.player, QtCore.SIGNAL('finished()'), self.clearLabel)
             if not self.hands_free:
                 # reset history
                 self.history = []
@@ -575,8 +574,6 @@ class Main(QtGui.QMainWindow):
                     self.ui.le_answer.setFocus(QtCore.Qt.OtherFocusReason)
                     self.disconnect(self.shortcut_Enter, QtCore.SIGNAL('activated()'), self.ui.pb_start.click)
                     self.connect(self.shortcut_Enter, QtCore.SIGNAL('activated()'), self.ui.pb_check.click)
-                if self.annoying_sound:
-                    self.connect(self.player, QtCore.SIGNAL('finished()'), self.clearLabel)
                 if options.verbose:
                     print
             else:
@@ -602,11 +599,10 @@ class Main(QtGui.QMainWindow):
                         t = t.replace('-', 'moins ')
                     self.pronounceit(t)
                 else:
-                    # clear the label after self.flash time
                     if self.annoying_sound:
-                        self.player.stop()
-                        self.player.setCurrentSource(Phonon.MediaSource(ANNOYING_SOUND))
+                        self.player.seek(0)
                         self.player.play()
+                    # clear the label after self.flash time
                     QtCore.QTimer.singleShot(self.flash, self.clearLabel)
 
     def closeEvent(self, event):
