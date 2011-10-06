@@ -1,7 +1,13 @@
 *Mental Calculation* (Calcul mental en français) est un simple outil fait pour pratiquer l'*anzan* - le calcul mental effectué en visualisant un soroban (boulier japonais).
 
+http://en.wikipedia.org/wiki/Soroban
+
 Dépendances:
 ============
+
+pour la version Windows
+------------------------
+Toutes les dépendances sont incluses sauf espeak pour la synthèse vocale
 
 pour la version *source*
 ------------------------
@@ -10,54 +16,109 @@ pour la version *source*
 - qt 4.6 + phonon (ou plus récent)
 - espeak pour la synthèse vocale (en option)
 
-pour la version Windows
-------------------------
-Toutes les dépdances sont incluses sauf espeak pour la synthèse vocale
-
 Téléchargements:
 ================
 
 Python
   http://www.python.org/download
+Qt
+  http://qt.nokia.com/downloads/downloads#qt-lib
 PyQt
   http://www.riverbankcomputing.co.uk/software/pyqt/download
 eSpeak
   http://espeak.sourceforge.net/download.html
 
-Astuces:
-========
+Espeak
+======
 
-Vous pouvez relancer/revoir une séquence (d'addtions/soustractions):
-- Si vous avez déjà vérifié votre réponse, appuyez juste sur 'Shift' et le bouton 'Lancer' deviendra 'Relancer'. Cliquer le bouton en appyant toujours sur 'Shift'
-- Si vous n'avez pas vérifié votre réponse, appuyez sur 'Tab' pour mettre le 'focus' sur le bouton 'Start'. Comme expliquer précedemment, appuyez sur 'Shift' et sur le bouton 'Relancer'. Dans ce cas précis, ça ne marche si vous n'appuyez pas d'abord sur 'Tab'.
+*mentalcalculation* recherche *espeak* dans plusieurs endroits
+    - C:\Program Files\eSpeak\command_line\espeak.exe sur Windows
+    - /usr/bin/espeak sur Linux
 
-Usage
-=====
+Seulement si *espeak* est trouvé, la fonction de synthèse vocale sera disponible.
 
-- Si vous avez cochez 'Synthèse vocale + sons' mentalcalculation essayera d'utiliser espeak qu'il cherchera dans un endroit standard:
-  - /usr/bin/espeak sous Linux 
-  - C:\Program Files\eSpeak\command_line\espeak.exe sous Windows.
-  Il utilisera la langue definie par votre locale.
-  Si vous voulez changer la langue utilisée par espeak ou spécifier le chemin de la commande esppeak, ajouter une section comme ci-dessous dans le fichier mentalcalculation.ini (voir plus bas):
+Si, pour quelques raisons que ce soit, espeak est installé à un endroit différent, vous pouvez le spécifier grâce au fichier de configuration. Voir plus bas.
+
+*Espeak* utilisera la langue de votre locale par défaut.
+Vous pouvez changer ça dans le fichier de configuration, section [Espeak]
+
+Fichier de configuration
+------------------------
+*mentalcalculation* sauve ses préférences dans un fichier:
+Sur Linux ou tout Unix-like
+  ~/.config/mentalcalculation/mentalcalculation.ini
+Sur Windows
+  C:\Documents and Settings\<your_user_name>\Application Data\mentalcalculation\mentalcalculation.ini pour Windows XP
+  ou
+  C:\Users\<your_user_name>\AppData\Roaming\mentalcalculation\mentalcalculation.ini pour Windows Vista ou au dessus
+
+  vous devez lancer au moin sune fois *mentalcalculation* pour que ce fichier soit créer.
+
+  Note: Aucune modification n'est faite au registre de Windows.
+
+Personalisation
+===============
+Le fichier de configuration ressebmel à ça:
+
+    ; les commentaires sont supprimés automatiquement
+    [General]
+    digits=1
+    rows=5
+    timeout=1500
+    flash=500
+    hands_free=false
+    neg=false
+    no_plus_sign=false
+
+    [GUI]
+    fullscreen=false
+    font_color=#000000
+    background_color=transparent
 
     [Espeak]
+    cmd=C:\\Program Files\\eSpeak\\command_line\\espeak.exe
     lang=en
-    cmd=D:\\Program Files\\eSpeak\\command_line\\espeak.exe
-    speed=150 ; words per minute from 80 to 390
+    speed=170 ; mot par minute de 80 à 390
 
-Fichier ini
------------
-*mentalcalculation* sauve sa configuration dans un fichier ini
-Sous linux:
-  ~/.config/mentalcalculation/mentalcalculation.ini
-Sous Windows
-  C:\Documents and Settings\<your_user_name>\Application Data\mentalcalculation\mentalcalculation.ini
-  ou C:\Users\<your_user_name>\AppData\Roaming\mentalcalculation\mentalcalculation.ini
+    [Sound]
+    one_digit=false
+    speech=false
+    annoying_sound=false
 
-Note: Il ne touche pas au registre windows !
+Couleurs
+++++++++
+Vous pouvez changer la couleur de l'arrière-plan ou de la police dans la section [GUI]. Midifiez font_color et/ou background_color; ils doivent des codes HTML valides ou des couleurs explicites: voir http://doc.qt.nokia.com/latest/qcolor.html#setNamedColor pour plus de détails
+Vous pouvez vous aider de http://www.colorpicker.com/ par exempel pour choisir une couleur. Ou encore http://html-color-codes.info/. Une recherche dans vore moteur de recherche préféré peut vous fournir un logiciel précis si voulu.
 
+Polices
++++++++
+On peut modifier la police de caractères des nombres. Il faut ajouter une directive font dans la section [GUI], en spécifiant une famille de police. Par exemple:
+
+    font=Times New Roman
+
+Son
++++
+Changer la variable annoying_sound dans la section [Sound] à true pour avoir un son à chaque fois qu'un nombre est affiché à l'écran.
+
+Le son n'est joué que si la synthèse vocale n'est pas selectionnée.
+
+Par défaut, le fichier s'appelle annoying-sound.mp3 dans le répertoire sound du dossier d'installation de *mentalcalculation*. Vous pouvez changer ce dichier pour n'importe quel son, de préférence court.
+
+Signe plus
+++++++++++
+On peut suppriemr l'affichage du signe plus devant les nimbres quand on a choisi d'avoir des soustractions
+
+    noplussign=true
+
+dans la section [General]
+
+Résilience
+==========
 Si vous n'aimez pas les émoticons ou les sons vous pouvez les renommer/effacer de votre disque dur et *mentalcalculation* fera très bien sans !
 
+
+Remerciements
+=============
 Je dois remercier le projet Tango pour les icones que j'ai emprunté et le projet GNOME (gnome-audio gnome-media) pour les fichiers sons que j'utilise.
 
 Merci à burlie (@Flickr) pour l'image du soroban. Voir http://www.flickr.com/photos/burls/

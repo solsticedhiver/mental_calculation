@@ -1,3 +1,30 @@
+0.3.4.4
+* now one can change the font from the conf. file
+
+0.3.4.3
+* new options can be changed from the configuration file: the colors of background and font and use a sound after each number. Look at the README
+
+0.3.4.2
+* add a minimize button to the main window
+
+0.3.4.1
+* change maximum values in the settings dialog
+
+0.3.4
+* new mode called "continuous" or "handsfree":
+It doe snot ask for an answer but display it and proceed to continue to display a new sequence ad infinitam
+* 'Replay' button replaces the complicated use of the 'Shift' key
+* a full-screen mode
+
+0.3.3
+* fixes a bug about the way to replay by using <shift>+<Return> and adds the long awaited possibility to force espeak to pronounce numbers one digit at a time
+
+0.3.2
+* allow to replay a sequence. It would be helpful for beginners or for the ones trying a higher level of difficulty. You can't score twice when replaying a sequence you gave a good answer
+
+0.3.1.6
+* fix some bugs with espeak language and command when specified from .ini file
+
 0.3.1.5
 * No sign for first number
 * Update gui to use subtractions instead of negative numbers
@@ -28,7 +55,7 @@ in ini file
 
 0.3
 * gui has been recreated. use a small dialog for the settings.
-* use espeak for speech synthesis and add some sounds for bad/good answer 
+* use espeak for speech synthesis and add some sounds for bad/good answer
 and bell for end of serie
 * add some smileys
 
