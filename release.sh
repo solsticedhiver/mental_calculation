@@ -28,14 +28,15 @@ mentalcalculation/settings.py
 mentalcalculation/mentalcalculation.py
 mentalcalculation/mentalcalculation_fr.qm
 mentalcalculation/sound/bad.mp3
+mentalcalculation/sound/annoying-sound.mp3
 mentalcalculation/sound/good.mp3
 mentalcalculation/sound/bell.mp3
 mentalcalculation/sound/3bells.mp3" | apack ./mentalcalculation/$archive
 
 cd mentalcalculation
-# use the build made by py2exe with InnoSetup
-# run the follwoing command in windows: python.exe setup.py py2exe
+# run the following command in windows: python.exe setup.py py2exe
 if [ -d dist ] ; then
+	# use the build made by py2exe with InnoSetup
 	if [ -f dist/Output/setup.exe ] ;then
 		mv -f dist/Output/setup.exe mentalcalculation-${version}-setup.exe
 		rmdir dist/Output
@@ -48,5 +49,3 @@ if [ -d dist ] ; then
 	apack mentalcalculation-${version}.7z mentalcalculation-${version}
 	rm -rf mentalcalculation-${version} build
 fi
-
-#lftp -e "orange; cd data; glob rm mentalcalculation-*; mput mentalcalculation-${version}*;"
