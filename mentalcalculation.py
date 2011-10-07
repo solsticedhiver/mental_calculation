@@ -172,7 +172,8 @@ class Main(QtGui.QMainWindow):
             self.randint = randint
 
         self.ui.label.clear()
-        self.ui.le_answer.setInputMask('000009')
+        # using an inputmask gives a bug when double clicking in any other apps if le_answer has the focus
+        #self.ui.le_answer.setInputMask('000000009')
         self.ui.l_total.hide()
 
         self.shortcut_bigger_font = QtGui.QShortcut(QtGui.QKeySequence('CTRL++'), self)
@@ -489,7 +490,6 @@ class Main(QtGui.QMainWindow):
             self.ui.l_total.setText(self.tr('The correct answer is %1').arg(self.answer))
             self.ui.le_answer.setDisabled(True)
             self.ui.pb_check.setDisabled(True)
-            self.ui.pb_start.setFocus(QtCore.Qt.OtherFocusReason)
             self.ui.label.setPixmap(QtGui.QPixmap(img))
             if self.speech and IS_ESPEAK_INSTALLED:
                 self.player.setCurrentSource(Phonon.MediaSource(sound))
@@ -569,9 +569,10 @@ class Main(QtGui.QMainWindow):
                     self.ui.pb_start.setText(self.tr('&Start'))
                     self.ui.pb_start.setToolTip(self.tr('Start a sequence'))
                     self.ui.le_answer.setEnabled(True)
+                    self.ui.le_answer.setFocus(QtCore.Qt.OtherFocusReason)
+                    self.ui.le_answer.clear()
                     self.ui.pb_check.setEnabled(True)
                     self.ui.pb_settings.setEnabled(True)
-                    self.ui.le_answer.setFocus(QtCore.Qt.OtherFocusReason)
                     self.disconnect(self.shortcut_Enter, QtCore.SIGNAL('activated()'), self.ui.pb_start.click)
                     self.connect(self.shortcut_Enter, QtCore.SIGNAL('activated()'), self.ui.pb_check.click)
                 if options.verbose:
