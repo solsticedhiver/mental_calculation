@@ -34,11 +34,11 @@
 #
 
 import sys
+import os
+
 from optparse import OptionParser
 from platform import system
 from tempfile import mkstemp, NamedTemporaryFile
-from os import remove, sep
-from os.path import isfile, abspath
 try:
     from random import SystemRandom
     IS_SYSTEMRANDOM_AVAILABLE = True
@@ -55,25 +55,27 @@ try:
 except ImportError:
     print 'Error: you need phonon support in PyQt4 to run this software'
     sys.exit(1)
-import settings, main
+
+from pymentalcalculation import settings, main
 
 DIGIT = dict([(i,(int('1'+'0'*(i-1)), int('9'*i))) for i in range(1,10)])
 
 appName = 'mentalcalculation'
 appVersion = '0.3.4.4'
 
-BELL = 'sound/bell.mp3'
+SHARE_PATH = ''
+BELL = SHARE_PATH + 'sound/bell.mp3'
 BELL_DURATION = 600
-THREEBELLS = 'sound/3bells.mp3'
+THREEBELLS = SHARE_PATH + 'sound/3bells.mp3'
 THREEBELLS_DURATION = 1000
-ANNOYING_SOUND = 'sound/annoying-sound.mp3'
+ANNOYING_SOUND = SHARE_PATH + 'sound/annoying-sound.mp3'
 ANNOYING_SOUND_DURATION = 150
-GOOD = 'sound/good.mp3'
-BAD = 'sound/bad.mp3'
-WELCOME = 'img/soroban.png'
-SMILE = 'img/face-smile.png'
-SAD = 'img/face-sad.png'
-RESTART = 'img/restart.png'
+GOOD = SHARE_PATH + 'sound/good.mp3'
+BAD = SHARE_PATH + 'sound/bad.mp3'
+WELCOME = SHARE_PATH + 'img/soroban.png'
+SMILE = SHARE_PATH + 'img/face-smile.png'
+SAD = SHARE_PATH + 'img/face-sad.png'
+RESTART = SHARE_PATH + 'img/restart.png'
 
 class Settings(QtGui.QDialog):
     def __init__(self, mysettings, parent=None):
@@ -229,7 +231,7 @@ class Main(QtGui.QMainWindow):
             # test for every option
             if settings.contains('Espeak/cmd'):
                 ESPEAK_CMD = str(settings.value('Espeak/cmd').toString()).strip('"')
-                IS_ESPEAK_INSTALLED = isfile(ESPEAK_CMD)
+                IS_ESPEAK_INSTALLED = os.path.isfile(ESPEAK_CMD)
             if settings.contains('Espeak/lang'):
                 ESPEAK_LANG = str(settings.value('Espeak/lang').toString())
                 if ESPEAK_LANG.find('_') > 0:
@@ -449,7 +451,7 @@ class Main(QtGui.QMainWindow):
         if (newstate == Phonon.PausedState or newstate == Phonon.StoppedState) and oldstate == Phonon.PlayingState:
             if self.tmpwav is not None:
                 self.tmpwav.close()
-                remove(self.tmpwav.name)
+                os.remove(self.tmpwav.name)
                 self.tmpwav = None
 
     def pronounceit(self, s):
@@ -630,7 +632,7 @@ if __name__ == '__main__':
     IS_ESPEAK_INSTALLED = False
     i = 0
     while not IS_ESPEAK_INSTALLED and i < len(ESPEAK_CMD_LIST):
-        if isfile(ESPEAK_CMD_LIST[i]):
+        if os.path.isfile(ESPEAK_CMD_LIST[i]):
             IS_ESPEAK_INSTALLED = True
             ESPEAK_CMD = ESPEAK_CMD_LIST[i]
             break
@@ -643,7 +645,7 @@ if __name__ == '__main__':
     locale = QtCore.QLocale()
     LOCALENAME = str(locale.system().name())
     translator = QtCore.QTranslator()
-    translator.load('mentalcalculation_%s' % LOCALENAME, '.')
+    translator.load(SHARE_PATH+'i18n/mentalcalculation_%s' % LOCALENAME, '.')
     app.installTranslator(translator)
 
     if LOCALENAME.find('_') > 0:

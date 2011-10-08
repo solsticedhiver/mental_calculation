@@ -13,20 +13,22 @@ archive="mentalcalculation-${version}.tar.gz"
 rm -f $archive
 cd ..
 echo "
+mentalcalculation/setup.py
 mentalcalculation/COPYING
 mentalcalculation/README
 mentalcalculation/LISEZMOI
 mentalcalculation/Changelog
-mentalcalculation/img/soro.jpg
+mentalcalculation/img/soroban.png
 mentalcalculation/img/warning.png
 mentalcalculation/img/restart.png
 mentalcalculation/img/face-sad.png
 mentalcalculation/img/face-smile.png
 mentalcalculation/img/calculator.png
-mentalcalculation/main.py
-mentalcalculation/settings.py
+mentalcalculation/pymentalcalculation/__init__.py
+mentalcalculation/pymentalcalculation/main.py
+mentalcalculation/pymentalcalculation/settings.py
 mentalcalculation/mentalcalculation.py
-mentalcalculation/mentalcalculation_fr.qm
+mentalcalculation/i18n/mentalcalculation_fr.qm
 mentalcalculation/sound/bad.mp3
 mentalcalculation/sound/annoying-sound.mp3
 mentalcalculation/sound/good.mp3
@@ -45,7 +47,6 @@ if [ -d dist ] ; then
 	mv dist mentalcalculation-${version}
 	rm -f mentalcalculation-${version}.{7z,zip}
 	apack mentalcalculation-${version}.zip mentalcalculation-${version}
-	#apack mentalcalculation-${version}.tar.xz mentalcalculation-${version}
 	apack mentalcalculation-${version}.7z mentalcalculation-${version}
 	rm -rf mentalcalculation-${version} build
 fi
