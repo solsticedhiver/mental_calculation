@@ -1,18 +1,32 @@
 if false; then
-pyuic4 main.ui >| main.py
-pyuic4 settings.ui >| settings.py
-
-pylupdate4 settings.py main.py mentalcalculation.py -ts mentalcalculation_fr.ts
-# update translation file to include translation for QDialogButtonBox
-sed -i 's/ type=\"obsolete\"//g' mentalcalculation_fr.ts
-lrelease mentalcalculation_fr.ts -qm mentalcalculation_fr.qm
+	pyuic4 main.ui >| main.py
+	pyuic4 settings.ui >| settings.py
+fi
+if false; then
+	pylupdate4 pymentalcalculation/settings.py pymentalcalculation/main.py mentalcalculation.py -ts mentalcalculation.ts
+	# update translation file to include translation for QDialogButtonBox
+	sed -i '/^<\/TS>/i\
+<context>\
+   <name>QDialogButtonBox</name>\
+   <message>\
+       <source>OK</source>\
+       <translation type="unfinished"></translation>\
+   </message>\
+   <message>\
+       <source>Cancel</source>\
+       <translation type="unfinished"></translation>\
+   </message>\
+</context>' mentalcalculation.ts
+	# remove obsolete entry
+	#sed -i 's/ type=\"obsolete\"//g' mentalcalculation.ts
+	#lrelease mentalcalculation_fr.ts -qm mentalcalculation_fr.qm
 fi
 
 version=`grep appVersion mentalcalculation.py|cut -f 3 -d ' '|tr -d "'"`
 archive="mentalcalculation-${version}.tar.gz"
 rm -f $archive
 cd ..
-echo "
+__FILES="
 mentalcalculation/setup.py
 mentalcalculation/COPYING
 mentalcalculation/README
@@ -28,12 +42,13 @@ mentalcalculation/pymentalcalculation/__init__.py
 mentalcalculation/pymentalcalculation/main.py
 mentalcalculation/pymentalcalculation/settings.py
 mentalcalculation/mentalcalculation.py
-mentalcalculation/i18n/mentalcalculation_fr.qm
 mentalcalculation/sound/bad.mp3
 mentalcalculation/sound/annoying-sound.mp3
 mentalcalculation/sound/good.mp3
 mentalcalculation/sound/bell.mp3
-mentalcalculation/sound/3bells.mp3" | apack ./mentalcalculation/$archive
+mentalcalculation/sound/3bells.mp3"
+
+echo -e "$__FILES\n`ls mentalcalculation/i18n/*.qm`" | apack ./mentalcalculation/$archive
 
 cd mentalcalculation
 # run the following command in windows: python.exe setup.py py2exe

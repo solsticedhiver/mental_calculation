@@ -35,9 +35,13 @@
 
 import sys
 import os
+import platform
+WINDOWS = platform.system() == 'Windows'
+if WINDOWS:
+    sys.stdout = open(os.sep.join([os.getenv('TMP'), 'mentalcalculation.log']), 'ab')
+    sys.stderr = open(os.sep.join([os.getenv('TMP'), 'mentalcalculation.log']), 'ab')
 
 from optparse import OptionParser
-from platform import system
 from tempfile import mkstemp, NamedTemporaryFile
 try:
     from random import SystemRandom
@@ -82,6 +86,8 @@ class Settings(QtGui.QDialog):
         QtGui.QDialog.__init__(self, parent)
         self.ui = settings.Ui_Dialog()
         self.ui.setupUi(self)
+        self.ui.buttonBox.button(QtGui.QDialogButtonBox.Ok).setText(self.tr('Ok'));
+        self.ui.buttonBox.button(QtGui.QDialogButtonBox.Cancel).setText(self.tr('Cancel'));
         self.importSettings(mysettings)
         self.ui.sb_flash.setEnabled(not self.ui.cb_speech.isChecked())
         self.ui.cb_onedigit.setEnabled(self.ui.cb_speech.isChecked())
@@ -621,7 +627,6 @@ if __name__ == '__main__':
             default=False, help='be verbose: print in console each number displayed')
     (options,args) = parser.parse_args(sys.argv)
 
-    WINDOWS = system() == 'Windows'
     if WINDOWS:
         ESPEAK_CMD_LIST = ['C:\Program Files\eSpeak\command_line\espeak.exe', 'C:\Program Files (x86)\eSpeak\command_line\espeak.exe']
     else:
@@ -645,7 +650,7 @@ if __name__ == '__main__':
     locale = QtCore.QLocale()
     LOCALENAME = str(locale.system().name())
     translator = QtCore.QTranslator()
-    translator.load(SHARE_PATH+'i18n/mentalcalculation_%s' % LOCALENAME, '.')
+    translator.load(SHARE_PATH+'i18n/%s' % LOCALENAME, '.')
     app.installTranslator(translator)
 
     if LOCALENAME.find('_') > 0:

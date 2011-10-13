@@ -17,6 +17,7 @@ import sys
 
 ################################################################
 import os
+import glob
 
 sys.path.append('C:\\Windows\\winsxs\\x86_microsoft.vc90.crt_1fc8b3b9a1e18e3b_9.0.30729.4940_none_50916076bcb9a742')
 
@@ -139,7 +140,7 @@ setup(
                 #'C:\\WINDOWS\\system32\\msvcp90.dll']),
                 #'C:\\WINDOWS\\WinSxS\\x86_Microsoft.VC90.CRT_1fc8b3b9a1e18e3b_9.0.30729.1_x-ww_6f74963e\\msvcp90.dll']),
 		'C:\\Windows\\winsxs\\x86_microsoft.vc90.crt_1fc8b3b9a1e18e3b_9.0.30729.4940_none_50916076bcb9a742\\msvcp90.dll']),
-            ('i18n', ['i18n/mentalcalculation_fr.qm']), 
+            ('i18n', glob.glob('i18n/*.qm')),
             ('img', [
                 'img/soroban.png',
                 'img/warning.png',
