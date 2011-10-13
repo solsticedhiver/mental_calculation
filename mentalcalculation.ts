@@ -110,33 +110,33 @@ and so on ...</source>
 <context>
     <name>Main</name>
     <message>
-        <location filename="mentalcalculation.py" line="418"/>
+        <location filename="mentalcalculation.py" line="422"/>
         <source>&amp;Stop</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mentalcalculation.py" line="419"/>
+        <location filename="mentalcalculation.py" line="423"/>
         <source>Stop the sequence</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mentalcalculation.py" line="577"/>
+        <location filename="mentalcalculation.py" line="582"/>
         <source>&amp;Start</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mentalcalculation.py" line="578"/>
+        <location filename="mentalcalculation.py" line="583"/>
         <source>Start a sequence</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mentalcalculation.py" line="538"/>
+        <location filename="mentalcalculation.py" line="543"/>
         <source>The correct answer is %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mentalcalculation.py" line="505"/>
-        <source>Mental Calculation %1/%2</source>
+        <location filename="mentalcalculation.py" line="510"/>
+        <source>Score: %1/%2</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

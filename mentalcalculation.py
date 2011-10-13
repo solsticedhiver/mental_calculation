@@ -215,6 +215,9 @@ class Main(QtGui.QMainWindow):
         if stylesheet != []:
             self.ui.label.setStyleSheet(';'.join(stylesheet))
 
+        # add url in statusbar
+        self.ui.statusbar.showMessage('www.sorobanexam.org')
+
         self.displayWindow()
 
     def importSettings(self):
@@ -397,6 +400,7 @@ class Main(QtGui.QMainWindow):
 
     def startPlay(self):
         if not self.started:
+            self.ui.statusbar.clearMessage()
             self.started = True
             self.isLabelClearable = True
             self.ui.label.clear()
@@ -480,6 +484,7 @@ class Main(QtGui.QMainWindow):
             except ValueError:
                 a = -100
             u,v = self.score
+            v += 1
             if  a == self.answer:
                 img = SMILE
                 sound = GOOD
@@ -491,7 +496,7 @@ class Main(QtGui.QMainWindow):
                 sound = BAD
             # Don't score twice if replay
             if not self.noscore:
-                self.score = u,v+1
+                self.score = u,v
             if msg == ':-)':
                 self.noscore = True
             self.ui.l_total.show()
@@ -502,7 +507,7 @@ class Main(QtGui.QMainWindow):
             if self.speech and IS_ESPEAK_INSTALLED:
                 self.player.setCurrentSource(Phonon.MediaSource(sound))
                 self.player.play()
-            self.setWindowTitle(self.tr('Mental Calculation %1/%2').arg(self.score[0]).arg(self.score[1]))
+            self.ui.statusbar.showMessage(self.tr('Score: %1/%2').arg(u).arg(v))
             self.disconnect(self.shortcut_Enter, QtCore.SIGNAL('activated()'), self.ui.pb_check.click)
             self.connect(self.shortcut_Enter, QtCore.SIGNAL('activated()'), self.ui.pb_start.click)
 
