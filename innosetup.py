@@ -18,6 +18,7 @@ import sys
 ################################################################
 import os
 import glob
+from mentalcalculation import appVersion
 
 sys.path.append('C:\\Windows\\winsxs\\x86_microsoft.vc90.crt_1fc8b3b9a1e18e3b_9.0.30729.4940_none_50916076bcb9a742')
 
@@ -28,7 +29,7 @@ class InnoScript:
             dist_dir,
             windows_exe_files = [],
             lib_files = [],
-            version = "0.3.4.4"):
+            version = appVersion):
         self.lib_dir = lib_dir
         self.dist_dir = dist_dir
         if not self.dist_dir[-1] in "\\/":
@@ -49,8 +50,11 @@ class InnoScript:
         print >> ofi, "; will be overwritten the next time py2exe is run!"
         print >> ofi, """
 [Languages]
-Name: fr; MessagesFile: "compiler:Languages\French.isl"
-Name: en; MessagesFile: "compiler:Default.isl"
+Name: "en"; MessagesFile: "compiler:Default.isl"
+Name: "fr"; MessagesFile: "compiler:Languages\French.isl"
+Name: "it"; MessagesFile: "compiler:Languages\Italian.isl"
+Name: "es"; MessagesFile: "compiler:Languages\Spanish.isl"
+Name: "cs"; MessagesFile: "compiler:Languages\Czech.isl"
 """
         print >> ofi, r"[Setup]"
         print >> ofi, r"AppName=%s" % self.name

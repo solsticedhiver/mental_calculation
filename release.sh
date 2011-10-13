@@ -49,6 +49,7 @@ mentalcalculation/sound/bell.mp3
 mentalcalculation/sound/3bells.mp3"
 
 echo -e "$__FILES\n`ls mentalcalculation/i18n/*.qm`" | apack ./mentalcalculation/$archive
+unset __FILES
 
 cd mentalcalculation
 # run the following command in windows: python.exe setup.py py2exe
