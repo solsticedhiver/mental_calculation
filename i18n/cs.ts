@@ -117,34 +117,34 @@ and so on ...</source>
 <context>
     <name>Main</name>
     <message>
-        <location filename="mentalcalculation.py" line="409"/>
+        <location filename="mentalcalculation.py" line="422"/>
         <source>&amp;Stop</source>
         <translation>&amp;Zastavit</translation>
     </message>
     <message>
-        <location filename="mentalcalculation.py" line="410"/>
+        <location filename="mentalcalculation.py" line="423"/>
         <source>Stop the sequence</source>
         <translation>Zastavit řadu</translation>
     </message>
     <message>
-        <location filename="mentalcalculation.py" line="571"/>
+        <location filename="mentalcalculation.py" line="582"/>
         <source>&amp;Start</source>
         <translation>&amp;Spustit</translation>
     </message>
     <message>
-        <location filename="mentalcalculation.py" line="572"/>
+        <location filename="mentalcalculation.py" line="583"/>
         <source>Start a sequence</source>
         <translation>Spustit řadu</translation>
     </message>
     <message>
-        <location filename="mentalcalculation.py" line="532"/>
+        <location filename="mentalcalculation.py" line="543"/>
         <source>The correct answer is %1</source>
         <translation>Správná odpověď je %1</translation>
     </message>
     <message>
-        <location filename="mentalcalculation.py" line="499"/>
-        <source>Mental Calculation %1/%2</source>
-        <translation>Výpočet z hlavy %1/%2</translation>
+        <location filename="mentalcalculation.py" line="510"/>
+        <source>Score: %1/%2</source>
+        <translation>Skóre: %1/%2</translation>
     </message>
 </context>
 <context>
@@ -155,79 +155,92 @@ and so on ...</source>
         <translation>Výpočet z hlavy</translation>
     </message>
     <message>
-        <location filename="main.py" line="36"/>
+        <location filename="main.py" line="31"/>
         <source>#</source>
         <translation>#</translation>
     </message>
     <message>
-        <location filename="main.py" line="53"/>
+        <location filename="main.py" line="48"/>
         <source>+99999</source>
         <translation>+99999</translation>
     </message>
     <message>
-        <location filename="main.py" line="61"/>
+        <location filename="main.py" line="56"/>
         <source>&amp;Your answer</source>
         <translation>&amp;Vaše odpověď</translation>
     </message>
     <message>
-        <location filename="main.py" line="77"/>
+        <location filename="main.py" line="72"/>
         <source>Type here your answer (the total)</source>
         <translation>Zde zadejte svou odpověď (celkový počet)</translation>
     </message>
     <message>
-        <location filename="main.py" line="86"/>
+        <location filename="main.py" line="81"/>
         <source>The total is </source>
         <translation>Celkem to je </translation>
     </message>
     <message>
-        <location filename="main.py" line="93"/>
+        <location filename="main.py" line="88"/>
         <source>Start a sequence</source>
         <translation>Spustit řadu</translation>
     </message>
     <message>
-        <location filename="main.py" line="94"/>
+        <location filename="main.py" line="89"/>
         <source>&amp;Start</source>
         <translation>&amp;Spustit</translation>
     </message>
     <message>
-        <location filename="main.py" line="99"/>
+        <location filename="main.py" line="94"/>
         <source>Replay the last sequence</source>
         <translation>Pustit poslední řadu ještě jednou</translation>
     </message>
     <message>
-        <location filename="main.py" line="100"/>
+        <location filename="main.py" line="95"/>
         <source>Replay</source>
         <translation>Přehrát znovu</translation>
     </message>
     <message>
-        <location filename="main.py" line="105"/>
+        <location filename="main.py" line="100"/>
         <source>Check your answer</source>
         <translation>Prověřte svou odpověď</translation>
     </message>
     <message>
-        <location filename="main.py" line="106"/>
+        <location filename="main.py" line="101"/>
         <source>&amp;Check</source>
         <translation>&amp;Ověřit</translation>
     </message>
     <message>
-        <location filename="main.py" line="112"/>
+        <location filename="main.py" line="107"/>
         <source>Go to Setttings dialog</source>
         <translation>Jít do dialogu nastavení</translation>
     </message>
     <message>
-        <location filename="main.py" line="113"/>
+        <location filename="main.py" line="108"/>
         <source>&amp;Settings</source>
         <translation>&amp;Nastavení</translation>
     </message>
     <message>
-        <location filename="main.py" line="119"/>
+        <location filename="main.py" line="114"/>
         <source>Exit the program</source>
         <translation>Ukončit program</translation>
     </message>
     <message>
-        <location filename="main.py" line="120"/>
+        <location filename="main.py" line="115"/>
         <source>&amp;Exit</source>
         <translation>&amp;Ukončit</translation>
+    </message>
+</context>
+<context>
+    <name>Settings</name>
+    <message>
+        <location filename="mentalcalculation.py" line="89"/>
+        <source>Ok</source>
+        <translation>Ok</translation>
+    </message>
+    <message>
+        <location filename="mentalcalculation.py" line="90"/>
+        <source>Cancel</source>
+        <translation>Zrušit</translation>
     </message>
 </context>
 </TS>

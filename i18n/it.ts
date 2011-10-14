@@ -39,32 +39,32 @@
     <message>
         <location filename="settings.py" line="80"/>
         <source>Timeout in ms between number disappearing and next number appearing</source>
-        <translation type="unfinished"/>
+        <translation>Timeout in ms tra numero scomparendo e prossimo numero che appare</translation>
     </message>
     <message>
         <location filename="settings.py" line="81"/>
         <source>&amp;Timeout (ms)</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Timeout (ms)</translation>
     </message>
     <message>
         <location filename="settings.py" line="99"/>
         <source>Time the number is displayed</source>
-        <translation type="unfinished"/>
+        <translation>Tempo il numero viene visualizzato</translation>
     </message>
     <message>
         <location filename="settings.py" line="100"/>
         <source>&amp;Flash (ms)</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Flash (ms)</translation>
     </message>
     <message>
         <location filename="settings.py" line="130"/>
         <source> &lt;p style=&apos;white-space:pre&apos;&gt;&lt;em&gt;&lt;strong&gt;espeak&lt;/strong&gt;&lt;/em&gt; is needed for speech synthesis&lt;/p&gt;</source>
-        <translation type="unfinished"/>
+        <translation>&lt;p style=&apos;white-space:pre&apos;&gt; &lt;strong&gt;&lt;em&gt;eSpeak&lt;/em&gt;&lt;/strong&gt; è necessaria per la sintesi vocale &lt;/p&gt;</translation>
     </message>
     <message>
         <location filename="settings.py" line="131"/>
         <source>S&amp;peech Synthesis</source>
-        <translation type="unfinished"/>
+        <translation>Sintesi &amp;vocale</translation>
     </message>
     <message>
         <location filename="settings.py" line="136"/>
@@ -83,7 +83,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="settings.py" line="152"/>
         <source>Pronounce each digit of a number</source>
-        <translation type="unfinished"/>
+        <translation>Pronunciare ogni cifra di un numero</translation>
     </message>
     <message>
         <location filename="settings.py" line="153"/>
@@ -111,34 +111,34 @@ and so on ...</source>
 <context>
     <name>Main</name>
     <message>
-        <location filename="mentalcalculation.py" line="409"/>
+        <location filename="mentalcalculation.py" line="422"/>
         <source>&amp;Stop</source>
         <translation>&amp;Arresta</translation>
     </message>
     <message>
-        <location filename="mentalcalculation.py" line="410"/>
+        <location filename="mentalcalculation.py" line="423"/>
         <source>Stop the sequence</source>
         <translation>Arresta la sequenza</translation>
     </message>
     <message>
-        <location filename="mentalcalculation.py" line="571"/>
+        <location filename="mentalcalculation.py" line="582"/>
         <source>&amp;Start</source>
         <translation>&amp;Avvia</translation>
     </message>
     <message>
-        <location filename="mentalcalculation.py" line="572"/>
+        <location filename="mentalcalculation.py" line="583"/>
         <source>Start a sequence</source>
         <translation>Avvia la sequenza</translation>
     </message>
     <message>
-        <location filename="mentalcalculation.py" line="532"/>
+        <location filename="mentalcalculation.py" line="543"/>
         <source>The correct answer is %1</source>
         <translation>La risposta corretta è %1</translation>
     </message>
     <message>
-        <location filename="mentalcalculation.py" line="499"/>
-        <source>Mental Calculation %1/%2</source>
-        <translation>Calcolo Mentale %1/%2</translation>
+        <location filename="mentalcalculation.py" line="510"/>
+        <source>Score: %1/%2</source>
+        <translation>Punteggio: %1/%2</translation>
     </message>
 </context>
 <context>
@@ -149,79 +149,92 @@ and so on ...</source>
         <translation>Calcolo Mentale</translation>
     </message>
     <message>
-        <location filename="main.py" line="36"/>
+        <location filename="main.py" line="31"/>
         <source>#</source>
         <translation>#</translation>
     </message>
     <message>
-        <location filename="main.py" line="53"/>
+        <location filename="main.py" line="48"/>
         <source>+99999</source>
         <translation>+99999</translation>
     </message>
     <message>
-        <location filename="main.py" line="61"/>
+        <location filename="main.py" line="56"/>
         <source>&amp;Your answer</source>
         <translation>&amp;La tua risposta</translation>
     </message>
     <message>
-        <location filename="main.py" line="77"/>
+        <location filename="main.py" line="72"/>
         <source>Type here your answer (the total)</source>
         <translation>Digita la tua risposta (il totale)</translation>
     </message>
     <message>
-        <location filename="main.py" line="86"/>
+        <location filename="main.py" line="81"/>
         <source>The total is </source>
         <translation>Il totale è </translation>
     </message>
     <message>
-        <location filename="main.py" line="93"/>
+        <location filename="main.py" line="88"/>
         <source>Start a sequence</source>
         <translation>Avvia una sequenza</translation>
     </message>
     <message>
-        <location filename="main.py" line="94"/>
+        <location filename="main.py" line="89"/>
         <source>&amp;Start</source>
         <translation>&amp;Avvia</translation>
     </message>
     <message>
-        <location filename="main.py" line="99"/>
+        <location filename="main.py" line="94"/>
         <source>Replay the last sequence</source>
         <translation>Repley dell&apos;ultima sequenza</translation>
     </message>
     <message>
-        <location filename="main.py" line="100"/>
+        <location filename="main.py" line="95"/>
         <source>Replay</source>
         <translation>Replay</translation>
     </message>
     <message>
-        <location filename="main.py" line="105"/>
+        <location filename="main.py" line="100"/>
         <source>Check your answer</source>
         <translation>Controlla la tua risposta</translation>
     </message>
     <message>
-        <location filename="main.py" line="106"/>
+        <location filename="main.py" line="101"/>
         <source>&amp;Check</source>
         <translation>&amp;Controlla</translation>
     </message>
     <message>
-        <location filename="main.py" line="112"/>
+        <location filename="main.py" line="107"/>
         <source>Go to Setttings dialog</source>
         <translation>Vai alle Impostazioni di dialogo</translation>
     </message>
     <message>
-        <location filename="main.py" line="113"/>
+        <location filename="main.py" line="108"/>
         <source>&amp;Settings</source>
         <translation>&amp;Impostazioni</translation>
     </message>
     <message>
-        <location filename="main.py" line="119"/>
+        <location filename="main.py" line="114"/>
         <source>Exit the program</source>
         <translation>Esci dal programma</translation>
     </message>
     <message>
-        <location filename="main.py" line="120"/>
+        <location filename="main.py" line="115"/>
         <source>&amp;Exit</source>
         <translation>&amp;Esci</translation>
+    </message>
+</context>
+<context>
+    <name>Settings</name>
+    <message>
+        <location filename="mentalcalculation.py" line="89"/>
+        <source>Ok</source>
+        <translation>Ok</translation>
+    </message>
+    <message>
+        <location filename="mentalcalculation.py" line="90"/>
+        <source>Cancel</source>
+        <translation>Annullare</translation>
     </message>
 </context>
 </TS>

@@ -549,7 +549,8 @@ class Main(QtGui.QMainWindow):
                     t = ' '.join(list(t)).replace('- ', '-')
                 if ESPEAK_LANG.startswith('fr'):
                     t = t.replace('=', u'égal ')
-                print t
+                if options.verbose:
+                    print t
                 self.disconnect(self.player, QtCore.SIGNAL('finished()'), self.clearLabel)
                 self.connect(self.player, QtCore.SIGNAL('finished()'), self.restartPlay)
                 self.pronounceit(t)
