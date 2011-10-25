@@ -112,6 +112,20 @@ On peut suppriemr l'affichage du signe plus devant les nimbres quand on a choisi
 
 dans la section [General]
 
+Statistiques
+++++++++++++
+Avec la version 0.3.5, chaque fois que vous lancez *mentalcalculation*, il essaye de se connecter à www.sorobanexam.org/mentalcalculation?ping=UUID. L'UUID est un uuid v4 crée aléatoirement. Aucune information n'est envoyée. Cela permet de générer des statistiques sur l'usage de ce soft. et de savoir si les personnes le téléchargent une fois sans jamais l'utiliser ensuite ou si il est réellement utiliser souvent.
+
+Vous pouvez ne pas apprécier ceci, et vous pouvez le donc désactiver. Dans mentalcalculation.ini, ajouter une ligne
+
+    uuid=opt-out
+
+dans la section [General]; vous pouvez aussi utiliser les valeurs: no, No, none, None, false, False, optout ou la laisser vide.
+
+Ou remplacez la valeur existante, si la ligne est déjà présente, par une des valeurs citées plus haut.
+
+Ceci devrait normalement être supprimé à la prochaine version.
+
 Résilience
 ==========
 Si vous n'aimez pas les émoticons ou les sons vous pouvez les renommer/effacer de votre disque dur et *mentalcalculation* fera très bien sans !

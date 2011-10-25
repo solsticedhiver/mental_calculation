@@ -216,14 +216,13 @@ class Main(QtGui.QMainWindow):
             self.ui.label.setStyleSheet(';'.join(stylesheet))
 
         # add url in statusbar
-        self.ui.statusbar.showMessage('www.sorobanexam.org')
+        self.ui.statusbar.showMessage('sorobanexam.org')
 
         self.displayWindow()
 
     def importSettings(self):
         # restore settings from the settings file if the settings exist
-        settings = QtCore.QSettings(QtCore.QSettings.IniFormat,
-                QtCore.QSettings.UserScope, '%s' % appName, '%s' % appName)
+        settings = QtCore.QSettings(QtCore.QSettings.IniFormat, QtCore.QSettings.UserScope, '%s' % appName, '%s' % appName)
 
         if settings.contains('digits'):
             # these value have been written by the program, so then should be ok
@@ -266,6 +265,25 @@ class Main(QtGui.QMainWindow):
         self.one_digit = settings.value('Sound/one_digit').toBool()
         if settings.contains('Sound/annoying_sound'):
             self.annoying_sound = settings.value('Sound/annoying_sound').toBool()
+
+        # uuid
+        self.uuid = ''
+        if settings.contains('uuid'):
+            self.uuid = str(settings.value('uuid').toString())
+        else:
+            import uuid
+            self.uuid = str(uuid.uuid4())
+        if self.uuid not in ('', 'no', 'none', 'false', 'No', 'None', 'False', 'opt-out', 'optout'):
+            # call home
+            try:
+                settings.setValue('uuid', QtCore.QVariant(self.uuid))
+                import urllib
+                ret = urllib.urlopen('http://sorobanexam.org/mentalcalculation/ping?uuid=%s' % self.uuid)
+                # stop tracking if url returns 404
+                if ret.getcode() == 404:
+                    settings.setValue('uuid', QtCore.QVariant('opt-out'))
+            except IOError:
+                pass
 
     def updateFullScreen(self):
         self.fullscreen = not self.fullscreen
@@ -341,8 +359,7 @@ class Main(QtGui.QMainWindow):
                 self.hands_free = mysettings['hands_free']
                 self.neg = mysettings['neg']
                 # always save settings when closing the settings dialog
-                settings = QtCore.QSettings(QtCore.QSettings.IniFormat,
-                        QtCore.QSettings.UserScope, '%s' % appName, '%s' % appName)
+                settings = QtCore.QSettings(QtCore.QSettings.IniFormat, QtCore.QSettings.UserScope, '%s' % appName, '%s' % appName)
                 settings.setValue('digits', QtCore.QVariant(self.digits))
                 settings.setValue('rows', QtCore.QVariant(self.rows))
                 settings.setValue('timeout', QtCore.QVariant(self.timeout))
@@ -626,6 +643,7 @@ class Main(QtGui.QMainWindow):
             self.player.stop()
             self.player = None
         QtGui.QMainWindow.closeEvent(self, event)
+
 
 if __name__ == '__main__':
     parser = OptionParser(usage='usage: %prog [-v]')

@@ -113,6 +113,20 @@ One can remove the + sign in front of numbers if using subtraction by using this
 
 in the [General] section of the mentalcalculation.ini
 
+Tracking Usage
+++++++++++++++
+With the 0.3.5 release, every time you launch *mentalcalculation*, it tries to reach www.sorobanexam.org/mentalcalculation?ping=UUID. The UUID is a randomly generated uuid v4. No information is sent. It just allows us to gather statistics about the usage of this software and know if people only download it once and never use it again, or if it is really used often.
+
+You might not like that tracking behavior, so you can opt-out. In mentalcalculation.ini, you can add a line:
+
+    uuid=opt-out
+
+in the [General] section; you can also use any of the following values: no, No, none, None, false, False, optout or leave it empty.
+
+Or if the line is already there, just change the value of uuid to one of the string mentionned above to opt-out.
+
+That tracking behavior will normally be removed on the next release.
+
 Fail-safe mechanism:
 --------------------
 There is a fail-safe mechanism that allows *mental calculation* to safely fail when it does not find one of its resources files. So, if you don't like the smileys/emoticons or the sounds, you can safely delete/rename them on your harddisk (img/sound directories), and *mentalcalculation* will continue to work without them.
