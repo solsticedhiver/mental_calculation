@@ -159,7 +159,6 @@ class Main(QtGui.QMainWindow):
         self.background_color = None
         self.annoying_sound = False
         self.no_plus_sign = False
-        self.oldPointSize = 72
 
         self.isLabelClearable = True
         self.geometryLabel = None
@@ -184,10 +183,6 @@ class Main(QtGui.QMainWindow):
         #self.ui.le_answer.setInputMask('000000009')
         self.ui.l_total.hide()
 
-        self.shortcut_bigger_font = QtGui.QShortcut(QtGui.QKeySequence('CTRL++'), self)
-        self.connect(self.shortcut_bigger_font, QtCore.SIGNAL('activated()'), self.increaseFontSize)
-        self.shortcut_smaller_font = QtGui.QShortcut(QtGui.QKeySequence('CTRL+-'), self)
-        self.connect(self.shortcut_smaller_font, QtCore.SIGNAL('activated()'), self.decreaseFontSize)
         self.shortcut_F11 = QtGui.QShortcut(QtGui.QKeySequence('F11'), self)
         self.connect(self.shortcut_F11, QtCore.SIGNAL('activated()'), self.updateFullScreen)
         self.shortcut_Enter = QtGui.QShortcut(QtGui.QKeySequence('Enter'), self)
@@ -218,7 +213,20 @@ class Main(QtGui.QMainWindow):
         # add url in statusbar
         self.ui.statusbar.showMessage('sorobanexam.org')
 
-        self.displayWindow()
+        if self.fullscreen:
+            self.showFullScreen()
+        else:
+            self.showNormal()
+
+        # resize font
+        font = self.ui.label.font()
+        # width is the size of of '+9999' in the current font
+        width = QtGui.QFontMetrics(font).width('+'+'9'*(self.digits+2))
+        # the factor to multiply by to use the max. space
+        factor = float(self.ui.gb_number.width())/width
+        newPointSize = min(int(font.pointSize()*factor), self.ui.gb_number.height())
+        font.setPointSize(newPointSize)
+        self.ui.label.setFont(font)
 
     def importSettings(self):
         # restore settings from the settings file if the settings exist
@@ -287,45 +295,30 @@ class Main(QtGui.QMainWindow):
 
     def updateFullScreen(self):
         self.fullscreen = not self.fullscreen
-        self.displayWindow()
-
-    def displayWindow(self):
-        font = self.ui.label.font()
-        if self.fullscreen:
-            self.oldPointSize = font.pointSize()
-            self.showFullScreen()
-            # width is the size of of '+9999' in the current font
-            width = QtGui.QFontMetrics(font).width('+'+'9'*(self.digits+2))
-            # the factor to multiply by to use the max. space
-            factor = float(self.ui.gb_number.width()-10)/width
-            newPointSize = min(int(font.pointSize()*factor), self.ui.gb_number.height()-10)
-        else:
-            newPointSize = self.oldPointSize
-            self.showNormal()
-        font.setPointSize(newPointSize)
-        self.ui.label.setFont(font)
-
         settings = QtCore.QSettings(QtCore.QSettings.IniFormat, QtCore.QSettings.UserScope, '%s' % appName, '%s' % appName)
         settings.setValue('GUI/fullscreen', QtCore.QVariant(self.fullscreen))
 
-    def increaseFontSize(self):
-        font = self.ui.label.font()
-        font.setPointSize(font.pointSize()+10)
-        width = QtGui.QFontMetrics(font).width('+'+'9'*(self.digits+2))
-        if width < self.ui.gb_number.width():
-            if self.ui.label.text() == '':
-                self.ui.label.setText('9'*self.digits)
-            self.ui.label.setFont(font)
-            QtCore.QTimer.singleShot(250, self.ui.label.clear)
+        if self.fullscreen:
+            self.showFullScreen()
+        else:
+            self.showNormal()
 
-    def decreaseFontSize(self):
+    def resizeEvent(self, e):
+        QtGui.QMainWindow.resizeEvent(self, e)
         font = self.ui.label.font()
-        if font.pointSize()-10 >= 32:
-            font.setPointSize(font.pointSize()-10)
-            if self.ui.label.text() == '':
-                self.ui.label.setText('9'*self.digits)
-            self.ui.label.setFont(font)
-            QtCore.QTimer.singleShot(250, self.ui.label.clear)
+        # width is the size of of '+9999' in the current font
+        width = QtGui.QFontMetrics(font).width('+'+'9'*(self.digits+2))
+
+        # the factor to multiply by to use the max. space
+        factor = float(self.ui.gb_number.width())/width
+        newPointSize = min(int(font.pointSize()*factor), self.ui.gb_number.height())
+
+        font.setPointSize(newPointSize)
+        self.ui.label.setFont(font)
+
+        if self.ui.label.pixmap == None and self.ui.label.text() == '':
+            self.ui.label.setText('9'*self.digits)
+            QtCore.QTimer.singleShot(150, self.ui.label.clear)
 
     def clearLabel(self):
         if self.isLabelClearable:
@@ -352,6 +345,16 @@ class Main(QtGui.QMainWindow):
             if ok:
                 self.flash = mysettings['flash']
                 self.timeout = mysettings['timeout']
+                if mysettings['digits'] != self.digits:
+                    # resize font
+                    font = self.ui.label.font()
+                    # width is the size of of '+9999' in the current font
+                    width = QtGui.QFontMetrics(font).width('+'+'9'*(mysettings['digits']+2))
+                    # the factor to multiply by to use the max. space
+                    factor = float(self.ui.gb_number.width())/width
+                    newPointSize = min(int(font.pointSize()*factor), self.ui.gb_number.height())
+                    font.setPointSize(newPointSize)
+                    self.ui.label.setFont(font)
                 self.digits = mysettings['digits']
                 self.rows = mysettings['rows']
                 self.speech = mysettings['speech']
