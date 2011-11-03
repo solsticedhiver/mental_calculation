@@ -95,12 +95,12 @@ p, li { white-space: pre-wrap; }
         <source>In this mode, you don't have to enter an answer, it's &quot;hands free&quot;;
 the solution is displayed, and a new sequence begins,
 and so on ...</source>
-        <translation type="unfinished"/>
+        <translation>In questa modalità, non è necessario immettere nessuna risposta, è una &quot;modalità libera&quot;, la soluzione viene visualizzata automaticamente, e inizia una nuova sequenza di domande, e così via ...</translation>
     </message>
     <message>
         <location filename="settings.py" line="161"/>
         <source>&amp;Continuous &quot;hands-free&quot; mode</source>
-        <translation type="unfinished"/>
+        <translation>&amp;Continua in &quot;modalità libera&quot;</translation>
     </message>
     <message>
         <location filename="settings.py" line="165"/>
