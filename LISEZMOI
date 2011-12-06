@@ -48,13 +48,15 @@ Fichier de configuration
 Sur Linux ou tout Unix-like
   ~/.config/mentalcalculation/mentalcalculation.ini
 Sur Windows
-  C:\Documents and Settings\<your_user_name>\Application Data\mentalcalculation\mentalcalculation.ini pour Windows XP
+  C:\Documents and Settings\<votre_nom_d_utilisateur>\Application Data\mentalcalculation\mentalcalculation.ini pour Windows XP
   ou
-  C:\Users\<your_user_name>\AppData\Roaming\mentalcalculation\mentalcalculation.ini pour Windows Vista ou au dessus
+  C:\Users\<votre_nom_d_utilisateur>\AppData\Roaming\mentalcalculation\mentalcalculation.ini pour Windows Vista ou au dessus
 
-  vous devez lancer au moin sune fois *mentalcalculation* pour que ce fichier soit créer.
+Il vous faudra peut-être modifier les options de l'explorateur Windows pour pouvoir voir les fichiers et répertoires cachés et accéder au fichier de configuration.
 
-  Note: Aucune modification n'est faite au registre de Windows.
+Vous devez lancer au moins une fois *mentalcalculation* (et le fermer) pour que ce fichier soit créer.
+
+Note: Aucune modification n'est faite au registre de Windows.
 
 Personalisation
 ===============

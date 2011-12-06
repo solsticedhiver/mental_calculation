@@ -1,7 +1,7 @@
 #!/usr/bin/python2
 # -*- coding: utf-8 -*-
 
-# mentalcalculation - version 0.3.5
+# mentalcalculation - version 0.3.5.1
 # Copyright (C) 2008-2010, solsTiCe d'Hiver <solstice.dhiver@gmail.com>
 
 # This program is free software; you can redistribute it and/or modify
@@ -65,7 +65,7 @@ from pymentalcalculation import settings, main
 DIGIT = dict([(i,(int('1'+'0'*(i-1)), int('9'*i))) for i in range(1,10)])
 
 appName = 'mentalcalculation'
-appVersion = '0.3.5'
+appVersion = '0.3.5.1'
 
 SHARE_PATH = ''
 BELL = SHARE_PATH + 'sound/bell.mp3'
@@ -655,7 +655,8 @@ if __name__ == '__main__':
     (options,args) = parser.parse_args(sys.argv)
 
     if WINDOWS:
-        ESPEAK_CMD_LIST = ['C:\Program Files\eSpeak\command_line\espeak.exe', 'C:\Program Files (x86)\eSpeak\command_line\espeak.exe']
+        programFiles = [os.getenv('ProgramFiles(x86)'), os.getenv('ProgramFiles')]
+        ESPEAK_CMD_LIST = [ os.path.join(p, 'eSpeak\command_line\espeak.exe') for p in programFiles if p is not None]
     else:
         ESPEAK_CMD_LIST = ['/usr/bin/espeak']
 

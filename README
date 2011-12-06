@@ -36,11 +36,11 @@ Espeak
     - C:\Program Files\eSpeak\command_line\espeak.exe for Windows
     - /usr/bin/espeak for Linux
 
-If it is found, you will be able to use Speach synthesis option to get the number spoken out automatically.
+If it is found, you will be able to use the speech synthesis option to get the number spoken out automatically.
 
-If, for any reason, *espeak* is installed in an unusual location, you can specify its path in the configuration file. See below to see how to do that.
+If, for any reason, *espeak* is installed in an unusual location, you must specify its path in the configuration file. See below on how to do that.
 
-*Espeak* will also use the language defined by your locale.
+*Espeak* will automatically use the language defined by your locale.
 If you want to change the language used by espeak, change the lang variable in the [Espeak] section of the config. file.
 
 Configuration file
@@ -53,7 +53,10 @@ On Windows
   or
   C:\Users\<your_user_name>\AppData\Roaming\mentalcalculation\mentalcalculation.ini for Windows Vista and above
 
-You need to run *mentalcalculation*, at least once so that the configuration file is written to disk.
+You might need to change the options of the Windows explorer to be able to see hidden files and directories
+to be able to access the configuration file.
+
+You need to run *mentalcalculation* (and close it), at least once so that the configuration file is written to disk.
 
 Note: It does not do anything to the Windows registry at all !
 
