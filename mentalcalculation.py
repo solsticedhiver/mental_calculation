@@ -245,7 +245,7 @@ class Main(QtGui.QMainWindow):
         if 'Espeak' in settings.childGroups():
             global ESPEAK_CMD, ESPEAK_LANG, ESPEAK_SPEED, IS_ESPEAK_INSTALLED
             # test for every option
-            if settings.contains('Espeak/cmd'):
+            if not IS_ESPEAK_INSTALLED and settings.contains('Espeak/cmd'):
                 ESPEAK_CMD = str(settings.value('Espeak/cmd').toString()).strip('"')
                 IS_ESPEAK_INSTALLED = os.path.isfile(ESPEAK_CMD)
             if settings.contains('Espeak/lang'):
