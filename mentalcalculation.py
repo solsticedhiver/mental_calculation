@@ -60,7 +60,7 @@ except ImportError:
     print 'Error: you need phonon support in PyQt4 to run this software'
     sys.exit(1)
 
-from pymentalcalculation import settings, main
+from gui import settings, main
 
 DIGIT = dict([(i,(int('1'+'0'*(i-1)), int('9'*i))) for i in range(1,10)])
 

@@ -135,7 +135,7 @@ setup(
             "icon_resources": [(1, "img/mentalcalculation.ico")]}],
         options = {"py2exe" : {"includes" : ["sip"], "compressed": 1, "optimize": 2}},
         zipfile = "lib/library.zip",
-        packages = ['pymentalcalculation'],
+        packages = ['gui'],
         data_files = [
             ('phonon_backend', [
                 'C:\\Python27\\Lib\\site-packages\\PyQt4\\plugins\\phonon_backend\\phonon_ds94.dll'

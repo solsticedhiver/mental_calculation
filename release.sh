@@ -3,7 +3,7 @@ if false; then
 	pyuic4 settings.ui >| settings.py
 fi
 if false; then
-	pylupdate4 pymentalcalculation/settings.py pymentalcalculation/main.py mentalcalculation.py -ts mentalcalculation.ts
+	pylupdate4 gui/settings.py gui/main.py mentalcalculation.py -ts mentalcalculation.ts
 	# update translation file to include translation for QDialogButtonBox
 	sed -i '/^<\/TS>/i\
 <context>\
@@ -38,9 +38,9 @@ mentalcalculation/img/restart.png
 mentalcalculation/img/face-sad.png
 mentalcalculation/img/face-smile.png
 mentalcalculation/img/calculator.png
-mentalcalculation/pymentalcalculation/__init__.py
-mentalcalculation/pymentalcalculation/main.py
-mentalcalculation/pymentalcalculation/settings.py
+mentalcalculation/gui/__init__.py
+mentalcalculation/gui/main.py
+mentalcalculation/gui/settings.py
 mentalcalculation/mentalcalculation.py
 mentalcalculation/sound/bad.mp3
 mentalcalculation/sound/annoying-sound.mp3

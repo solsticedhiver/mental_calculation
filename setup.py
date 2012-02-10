@@ -15,7 +15,7 @@ dist = setup(name='mentalcalculation',
         author_email='solstice.dhiver@gmail.com',
         url='http://www.sorobanexam.org/anzan.html',
         scripts=['mentalcalculation.py'],
-        packages = ['pymentalcalculation'],
+        packages = ['gui'],
         data_files = [
             ('share/mentalcalculation/i18n', ['i18n/mentalcalculation_fr.qm' ]),
             ('share/doc/mentalcalculation', ['README', 'LISEZMOI', 'COPYING', 'Changelog']),
