@@ -52,13 +52,13 @@ except ImportError:
 try:
     from PyQt4 import QtGui,QtCore
 except ImportError:
-    print 'Error: you need PyQt4 to run this software'
+    print >> sys.stderr, 'Error: you need PyQt4 to run this software'
     sys.exit(1)
+IS_PHONON_AVAILABLE = True
 try:
     from PyQt4.phonon import Phonon
 except ImportError:
-    print 'Error: you need phonon support in PyQt4 to run this software'
-    sys.exit(1)
+    IS_PHONON_AVAILABLE = False
 
 from gui import settings, main
 
@@ -93,9 +93,11 @@ class Settings(QtGui.QDialog):
         self.ui.cb_onedigit.setEnabled(self.ui.cb_speech.isChecked())
         self.connect(self, QtCore.SIGNAL('accepted()'), self.exportSettings)
         self.connect(self.ui.cb_speech, QtCore.SIGNAL('clicked()'), self.updateSound)
-        if IS_ESPEAK_INSTALLED:
+        if IS_SOUND_WORKING:
             self.ui.cb_speech.setEnabled(True)
             self.ui.pm_warning.hide()
+        elif not IS_PHONON_AVAILABLE:
+            self.ui.pm_warning.setToolTip(self.tr('phonon is not working'))
         self.adjustSize()
 
     def importSettings(self, mysettings):
@@ -197,8 +199,9 @@ class Main(QtGui.QMainWindow):
         # TODO: add a welcome message; this would be more explicit that this
         self.ui.label.setPixmap(QtGui.QPixmap(WELCOME))
 
-        self.player = Phonon.createPlayer(Phonon.AccessibilityCategory, Phonon.MediaSource(''))
-        self.connect(self.player, QtCore.SIGNAL('stateChanged(Phonon::State, Phonon::State)'), self.cleanup)
+        if IS_PHONON_AVAILABLE:
+            self.player = Phonon.createPlayer(Phonon.AccessibilityCategory, Phonon.MediaSource(''))
+            self.connect(self.player, QtCore.SIGNAL('stateChanged(Phonon::State, Phonon::State)'), self.cleanup)
 
         self.importSettings()
         # change background and foreground color if needed
@@ -390,7 +393,7 @@ class Main(QtGui.QMainWindow):
     def restartPlay(self):
         if self.started:
             duration = self.timeout
-            if self.speech and IS_ESPEAK_INSTALLED:
+            if self.speech and IS_SOUND_WORKING:
                 self.disconnect(self.player, QtCore.SIGNAL('finished()'), self.restartPlay)
                 self.connect(self.player, QtCore.SIGNAL('finished()'), self.clearLabel)
                 self.player.setCurrentSource(Phonon.MediaSource(THREEBELLS))
@@ -411,8 +414,9 @@ class Main(QtGui.QMainWindow):
         self.ui.pb_replay.setEnabled(False)
         self.timerUpdateLabel.stop()
         if self.hands_free:
-            self.disconnect(self.player, QtCore.SIGNAL('finished()'), self.restartPlay)
-            self.connect(self.player, QtCore.SIGNAL('finished()'), self.clearLabel)
+            if IS_PHONON_AVAILABLE:
+                self.disconnect(self.player, QtCore.SIGNAL('finished()'), self.restartPlay)
+                self.connect(self.player, QtCore.SIGNAL('finished()'), self.clearLabel)
             self.timerShowAnswer.stop()
             self.timerRestartPlay.stop()
             self.ui.l_total.hide()
@@ -441,12 +445,13 @@ class Main(QtGui.QMainWindow):
             # change pb_start to 'Stop' when starting display
             self.ui.pb_start.setText(self.tr('&Stop'))
             self.ui.pb_start.setToolTip(self.tr('Stop the sequence'))
-            if self.speech and IS_ESPEAK_INSTALLED:
-                self.player.stop()
-                self.connect(self.player, QtCore.SIGNAL('finished()'), self.clearLabel)
-            elif self.annoying_sound:
-                self.disconnect(self.player, QtCore.SIGNAL('finished()'), self.clearLabel)
-                self.player.setCurrentSource(Phonon.MediaSource(ANNOYING_SOUND))
+            if IS_PHONON_AVAILABLE:
+                if self.speech and IS_ESPEAK_INSTALLED:
+                    self.player.stop()
+                    self.connect(self.player, QtCore.SIGNAL('finished()'), self.clearLabel)
+                elif self.annoying_sound:
+                    self.disconnect(self.player, QtCore.SIGNAL('finished()'), self.clearLabel)
+                    self.player.setCurrentSource(Phonon.MediaSource(ANNOYING_SOUND))
             if self.hands_free:
                 self.ui.l_answer.setEnabled(False)
             # wait 1s before starting the display
@@ -458,8 +463,9 @@ class Main(QtGui.QMainWindow):
             self.isLabelClearable = False
             self.timerUpdateLabel.stop()
             if self.hands_free:
-                self.disconnect(self.player, QtCore.SIGNAL('finished()'), self.restartPlay)
-                self.connect(self.player, QtCore.SIGNAL('finished()'), self.clearLabel)
+                if IS_PHONON_AVAILABLE:
+                    self.disconnect(self.player, QtCore.SIGNAL('finished()'), self.restartPlay)
+                    self.connect(self.player, QtCore.SIGNAL('finished()'), self.clearLabel)
                 self.timerShowAnswer.stop()
                 self.timerRestartPlay.stop()
                 self.ui.l_answer.setEnabled(True)
@@ -471,7 +477,7 @@ class Main(QtGui.QMainWindow):
             self.ui.label.clear()
             if options.verbose:
                 print
-            if self.speech and IS_ESPEAK_INSTALLED:
+            if self.speech and IS_SOUND_WORKING:
                 self.player.stop()
             if not self.hands_free:
                 # reset history
@@ -524,7 +530,7 @@ class Main(QtGui.QMainWindow):
             self.ui.le_answer.setDisabled(True)
             self.ui.pb_check.setDisabled(True)
             self.ui.label.setPixmap(QtGui.QPixmap(img))
-            if self.speech and IS_ESPEAK_INSTALLED:
+            if self.speech and IS_SOUND_WORKING:
                 self.player.setCurrentSource(Phonon.MediaSource(sound))
                 self.player.play()
             self.ui.statusbar.showMessage(self.tr('Score: %1/%2').arg(u).arg(v))
@@ -562,7 +568,7 @@ class Main(QtGui.QMainWindow):
             self.ui.l_total.show()
             self.ui.l_total.setText(self.tr('The correct answer is %1').arg(self.answer))
             self.ui.label.setText('=%d' % self.answer)
-            if self.speech and IS_ESPEAK_INSTALLED:
+            if self.speech and IS_SOUND_WORKING:
                 # pronounce one digit at a time
                 t = '= %d' % self.answer
                 if self.one_digit:
@@ -587,7 +593,7 @@ class Main(QtGui.QMainWindow):
                 if not self.hands_free:
                     self.started = False
                 duration = self.timeout
-                if self.speech and IS_ESPEAK_INSTALLED:
+                if self.speech and IS_SOUND_WORKING:
                     self.player.stop()
                     self.player.setCurrentSource(Phonon.MediaSource(BELL))
                     self.player.play()
@@ -625,24 +631,27 @@ class Main(QtGui.QMainWindow):
                 if options.verbose:
                     print t,
                 # say it aloud
-                if self.speech and IS_ESPEAK_INSTALLED:
-                    # pronounce one digit at a time
-                    if self.one_digit:
-                        t = ' '.join(list(t)).replace('- ', '-')
-                    # fix a bug with french not pronouncing the negative sign
-                    if ESPEAK_LANG.startswith('fr'):
-                        t = t.replace('-', 'moins ')
-                    self.pronounceit(t)
+                if IS_PHONON_AVAILABLE:
+                    if self.speech and IS_ESPEAK_INSTALLED:
+                        # pronounce one digit at a time
+                        if self.one_digit:
+                            t = ' '.join(list(t)).replace('- ', '-')
+                        # fix a bug with french not pronouncing the negative sign
+                        if ESPEAK_LANG.startswith('fr'):
+                            t = t.replace('-', 'moins ')
+                        self.pronounceit(t)
+                    else:
+                        if self.annoying_sound:
+                            self.player.seek(0)
+                            self.player.play()
+                        # clear the label after self.flash time
+                        QtCore.QTimer.singleShot(self.flash, self.clearLabel)
                 else:
-                    if self.annoying_sound:
-                        self.player.seek(0)
-                        self.player.play()
-                    # clear the label after self.flash time
                     QtCore.QTimer.singleShot(self.flash, self.clearLabel)
 
     def closeEvent(self, event):
         # stop the player
-        if self.player:
+        if IS_PHONON_AVAILABLE and self.player:
             self.player.stop()
             self.player = None
         QtGui.QMainWindow.closeEvent(self, event)
@@ -656,12 +665,11 @@ if __name__ == '__main__':
 
     if WINDOWS:
         programFiles = [os.getenv('ProgramFiles(x86)'), os.getenv('ProgramFiles')]
-        ESPEAK_CMD_LIST = [ os.path.join(p, 'eSpeak\command_line\espeak.exe') for p in programFiles if p is not None]
+        ESPEAK_CMD_LIST = [os.path.join(p, 'eSpeak\command_line\espeak.exe') for p in programFiles if p is not None]
     else:
         ESPEAK_CMD_LIST = ['/usr/bin/espeak']
 
     # check espeak in the default location
-    ESPEAK_CMD = ESPEAK_CMD_LIST[0]
     IS_ESPEAK_INSTALLED = False
     i = 0
     while not IS_ESPEAK_INSTALLED and i < len(ESPEAK_CMD_LIST):
@@ -670,6 +678,8 @@ if __name__ == '__main__':
             ESPEAK_CMD = ESPEAK_CMD_LIST[i]
             break
         i += 1
+
+    IS_SOUND_WORKING = IS_ESPEAK_INSTALLED and IS_PHONON_AVAILABLE
 
     app = QtGui.QApplication(sys.argv)
     app.setApplicationName('Mental Calculation')
