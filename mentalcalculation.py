@@ -196,7 +196,6 @@ class Main(QtGui.QMainWindow):
         self.connect(self.ui.pb_start, QtCore.SIGNAL('clicked()'), self.startPlay)
         self.connect(self.ui.pb_replay, QtCore.SIGNAL('clicked()'), self.redisplaySequence)
 
-        # TODO: add a welcome message; this would be more explicit that this
         self.ui.label.setPixmap(QtGui.QPixmap(WELCOME))
 
         if IS_PHONON_AVAILABLE:
