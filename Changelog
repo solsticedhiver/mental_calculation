@@ -1,3 +1,10 @@
+0.3.5.1
+* Changes in the README/LISEZMOI to be more explicit about the option of Windows explorer that needs to be changed to be able to see hidden files/directories and to access the configuration file.
+
+0.3.5
+* One can use F11 to switch to full screen. Font size is auto-adjusted with the size of the window.
+* It is available in several new languagues now: czech, spanish, italian; french was already available.
+
 0.3.4.4
 * now one can change the font from the conf. file
 
