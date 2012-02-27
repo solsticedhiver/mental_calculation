@@ -65,7 +65,7 @@ from gui import settings, main
 DIGIT = dict([(i,(int('1'+'0'*(i-1)), int('9'*i))) for i in range(1,10)])
 
 appName = 'mentalcalculation'
-appVersion = '0.3.5.1'
+appVersion = '0.3.5.2'
 
 SHARE_PATH = ''
 BELL = SHARE_PATH + 'sound/bell.mp3'

@@ -14,7 +14,8 @@ for the source version:
 -----------------------
 - python 2.6 (or higher)
 - PyQt4 4.7 (or higher)
-- qt 4.6 + phonon (or higher)
+- qt 4.6 (or higher)
+- phonon (Watch out: there is a bug in phonon 4.6.0 that completly breaks this software. Try to use the 4.5.1 version)
 - espeak for the speech synthesis (as an option)
 
 Downloads:
