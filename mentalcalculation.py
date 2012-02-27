@@ -396,7 +396,7 @@ class Main(QtGui.QMainWindow):
                 self.disconnect(self.player, QtCore.SIGNAL('finished()'), self.restartPlay)
                 self.connect(self.player, QtCore.SIGNAL('finished()'), self.clearLabel)
                 self.player.setCurrentSource(Phonon.MediaSource(THREEBELLS))
-                duration = THREEBELLS_DURATION
+                duration += THREEBELLS_DURATION
                 self.player.play()
             self.isLabelClearable = False
             self.started = False
@@ -580,9 +580,9 @@ class Main(QtGui.QMainWindow):
                 self.connect(self.player, QtCore.SIGNAL('finished()'), self.restartPlay)
                 self.pronounceit(t)
             else:
-                QtCore.QTimer.singleShot(2*self.flash, self.ui.label.clear)
-                QtCore.QTimer.singleShot(2*self.flash, self.ui.l_total.hide)
-                self.timerRestartPlay.setInterval(2*self.flash+self.timeout)
+                QtCore.QTimer.singleShot(3*self.timeout, self.ui.label.clear)
+                QtCore.QTimer.singleShot(3*self.timeout, self.ui.l_total.hide)
+                self.timerRestartPlay.setInterval(2*self.flash+3*self.timeout)
                 self.timerRestartPlay.start()
 
     def updateLabel(self):
@@ -591,7 +591,7 @@ class Main(QtGui.QMainWindow):
                 self.isLabelClearable = False
                 if not self.hands_free:
                     self.started = False
-                duration = self.timeout
+                duration = 3*self.timeout
                 if self.speech and IS_SOUND_WORKING:
                     self.player.stop()
                     self.player.setCurrentSource(Phonon.MediaSource(BELL))
