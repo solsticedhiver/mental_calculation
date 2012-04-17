@@ -167,7 +167,7 @@ se muestra la solución y seguidamente comienza una nueva secuencia</translation
     <message>
         <location filename="main.py" line="56"/>
         <source>&amp;Your answer</source>
-        <translation>&amp;Su respuesta</translation>
+        <translation>S&amp;u respuesta</translation>
     </message>
     <message>
         <location filename="main.py" line="72"/>
@@ -196,8 +196,8 @@ se muestra la solución y seguidamente comienza una nueva secuencia</translation
     </message>
     <message>
         <location filename="main.py" line="95"/>
-        <source>Replay</source>
-        <translation>Repetir</translation>
+        <source>&amp;Replay</source>
+        <translation>&amp;Repetir</translation>
     </message>
     <message>
         <location filename="main.py" line="100"/>
@@ -216,8 +216,8 @@ se muestra la solución y seguidamente comienza una nueva secuencia</translation
     </message>
     <message>
         <location filename="main.py" line="108"/>
-        <source>&amp;Settings</source>
-        <translation>&amp;Configuración</translation>
+        <source>S&amp;ettings</source>
+        <translation>C&amp;onfiguración</translation>
     </message>
     <message>
         <location filename="main.py" line="114"/>

@@ -153,7 +153,7 @@
          <string>Replay the last sequence</string>
         </property>
         <property name="text">
-         <string>Replay</string>
+         <string>&amp;Replay</string>
         </property>
        </widget>
       </item>
@@ -189,7 +189,7 @@
          <string>Go to Setttings dialog</string>
         </property>
         <property name="text">
-         <string>&amp;Settings</string>
+         <string>S&amp;ettings</string>
         </property>
        </widget>
       </item>

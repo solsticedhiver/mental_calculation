@@ -189,7 +189,7 @@ and so on ...</source>
     </message>
     <message>
         <location filename="main.py" line="95"/>
-        <source>Replay</source>
+        <source>&amp;Replay</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -209,7 +209,7 @@ and so on ...</source>
     </message>
     <message>
         <location filename="main.py" line="108"/>
-        <source>&amp;Settings</source>
+        <source>S&amp;ettings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

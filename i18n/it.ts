@@ -190,8 +190,8 @@ and so on ...</source>
     </message>
     <message>
         <location filename="main.py" line="95"/>
-        <source>Replay</source>
-        <translation>Replay</translation>
+        <source>&amp;Replay</source>
+        <translation>&amp;Replay</translation>
     </message>
     <message>
         <location filename="main.py" line="100"/>
@@ -210,7 +210,7 @@ and so on ...</source>
     </message>
     <message>
         <location filename="main.py" line="108"/>
-        <source>&amp;Settings</source>
+        <source>S&amp;ettings</source>
         <translation>&amp;Impostazioni</translation>
     </message>
     <message>

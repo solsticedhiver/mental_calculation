@@ -196,8 +196,8 @@ and so on ...</source>
     </message>
     <message>
         <location filename="main.py" line="95"/>
-        <source>Replay</source>
-        <translation>Přehrát znovu</translation>
+        <source>&amp;Replay</source>
+        <translation>&amp;Přehrát znovu</translation>
     </message>
     <message>
         <location filename="main.py" line="100"/>
@@ -216,7 +216,7 @@ and so on ...</source>
     </message>
     <message>
         <location filename="main.py" line="108"/>
-        <source>&amp;Settings</source>
+        <source>S&amp;ettings</source>
         <translation>&amp;Nastavení</translation>
     </message>
     <message>

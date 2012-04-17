@@ -1,7 +1,7 @@
 #!/usr/bin/python2
 # -*- coding: utf-8 -*-
 
-# mentalcalculation - version 0.3.5.1
+# mentalcalculation - version 0.3.5.3
 # Copyright (C) 2008-2010, solsTiCe d'Hiver <solstice.dhiver@gmail.com>
 
 # This program is free software; you can redistribute it and/or modify
@@ -65,7 +65,7 @@ from gui import settings, main
 DIGIT = dict([(i,(int('1'+'0'*(i-1)), int('9'*i))) for i in range(1,10)])
 
 appName = 'mentalcalculation'
-appVersion = '0.3.5.2'
+appVersion = '0.3.5.3'
 
 SHARE_PATH = ''
 BELL = SHARE_PATH + 'sound/bell.mp3'

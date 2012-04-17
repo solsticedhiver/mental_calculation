@@ -1,3 +1,6 @@
+0.3.5.3
+* Minor fixes about translations and shortcuts
+
 0.3.5.2
 * Increase timeout before showing answer in "hands-free" mode
 * Don't fail if phonon is not available (on Linux)
