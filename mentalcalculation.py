@@ -65,7 +65,7 @@ from gui import settings, main
 DIGIT = dict([(i,(int('1'+'0'*(i-1)), int('9'*i))) for i in range(1,10)])
 
 appName = 'mentalcalculation'
-appVersion = '0.3.5.3'
+appVersion = '0.3.5.4'
 
 SHARE_PATH = ''
 BELL = SHARE_PATH + 'sound/bell.mp3'
@@ -638,6 +638,9 @@ class Main(QtGui.QMainWindow):
                         # fix a bug with french not pronouncing the negative sign
                         if ESPEAK_LANG.startswith('fr'):
                             t = t.replace('-', 'moins ')
+                        # fix a bug in turkish
+                        elif ESPEAK_LANG.startswith('tr'):
+                            t = t.replace('-', 'eksi ')
                         self.pronounceit(t)
                     else:
                         if self.annoying_sound:
