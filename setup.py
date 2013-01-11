@@ -2,8 +2,9 @@
 
 from distutils.core import setup
 from subprocess import call
-
+import glob
 import sys
+
 if sys.version_info[0] > 2:
     print("This script requires python 2")
     exit(1)
@@ -17,7 +18,7 @@ dist = setup(name='mentalcalculation',
         scripts=['mentalcalculation.py'],
         packages = ['gui'],
         data_files = [
-            ('share/mentalcalculation/i18n', ['i18n/mentalcalculation_fr.qm' ]),
+            ('share/mentalcalculation/i18n', glob.glob('i18n/*.qm')),
             ('share/doc/mentalcalculation', ['README', 'LISEZMOI', 'COPYING', 'Changelog']),
             ('share/mentalcalculation/img', [
                 'img/soroban.png',
@@ -41,10 +42,10 @@ dist = setup(name='mentalcalculation',
 installCmd = dist.get_command_obj(command="install_data")
 installdir = installCmd.install_dir
 installroot = installCmd.root if installCmd.root else ''
-installprefix = installdir.replace(installroot, '')
+installprefix = installdir.replace(installroot, '', 1)
 
 # hard-code the location of ressources in the main script
-call(("sed -i /^SHARE_PATH/s|''|'%s'| %s" % (installprefix+'/share/mentalcalculation/', installdir+'/bin/mentalcalculation.py')).split(' '))
+call(("sed -i /^SHARE_PATH/s|''|'%s'| %s" % (installdir+'/share/mentalcalculation/', installdir+'/bin/mentalcalculation.py')).split(' '))
 
 
 # To uninstall, remove
