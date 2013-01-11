@@ -4,13 +4,14 @@ from distutils.core import setup
 from subprocess import call
 import glob
 import sys
+import mentalcalculation
 
 if sys.version_info[0] > 2:
     print("This script requires python 2")
     exit(1)
 
-dist = setup(name='mentalcalculation',
-        version='0.3.4.4',
+dist = setup(name=mentalcalculation.appName,
+        version=mentalcalculation.appVersion,
         description='Mental Calculation',
         author="solsTiCe d'Hiver",
         author_email='solstice.dhiver@gmail.com',
