@@ -1,3 +1,9 @@
+0.3.5.5
+* Fix some bug in the setup.py script
+
+0.3.5.4
+* Fix a bug with the minus sign in turkish speaking
+
 0.3.5.3
 * Minor fixes about translations and shortcuts
 
