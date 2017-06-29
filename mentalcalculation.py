@@ -1,7 +1,7 @@
 #!/usr/bin/python2
 # -*- coding: utf-8 -*-
 
-# mentalcalculation - version 0.3.5.6
+# mentalcalculation - version 0.4
 # Copyright (C) 2008-2010, solsTiCe d'Hiver <solstice.dhiver@gmail.com>
 
 # This program is free software; you can redistribute it and/or modify
@@ -50,13 +50,13 @@ except ImportError:
     from random import randint
 
 try:
-    from PyQt4 import QtGui,QtCore
+    from PyQt5 import QtGui,QtCore,QtWidgets
 except ImportError:
-    print >> sys.stderr, 'Error: you need PyQt4 to run this software'
+    print >> sys.stderr, 'Error: you need PyQt5 to run this software'
     sys.exit(1)
 IS_PHONON_AVAILABLE = True
 try:
-    from PyQt4.phonon import Phonon
+    from PyQt5.phonon import Phonon
 except ImportError:
     IS_PHONON_AVAILABLE = False
 
@@ -65,7 +65,7 @@ from gui import settings, main
 DIGIT = dict([(i,(int('1'+'0'*(i-1)), int('9'*i))) for i in range(1,10)])
 
 appName = 'mentalcalculation'
-appVersion = '0.3.5.6'
+appVersion = '0.4'
 
 SHARE_PATH = ''
 BELL = SHARE_PATH + 'sound/bell.mp3'
@@ -81,18 +81,18 @@ SMILE = SHARE_PATH + 'img/face-smile.png'
 SAD = SHARE_PATH + 'img/face-sad.png'
 RESTART = SHARE_PATH + 'img/restart.png'
 
-class Settings(QtGui.QDialog):
+class Settings(QtWidgets.QDialog):
     def __init__(self, mysettings, parent=None):
-        QtGui.QDialog.__init__(self, parent)
+        QtWidgets.QDialog.__init__(self, parent)
         self.ui = settings.Ui_Dialog()
         self.ui.setupUi(self)
-        self.ui.buttonBox.button(QtGui.QDialogButtonBox.Ok).setText(self.tr('Ok'));
-        self.ui.buttonBox.button(QtGui.QDialogButtonBox.Cancel).setText(self.tr('Cancel'));
+        self.ui.buttonBox.button(QtWidgets.QDialogButtonBox.Ok).setText(self.tr('Ok'));
+        self.ui.buttonBox.button(QtWidgets.QDialogButtonBox.Cancel).setText(self.tr('Cancel'));
         self.importSettings(mysettings)
         self.ui.sb_flash.setEnabled(not self.ui.cb_speech.isChecked())
         self.ui.cb_onedigit.setEnabled(self.ui.cb_speech.isChecked())
-        self.connect(self, QtCore.SIGNAL('accepted()'), self.exportSettings)
-        self.connect(self.ui.cb_speech, QtCore.SIGNAL('clicked()'), self.updateSound)
+        self.accepted.connect(self.exportSettings)
+        self.ui.cb_speech.clicked.connect(self.updateSound)
         if IS_SOUND_WORKING:
             self.ui.cb_speech.setEnabled(True)
             self.ui.pm_warning.hide()
@@ -133,12 +133,12 @@ class Settings(QtGui.QDialog):
         self.ui.cb_onedigit.setEnabled(sound)
 
     def exec_(self):
-        ok = QtGui.QDialog.exec_(self)
+        ok = QtWidgets.QDialog.exec_(self)
         return (ok, self.mysettings)
 
-class Main(QtGui.QMainWindow):
+class Main(QtWidgets.QMainWindow):
     def __init__(self, parent=None, flag=QtCore.Qt.Widget):
-        QtGui.QMainWindow.__init__(self, parent, flag)
+        QtWidgets.QMainWindow.__init__(self, parent, flag)
         self.ui = main.Ui_MainWindow()
         self.ui.setupUi(self)
         self.score = (0,0)
@@ -167,13 +167,13 @@ class Main(QtGui.QMainWindow):
 
         self.timerUpdateLabel = QtCore.QTimer()
         self.timerUpdateLabel.setSingleShot(True)
-        self.connect(self.timerUpdateLabel, QtCore.SIGNAL('timeout()'), self.updateLabel)
+        self.timerUpdateLabel.timeout.connect(self.updateLabel)
         self.timerShowAnswer = QtCore.QTimer()
         self.timerShowAnswer.setSingleShot(True)
-        self.connect(self.timerShowAnswer, QtCore.SIGNAL('timeout()'), self.showAnswer)
+        self.timerShowAnswer.timeout.connect(self.showAnswer)
         self.timerRestartPlay = QtCore.QTimer()
         self.timerRestartPlay.setSingleShot(True)
-        self.connect(self.timerRestartPlay, QtCore.SIGNAL('timeout()'), self.restartPlay)
+        self.timerRestartPlay.timeout.connect(self.restartPlay)
 
         if IS_SYSTEMRANDOM_AVAILABLE:
             self.randint = SystemRandom().randint
@@ -185,22 +185,22 @@ class Main(QtGui.QMainWindow):
         #self.ui.le_answer.setInputMask('000000009')
         self.ui.l_total.hide()
 
-        self.shortcut_F11 = QtGui.QShortcut(QtGui.QKeySequence('F11'), self)
-        self.connect(self.shortcut_F11, QtCore.SIGNAL('activated()'), self.updateFullScreen)
-        self.shortcut_Enter = QtGui.QShortcut(QtGui.QKeySequence('Enter'), self)
-        self.connect(self.shortcut_Enter, QtCore.SIGNAL('activated()'), self.ui.pb_start.click)
+        self.shortcut_F11 = QtWidgets.QShortcut(QtGui.QKeySequence('F11'), self)
+        self.shortcut_F11.activated.connect(self.updateFullScreen)
+        self.shortcut_Enter = QtWidgets.QShortcut(QtGui.QKeySequence('Enter'), self)
+        self.shortcut_Enter.activated.connect(self.ui.pb_start.click)
 
-        self.connect(self.ui.pb_check, QtCore.SIGNAL('clicked()'), self.updateAnswer)
-        self.connect(self.ui.pb_settings, QtCore.SIGNAL('clicked()'), self.changeSettings)
-        self.connect(self.ui.pb_exit, QtCore.SIGNAL('clicked()'), self.close)
-        self.connect(self.ui.pb_start, QtCore.SIGNAL('clicked()'), self.startPlay)
-        self.connect(self.ui.pb_replay, QtCore.SIGNAL('clicked()'), self.redisplaySequence)
+        self.ui.pb_check.clicked.connect(self.updateAnswer)
+        self.ui.pb_settings.clicked.connect(self.changeSettings)
+        self.ui.pb_exit.clicked.connect(self.close)
+        self.ui.pb_start.clicked.connect(self.startPlay)
+        self.ui.pb_replay.clicked.connect(self.redisplaySequence)
 
         self.ui.label.setPixmap(QtGui.QPixmap(WELCOME))
 
         if IS_PHONON_AVAILABLE:
             self.player = Phonon.createPlayer(Phonon.AccessibilityCategory, Phonon.MediaSource(''))
-            self.connect(self.player, QtCore.SIGNAL('stateChanged(Phonon::State, Phonon::State)'), self.cleanup)
+            self.player.stateChanged.connect(self.cleanup)
 
         self.importSettings()
         # change background and foreground color if needed
@@ -233,53 +233,52 @@ class Main(QtGui.QMainWindow):
     def importSettings(self):
         # restore settings from the settings file if the settings exist
         settings = QtCore.QSettings(QtCore.QSettings.IniFormat, QtCore.QSettings.UserScope, '%s' % appName, '%s' % appName)
-
         if settings.contains('digits'):
             # these value have been written by the program, so then should be ok
-            self.digits = settings.value('digits').toInt()[0]
-            self.rows = settings.value('rows').toInt()[0]
-            self.timeout = settings.value('timeout').toInt()[0]
-            self.flash = settings.value('flash').toInt()[0]
-            self.hands_free = settings.value('hands_free').toBool()
-            self.neg = settings.value('neg').toBool()
+            self.digits = int(settings.value('digits'))
+            self.rows = int(settings.value('rows'))
+            self.timeout = int(settings.value('timeout'))
+            self.flash = int(settings.value('flash'))
+            self.hands_free = eval(settings.value('hands_free').capitalize())
+            self.neg = eval(settings.value('neg').capitalize())
             if settings.contains('no_plus_sign'):
-                self.no_plus_sign = settings.value('no_plus_sign').toBool()
+                self.no_plus_sign = eval(settings.value('no_plus_sign').capitalize())
         if 'Espeak' in settings.childGroups():
             global ESPEAK_CMD, ESPEAK_LANG, ESPEAK_SPEED, IS_ESPEAK_INSTALLED
             # test for every option
             if not IS_ESPEAK_INSTALLED and settings.contains('Espeak/cmd'):
-                ESPEAK_CMD = str(settings.value('Espeak/cmd').toString()).strip('"')
+                ESPEAK_CMD = str(settings.value('Espeak/cmd')).strip('"')
                 IS_ESPEAK_INSTALLED = os.path.isfile(ESPEAK_CMD)
             if settings.contains('Espeak/lang'):
-                ESPEAK_LANG = str(settings.value('Espeak/lang').toString())
+                ESPEAK_LANG = str(settings.value('Espeak/lang'))
                 if ESPEAK_LANG.find('_') > 0:
                     ESPEAK_LANG = ESPEAK_LANG[:ESPEAK_LANG.index('_')]
             if settings.contains('Espeak/speed'):
-                a,b = settings.value('Espeak/speed').toInt()
-                # check if it's good
-                if b:
-                    ESPEAK_SPEED = a
+                ESPEAK_SPEED = int(settings.value('Espeak/speed'))
 
         # GUI settings
-        self.fullscreen = settings.value('GUI/fullscreen').toBool()
+        if settings.contains('GUI/fullscreen'):
+            self.fullscreen = eval(settings.value('GUI/fullscreen').capitalize())
         if settings.contains('GUI/font'):
-            font = str(settings.value('GUI/font').toString())
+            font = str(settings.value('GUI/font'))
             self.ui.label.setFont(QtGui.QFont(font, 72, QtGui.QFont.Bold))
         if settings.contains('GUI/font_color'):
-            self.font_color = str(settings.value('GUI/font_color').toString())
+            self.font_color = str(settings.value('GUI/font_color'))
         if settings.contains('GUI/background_color'):
-            self.background_color = str(settings.value('GUI/background_color').toString())
+            self.background_color = str(settings.value('GUI/background_color'))
 
         # Sound settings
-        self.speech = settings.value('Sound/speech').toBool()
-        self.one_digit = settings.value('Sound/one_digit').toBool()
+        if settings.contains('Sound/speech'):
+            self.speech = eval(settings.value('Sound/speech').capitalize())
+        if settings.contains('Sound/one_digit'):
+            self.one_digit = eval(settings.value('Sound/one_digit').capitalize())
         if settings.contains('Sound/annoying_sound'):
-            self.annoying_sound = settings.value('Sound/annoying_sound').toBool()
+            self.annoying_sound = eval(settings.value('Sound/annoying_sound').capitalize())
 
         # uuid
         self.uuid = ''
         if settings.contains('uuid'):
-            self.uuid = str(settings.value('uuid').toString())
+            self.uuid = str(settings.value('uuid'))
         else:
             import uuid
             self.uuid = str(uuid.uuid4())
@@ -306,7 +305,7 @@ class Main(QtGui.QMainWindow):
             self.showNormal()
 
     def resizeEvent(self, e):
-        QtGui.QMainWindow.resizeEvent(self, e)
+        QtWidgets.QMainWindow.resizeEvent(self, e)
         font = self.ui.label.font()
         # width is the size of of '+9999' in the current font
         width = QtGui.QFontMetrics(font).width('+'+'9'*(self.digits+2))
@@ -342,7 +341,7 @@ class Main(QtGui.QMainWindow):
             mysettings['one_digit'] = self.one_digit
             mysettings['neg'] = self.neg
             s = Settings(mysettings, parent=self)
-            s.connect(s.ui.cb_fullscreen, QtCore.SIGNAL('stateChanged(int)'), self.updateFullScreen)
+            s.ui.cb_fullscreen.stateChanged.connect(self.updateFullScreen)
             ok, mysettings = s.exec_()
             if ok:
                 self.flash = mysettings['flash']
@@ -393,8 +392,8 @@ class Main(QtGui.QMainWindow):
         if self.started:
             duration = self.timeout
             if self.speech and IS_SOUND_WORKING:
-                self.disconnect(self.player, QtCore.SIGNAL('finished()'), self.restartPlay)
-                self.connect(self.player, QtCore.SIGNAL('finished()'), self.clearLabel)
+                self.player.finished.disconnect(self.restartPlay)
+                self.player.finished.connect(self.clearLabel)
                 self.player.setCurrentSource(Phonon.MediaSource(THREEBELLS))
                 duration += THREEBELLS_DURATION
                 self.player.play()
@@ -414,8 +413,8 @@ class Main(QtGui.QMainWindow):
         self.timerUpdateLabel.stop()
         if self.hands_free:
             if IS_PHONON_AVAILABLE:
-                self.disconnect(self.player, QtCore.SIGNAL('finished()'), self.restartPlay)
-                self.connect(self.player, QtCore.SIGNAL('finished()'), self.clearLabel)
+                self.player.finished.disconnect(self.restartPlay)
+                self.player.finished.connect(self.clearLabel)
             self.timerShowAnswer.stop()
             self.timerRestartPlay.stop()
             self.ui.l_total.hide()
@@ -447,9 +446,9 @@ class Main(QtGui.QMainWindow):
             if IS_PHONON_AVAILABLE:
                 if self.speech and IS_ESPEAK_INSTALLED:
                     self.player.stop()
-                    self.connect(self.player, QtCore.SIGNAL('finished()'), self.clearLabel)
+                    self.player.finished.connect(self.clearLabel)
                 elif self.annoying_sound:
-                    self.disconnect(self.player, QtCore.SIGNAL('finished()'), self.clearLabel)
+                    self.player.finished.disconnect(self.clearLabel)
                     self.player.setCurrentSource(Phonon.MediaSource(ANNOYING_SOUND))
             if self.hands_free:
                 self.ui.l_answer.setEnabled(False)
@@ -463,8 +462,8 @@ class Main(QtGui.QMainWindow):
             self.timerUpdateLabel.stop()
             if self.hands_free:
                 if IS_PHONON_AVAILABLE:
-                    self.disconnect(self.player, QtCore.SIGNAL('finished()'), self.restartPlay)
-                    self.connect(self.player, QtCore.SIGNAL('finished()'), self.clearLabel)
+                    self.player.finished.disconnect(self.restartPlay)
+                    self.player.finished.connect(self.clearLabel)
                 self.timerShowAnswer.stop()
                 self.timerRestartPlay.stop()
                 self.ui.l_answer.setEnabled(True)
@@ -533,8 +532,8 @@ class Main(QtGui.QMainWindow):
                 self.player.setCurrentSource(Phonon.MediaSource(sound))
                 self.player.play()
             self.ui.statusbar.showMessage(self.tr('Score: %1/%2').arg(u).arg(v))
-            self.disconnect(self.shortcut_Enter, QtCore.SIGNAL('activated()'), self.ui.pb_check.click)
-            self.connect(self.shortcut_Enter, QtCore.SIGNAL('activated()'), self.ui.pb_start.click)
+            self.shortcut_Enter.activated.disconnect(self.ui.pb_check.click)
+            self.shortcut_Enter.activated.connect(self.ui.pb_start.click)
 
             if options.verbose:
                 sys.stdout.flush()
@@ -576,8 +575,8 @@ class Main(QtGui.QMainWindow):
                     t = t.replace('=', u'égal ')
                 if options.verbose:
                     print t
-                self.disconnect(self.player, QtCore.SIGNAL('finished()'), self.clearLabel)
-                self.connect(self.player, QtCore.SIGNAL('finished()'), self.restartPlay)
+                self.player.finished.disconnect(self.clearLabel)
+                self.player.finished.connect(self.restartPlay)
                 self.pronounceit(t)
             else:
                 QtCore.QTimer.singleShot(self.timeout+2000, self.ui.label.clear)
@@ -612,8 +611,8 @@ class Main(QtGui.QMainWindow):
                     self.ui.le_answer.clear()
                     self.ui.pb_check.setEnabled(True)
                     self.ui.pb_settings.setEnabled(True)
-                    self.disconnect(self.shortcut_Enter, QtCore.SIGNAL('activated()'), self.ui.pb_start.click)
-                    self.connect(self.shortcut_Enter, QtCore.SIGNAL('activated()'), self.ui.pb_check.click)
+                    self.shortcut_Enter.activated.disconnect(self.ui.pb_start.click)
+                    self.shortcut_Enter.activated.connect(self.ui.pb_check.click)
                 if options.verbose:
                     print
             else:
@@ -656,7 +655,7 @@ class Main(QtGui.QMainWindow):
         if IS_PHONON_AVAILABLE and self.player:
             self.player.stop()
             self.player = None
-        QtGui.QMainWindow.closeEvent(self, event)
+        QtWidgets.QMainWindow.closeEvent(self, event)
 
 
 if __name__ == '__main__':
@@ -684,7 +683,7 @@ if __name__ == '__main__':
 
     IS_SOUND_WORKING = IS_ESPEAK_INSTALLED and IS_PHONON_AVAILABLE
 
-    app = QtGui.QApplication(sys.argv)
+    app = QtWidgets.QApplication(sys.argv)
     app.setApplicationName('Mental Calculation')
 
     # initialize locale and load translation files if available
