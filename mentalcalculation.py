@@ -1,7 +1,7 @@
 #!/usr/bin/python2
 # -*- coding: utf-8 -*-
 
-# mentalcalculation - version 0.3.5.3
+# mentalcalculation - version 0.3.5.6
 # Copyright (C) 2008-2010, solsTiCe d'Hiver <solstice.dhiver@gmail.com>
 
 # This program is free software; you can redistribute it and/or modify
@@ -65,7 +65,7 @@ from gui import settings, main
 DIGIT = dict([(i,(int('1'+'0'*(i-1)), int('9'*i))) for i in range(1,10)])
 
 appName = 'mentalcalculation'
-appVersion = '0.3.5.5'
+appVersion = '0.3.5.6'
 
 SHARE_PATH = ''
 BELL = SHARE_PATH + 'sound/bell.mp3'
@@ -673,6 +673,7 @@ if __name__ == '__main__':
 
     # check espeak in the default location
     IS_ESPEAK_INSTALLED = False
+    ESPEAK_CMD = ''
     i = 0
     while not IS_ESPEAK_INSTALLED and i < len(ESPEAK_CMD_LIST):
         if os.path.isfile(ESPEAK_CMD_LIST[i]):
@@ -706,4 +707,3 @@ if __name__ == '__main__':
     f.changeSettings()
 
     sys.exit(app.exec_())
-
