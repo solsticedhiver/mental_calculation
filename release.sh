@@ -52,7 +52,7 @@ mentalcalculation/sound/3bells.mp3"
 unset __FILES
 
 cd mentalcalculation
-# run the following command in windows: python.exe setup.py py2exe
+# run the following command in windows: python.exe innosetup.py py2exe
 if [ -d dist ] ; then
 	# use the build made by py2exe with InnoSetup
 	if [ -f dist/Output/mysetup.exe ] ;then
