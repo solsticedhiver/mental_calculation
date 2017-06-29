@@ -48,20 +48,20 @@ mentalcalculation/sound/good.mp3
 mentalcalculation/sound/bell.mp3
 mentalcalculation/sound/3bells.mp3"
 
-echo -e "$__FILES\n`ls mentalcalculation/i18n/*.qm`" | apack ./mentalcalculation/$archive
+/bin/echo -e "$__FILES\n`ls -1 mentalcalculation/i18n/*.qm`" | apack ./mentalcalculation/$archive
 unset __FILES
 
 cd mentalcalculation
 # run the following command in windows: python.exe setup.py py2exe
 if [ -d dist ] ; then
 	# use the build made by py2exe with InnoSetup
-	if [ -f dist/Output/setup.exe ] ;then
-		mv -f dist/Output/setup.exe mentalcalculation-${version}-setup.exe
+	if [ -f dist/Output/mysetup.exe ] ;then
+		mv -f dist/Output/mysetup.exe mentalcalculation-${version}-setup.exe
 		rmdir dist/Output
 	fi
 	rm -f dist/mentalcalculation.iss dist/setup.py
 	mv dist mentalcalculation-${version}
-	rm -f mentalcalculation-${version}.{7z,zip}
+	rm -f mentalcalculation-${version}.7z mentalcalculation-${version}.zip
 	apack mentalcalculation-${version}.zip mentalcalculation-${version}
 	apack mentalcalculation-${version}.7z mentalcalculation-${version}
 	rm -rf mentalcalculation-${version} build

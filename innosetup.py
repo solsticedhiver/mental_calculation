@@ -12,15 +12,19 @@
 # By default, the installer will be created as dist\\Output\\setup.exe.
 
 from distutils.core import setup
-import py2exe
+#import py2exe
 import sys
 
 ################################################################
 import os
 import glob
-from mentalcalculation import appVersion
+# get mentalcalculation version from source file
+with open('mentalcalculation.py') as f:
+    for line in f.readlines():
+        if line.startswith('appVersion'):
+            appVersion = line.split('=')[1].strip()
 
-sys.path.append('C:\\Windows\\winsxs\\x86_microsoft.vc90.crt_1fc8b3b9a1e18e3b_9.0.30729.4940_none_50916076bcb9a742')
+sys.path.append('C:\\Windows\\WinSxS\\x86_microsoft.vc90.crt_1fc8b3b9a1e18e3b_9.0.30729.9279_none_50939ec6bcb7c97c')
 
 class InnoScript:
     def __init__(self,
@@ -115,7 +119,6 @@ class build_installer(py2exe):
     def run(self):
         # First, let py2exe do it's work.
         py2exe.run(self)
-
         # create the Installer, using the files py2exe has created.
         script = InnoScript("Mental Calculation",
                 self.lib_dir,
@@ -143,7 +146,7 @@ setup(
             ('.', ['README', 'LISEZMOI', 'COPYING', 'Changelog',
                 #'C:\\WINDOWS\\system32\\msvcp90.dll']),
                 #'C:\\WINDOWS\\WinSxS\\x86_Microsoft.VC90.CRT_1fc8b3b9a1e18e3b_9.0.30729.1_x-ww_6f74963e\\msvcp90.dll']),
-		'C:\\Windows\\winsxs\\x86_microsoft.vc90.crt_1fc8b3b9a1e18e3b_9.0.30729.4940_none_50916076bcb9a742\\msvcp90.dll']),
+            'C:\\Windows\\WinSxS\\x86_microsoft.vc90.crt_1fc8b3b9a1e18e3b_9.0.30729.9279_none_50939ec6bcb7c97c\\msvcp90.dll']),
             ('i18n', glob.glob('i18n/*.qm')),
             ('img', [
                 'img/soroban.png',
