@@ -1,4 +1,4 @@
-#!/usr/bin/python2
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
 # mentalcalculation - version 0.4
@@ -52,7 +52,7 @@ except ImportError:
 try:
     from PyQt5 import QtGui,QtCore,QtWidgets
 except ImportError:
-    print >> sys.stderr, 'Error: you need PyQt5 to run this software'
+    print('Error: you need PyQt5 to run this software', file=sys.stderr)
     sys.exit(1)
 IS_PHONON_AVAILABLE = True
 try:
@@ -286,8 +286,8 @@ class Main(QtWidgets.QMainWindow):
             # call home
             try:
                 settings.setValue('uuid', QtCore.QVariant(self.uuid))
-                import urllib
-                ret = urllib.urlopen('http://sorobanexam.org/mentalcalculation/ping?uuid=%s' % self.uuid)
+                import urllib.request, urllib.parse, urllib.error
+                ret = urllib.request.urlopen('http://sorobanexam.org/mentalcalculation/ping?uuid=%s' % self.uuid)
                 # stop tracking if url returns 404
                 if ret.getcode() == 404:
                     settings.setValue('uuid', QtCore.QVariant('opt-out'))
@@ -474,7 +474,7 @@ class Main(QtWidgets.QMainWindow):
             self.ui.pb_start.setToolTip(self.tr('Start a sequence'))
             self.ui.label.clear()
             if options.verbose:
-                print
+                print()
             if self.speech and IS_SOUND_WORKING:
                 self.player.stop()
             if not self.hands_free:
@@ -572,9 +572,9 @@ class Main(QtWidgets.QMainWindow):
                 if self.one_digit:
                     t = ' '.join(list(t)).replace('- ', '-')
                 if ESPEAK_LANG.startswith('fr'):
-                    t = t.replace('=', u'égal ')
+                    t = t.replace('=', 'égal ')
                 if options.verbose:
-                    print t
+                    print(t)
                 self.player.finished.disconnect(self.clearLabel)
                 self.player.finished.connect(self.restartPlay)
                 self.pronounceit(t)
@@ -614,7 +614,7 @@ class Main(QtWidgets.QMainWindow):
                     self.shortcut_Enter.activated.disconnect(self.ui.pb_start.click)
                     self.shortcut_Enter.activated.connect(self.ui.pb_check.click)
                 if options.verbose:
-                    print
+                    print()
             else:
                 self.count += 1
                 self.ui.gb_number.setTitle('#%d / %s' % (self.count, self.rows))
@@ -627,7 +627,7 @@ class Main(QtWidgets.QMainWindow):
                 self.ui.label.setText(t)
                 # print the sequence in the console
                 if options.verbose:
-                    print t,
+                    print(t, end=' ')
                 # say it aloud
                 if IS_PHONON_AVAILABLE:
                     if self.speech and IS_ESPEAK_INSTALLED:
