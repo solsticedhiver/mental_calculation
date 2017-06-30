@@ -8,7 +8,6 @@ Requirements:
 for the Windows version:
 ------------------------
 All dependancies are included.
-- espeak for the speech synthesis (as an option)
 
 for the source version:
 -----------------------
@@ -16,7 +15,6 @@ for the source version:
 - PyQt4 4.7 (or higher)
 - qt 4.6 (or higher)
 - phonon (Watch out: there is a bug in phonon 4.6.0 that completly breaks this software. Try to use the 4.5.1 version)
-- espeak for the speech synthesis (as an option)
 
 Downloads:
 ----------
@@ -27,26 +25,10 @@ Qt
   http://qt.nokia.com/downloads/downloads#qt-lib
 PyQt
   http://www.riverbankcomputing.co.uk/software/pyqt/download
-eSpeak
-  http://espeak.sourceforge.net/download.html
-
-Espeak
-======
-
-*mentalcalculation* will look for *espeak* executable at its default location:
-    - C:\Program Files\eSpeak\command_line\espeak.exe for Windows
-    - /usr/bin/espeak for Linux
-
-If it is found, you will be able to use the speech synthesis option to get the number spoken out automatically.
-
-If, for any reason, *espeak* is installed in an unusual location, you must specify its path in the configuration file. See below on how to do that.
-
-*Espeak* will automatically use the language defined by your locale.
-If you want to change the language used by espeak, change the lang variable in the [Espeak] section of the config. file.
 
 Configuration file
 ------------------
-*mentalcalculation* saves its settings in a configuration file: 
+*mentalcalculation* saves its settings in a configuration file:
 On Linux/or any unix-like
   ~/.config/mentalcalculation/mentalcalculation.ini
 On Windows
@@ -80,15 +62,11 @@ The default configuration file looks like this:
     font_color=#000000
     background_color=transparent
 
-    [Espeak]
-    cmd=C:\\Program Files\\eSpeak\\command_line\\espeak.exe
-    lang=en
-    speed=170 ; words per minute from 80 to 390
-
     [Sound]
     one_digit=false
     speech=false
     annoying_sound=false
+    lang=en-us
 
 Colors
 ++++++

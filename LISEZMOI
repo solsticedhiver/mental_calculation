@@ -7,14 +7,13 @@ Dépendances:
 
 pour la version Windows
 ------------------------
-Toutes les dépendances sont incluses sauf espeak pour la synthèse vocale
+Toutes les dépendances sont incluses
 
 pour la version *source*
 ------------------------
 - python 2.6 (ou plus récent)
 - PyQt4 4.7 (ou plus récent)
 - qt 4.6 + phonon (ou plus récent)
-- espeak pour la synthèse vocale (en option)
 
 Téléchargements:
 ================
@@ -25,22 +24,6 @@ Qt
   http://qt.nokia.com/downloads/downloads#qt-lib
 PyQt
   http://www.riverbankcomputing.co.uk/software/pyqt/download
-eSpeak
-  http://espeak.sourceforge.net/download.html
-
-Espeak
-======
-
-*mentalcalculation* recherche *espeak* dans plusieurs endroits
-    - C:\Program Files\eSpeak\command_line\espeak.exe sur Windows
-    - /usr/bin/espeak sur Linux
-
-Seulement si *espeak* est trouvé, la fonction de synthèse vocale sera disponible.
-
-Si, pour quelques raisons que ce soit, espeak est installé à un endroit différent, vous pouvez le spécifier grâce au fichier de configuration. Voir plus bas.
-
-*Espeak* utilisera la langue de votre locale par défaut.
-Vous pouvez changer ça dans le fichier de configuration, section [Espeak]
 
 Fichier de configuration
 ------------------------
@@ -60,7 +43,7 @@ Note: Aucune modification n'est faite au registre de Windows.
 
 Personalisation
 ===============
-Le fichier de configuration ressebmel à ça:
+Le fichier de configuration ressemble à ça:
 
     ; les commentaires sont supprimés automatiquement
     [General]
@@ -77,15 +60,11 @@ Le fichier de configuration ressebmel à ça:
     font_color=#000000
     background_color=transparent
 
-    [Espeak]
-    cmd=C:\\Program Files\\eSpeak\\command_line\\espeak.exe
-    lang=en
-    speed=170 ; mot par minute de 80 à 390
-
     [Sound]
     one_digit=false
     speech=false
     annoying_sound=false
+    lang=en-us
 
 Couleurs
 ++++++++

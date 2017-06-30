@@ -81,6 +81,10 @@ SMILE = SHARE_PATH + 'img/face-smile.png'
 SAD = SHARE_PATH + 'img/face-sad.png'
 RESTART = SHARE_PATH + 'img/restart.png'
 
+APPID = '24125E3CEC86D159166858FC5D5B833C43D05EB9'
+URL = 'https://api.microsofttranslator.com/v2/Http.svc/Speak?appId=%s&text=%s&language=%s&format=audio/mp3'
+LANG = 'en'
+
 class Settings(QtWidgets.QDialog):
     def __init__(self, mysettings, parent=None):
         QtWidgets.QDialog.__init__(self, parent)
@@ -109,8 +113,6 @@ class Settings(QtWidgets.QDialog):
         self.ui.cb_onedigit.setChecked(mysettings['one_digit'])
         self.ui.cb_fullscreen.setChecked(mysettings['fullscreen'])
         self.ui.cb_handsfree.setChecked(mysettings['hands_free'])
-        if not IS_ESPEAK_INSTALLED:
-            self.ui.cb_speech.setChecked(False)
         self.ui.cb_neg.setChecked(mysettings['neg'])
         self.mysettings = mysettings
 
@@ -243,18 +245,6 @@ class Main(QtWidgets.QMainWindow):
             self.neg = eval(settings.value('neg').capitalize())
             if settings.contains('no_plus_sign'):
                 self.no_plus_sign = eval(settings.value('no_plus_sign').capitalize())
-        if 'Espeak' in settings.childGroups():
-            global ESPEAK_CMD, ESPEAK_LANG, ESPEAK_SPEED, IS_ESPEAK_INSTALLED
-            # test for every option
-            if not IS_ESPEAK_INSTALLED and settings.contains('Espeak/cmd'):
-                ESPEAK_CMD = str(settings.value('Espeak/cmd')).strip('"')
-                IS_ESPEAK_INSTALLED = os.path.isfile(ESPEAK_CMD)
-            if settings.contains('Espeak/lang'):
-                ESPEAK_LANG = str(settings.value('Espeak/lang'))
-                if ESPEAK_LANG.find('_') > 0:
-                    ESPEAK_LANG = ESPEAK_LANG[:ESPEAK_LANG.index('_')]
-            if settings.contains('Espeak/speed'):
-                ESPEAK_SPEED = int(settings.value('Espeak/speed'))
 
         # GUI settings
         if settings.contains('GUI/fullscreen'):
@@ -274,6 +264,11 @@ class Main(QtWidgets.QMainWindow):
             self.one_digit = eval(settings.value('Sound/one_digit').capitalize())
         if settings.contains('Sound/annoying_sound'):
             self.annoying_sound = eval(settings.value('Sound/annoying_sound').capitalize())
+        global LANG
+        if settings.contains('Sound/lang'):
+            LANG = str(settings.value('Sound/lang').toString())
+            if LANG.find('_') > 0:
+                LANG = LANG.replace('_','-').lower()
 
         # uuid
         self.uuid = ''
@@ -376,10 +371,7 @@ class Main(QtWidgets.QMainWindow):
                 settings.setValue('GUI/background_color', QtCore.QVariant(self.background_color \
                         if self.background_color is not None else 'transparent'))
 
-                settings.setValue('Espeak/cmd', QtCore.QVariant(ESPEAK_CMD))
-                settings.setValue('Espeak/lang', QtCore.QVariant(ESPEAK_LANG))
-                settings.setValue('Espeak/speed', QtCore.QVariant(ESPEAK_SPEED))
-
+                settings.setValue('Sound/lang', QtCore.QVariant(LANG))
                 settings.setValue('Sound/one_digit', QtCore.QVariant(self.one_digit))
                 settings.setValue('Sound/speech', QtCore.QVariant(self.speech))
                 settings.setValue('Sound/annoying_sound', QtCore.QVariant(self.annoying_sound))
@@ -444,7 +436,7 @@ class Main(QtWidgets.QMainWindow):
             self.ui.pb_start.setText(self.tr('&Stop'))
             self.ui.pb_start.setToolTip(self.tr('Stop the sequence'))
             if IS_PHONON_AVAILABLE:
-                if self.speech and IS_ESPEAK_INSTALLED:
+                if self.speech:
                     self.player.stop()
                     self.player.finished.connect(self.clearLabel)
                 elif self.annoying_sound:
@@ -489,16 +481,10 @@ class Main(QtWidgets.QMainWindow):
                 self.tmpwav = None
 
     def pronounceit(self, s):
-        p = QtCore.QProcess(self)
-        # Create a tmp wav file that it is later played by Phonon back end
-        self.tmpwav = NamedTemporaryFile(suffix='.wav', prefix='mentalcalculation_', delete=False)
-        p.start(ESPEAK_CMD, ['-v', ESPEAK_LANG, '-s',  '%d' % ESPEAK_SPEED,'-w', self.tmpwav.name, "'%s'" % s])
-        p.waitForFinished()
-        # so that it works also on Windows ! wtf !
-        self.tmpwav.close()
         self.player.stop()
         # make sure to use the tmp wav
-        self.player.setCurrentSource(Phonon.MediaSource(self.tmpwav.name))
+        url = URL % (APPID, s, LANG)
+        self.player.setCurrentSource(Phonon.MediaSource(QtCore.QUrl(url)))
         self.player.play()
 
     def updateAnswer(self):
@@ -571,8 +557,8 @@ class Main(QtWidgets.QMainWindow):
                 t = '= %d' % self.answer
                 if self.one_digit:
                     t = ' '.join(list(t)).replace('- ', '-')
-                if ESPEAK_LANG.startswith('fr'):
-                    t = t.replace('=', 'égal ')
+                if LANG.startswith('fr'):
+                    t = t.replace('=', u'égal ')
                 if options.verbose:
                     print(t)
                 self.player.finished.disconnect(self.clearLabel)
@@ -630,15 +616,15 @@ class Main(QtWidgets.QMainWindow):
                     print(t, end=' ')
                 # say it aloud
                 if IS_PHONON_AVAILABLE:
-                    if self.speech and IS_ESPEAK_INSTALLED:
+                    if self.speech:
                         # pronounce one digit at a time
                         if self.one_digit:
                             t = ' '.join(list(t)).replace('- ', '-')
                         # fix a bug with french not pronouncing the negative sign
-                        if ESPEAK_LANG.startswith('fr'):
+                        if LANG.startswith('fr'):
                             t = t.replace('-', 'moins ')
                         # fix a bug in turkish
-                        elif ESPEAK_LANG.startswith('tr'):
+                        elif LANG.startswith('tr'):
                             t = t.replace('-', 'eksi ')
                         self.pronounceit(t)
                     else:
@@ -664,24 +650,7 @@ if __name__ == '__main__':
             default=False, help='be verbose: print in console each number displayed')
     (options,args) = parser.parse_args(sys.argv)
 
-    if WINDOWS:
-        programFiles = [os.getenv('ProgramFiles(x86)'), os.getenv('ProgramFiles')]
-        ESPEAK_CMD_LIST = [os.path.join(p, 'eSpeak\command_line\espeak.exe') for p in programFiles if p is not None]
-    else:
-        ESPEAK_CMD_LIST = ['/usr/bin/espeak']
-
-    # check espeak in the default location
-    IS_ESPEAK_INSTALLED = False
-    ESPEAK_CMD = ''
-    i = 0
-    while not IS_ESPEAK_INSTALLED and i < len(ESPEAK_CMD_LIST):
-        if os.path.isfile(ESPEAK_CMD_LIST[i]):
-            IS_ESPEAK_INSTALLED = True
-            ESPEAK_CMD = ESPEAK_CMD_LIST[i]
-            break
-        i += 1
-
-    IS_SOUND_WORKING = IS_ESPEAK_INSTALLED and IS_PHONON_AVAILABLE
+    IS_SOUND_WORKING = IS_PHONON_AVAILABLE
 
     app = QtWidgets.QApplication(sys.argv)
     app.setApplicationName('Mental Calculation')
@@ -694,10 +663,9 @@ if __name__ == '__main__':
     app.installTranslator(translator)
 
     if LOCALENAME.find('_') > 0:
-        ESPEAK_LANG = LOCALENAME[:LOCALENAME.index('_')]
+        LANG = LOCALENAME.replace('_', '-').lower()
     else:
-        ESPEAK_LANG = LOCALENAME
-    ESPEAK_SPEED = 170 # the default of espeak
+        LANG = LOCALENAME
 
     # create main gui and display settings dialog
     f = Main()
