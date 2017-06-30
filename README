@@ -31,10 +31,8 @@ Configuration file
 *mentalcalculation* saves its settings in a configuration file:
 On Linux/or any unix-like
   ~/.config/mentalcalculation/mentalcalculation.ini
-On Windows
-  C:\Documents and Settings\<your_user_name>\Application Data\mentalcalculation\mentalcalculation.ini for Windows XP
-  or
-  C:\Users\<your_user_name>\AppData\Roaming\mentalcalculation\mentalcalculation.ini for Windows Vista and above
+On Windows Vista and above
+  C:\Users\<your_user_name>\AppData\Roaming\mentalcalculation\mentalcalculation.ini
 
 You might need to change the options of the Windows explorer to be able to see hidden files and directories
 to be able to access the configuration file.

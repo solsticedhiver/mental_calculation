@@ -30,10 +30,8 @@ Fichier de configuration
 *mentalcalculation* sauve ses préférences dans un fichier:
 Sur Linux ou tout Unix-like
   ~/.config/mentalcalculation/mentalcalculation.ini
-Sur Windows
-  C:\Documents and Settings\<votre_nom_d_utilisateur>\Application Data\mentalcalculation\mentalcalculation.ini pour Windows XP
-  ou
-  C:\Users\<votre_nom_d_utilisateur>\AppData\Roaming\mentalcalculation\mentalcalculation.ini pour Windows Vista ou au dessus
+Sur Windows Vista ou au dessus
+  C:\Users\<votre_nom_d_utilisateur>\AppData\Roaming\mentalcalculation\mentalcalculation.ini
 
 Il vous faudra peut-être modifier les options de l'explorateur Windows pour pouvoir voir les fichiers et répertoires cachés et accéder au fichier de configuration.
 
