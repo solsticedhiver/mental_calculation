@@ -50,37 +50,37 @@ class InnoScript:
     def create(self, pathname="dist\\mentalcalculation.iss"):
         self.pathname = pathname
         ofi = self.file = open(pathname, "w")
-        print >> ofi, "; WARNING: This script has been created by py2exe. Changes to this script"
-        print >> ofi, "; will be overwritten the next time py2exe is run!"
-        print >> ofi, """
+        print("; WARNING: This script has been created by py2exe. Changes to this script", file=ofi)
+        print("; will be overwritten the next time py2exe is run!", file=ofi)
+        print("""
 [Languages]
 Name: "en"; MessagesFile: "compiler:Default.isl"
 Name: "fr"; MessagesFile: "compiler:Languages\French.isl"
 Name: "it"; MessagesFile: "compiler:Languages\Italian.isl"
 Name: "es"; MessagesFile: "compiler:Languages\Spanish.isl"
 Name: "cs"; MessagesFile: "compiler:Languages\Czech.isl"
-"""
-        print >> ofi, r"[Setup]"
-        print >> ofi, r"AppName=%s" % self.name
-        print >> ofi, r"AppVerName=%s %s" % (self.name, self.version)
-        print >> ofi, r"DefaultDirName={pf}\%s" % self.name
-        print >> ofi, r"DefaultGroupName=%s" % self.name
-        print >> ofi
+""", file=ofi)
+        print(r"[Setup]", file=ofi)
+        print(r"AppName=%s" % self.name, file=ofi)
+        print(r"AppVerName=%s %s" % (self.name, self.version), file=ofi)
+        print(r"DefaultDirName={pf}\%s" % self.name, file=ofi)
+        print(r"DefaultGroupName=%s" % self.name, file=ofi)
+        print(file=ofi)
 
-        print >> ofi, r"[Files]"
+        print(r"[Files]", file=ofi)
         for path in self.windows_exe_files + self.lib_files:
-            print >> ofi, r'Source: "%s"; DestDir: "{app}\%s"; Flags: ignoreversion' % (path, os.path.dirname(path))
-        print >> ofi
+            print(r'Source: "%s"; DestDir: "{app}\%s"; Flags: ignoreversion' % (path, os.path.dirname(path)), file=ofi)
+        print(file=ofi)
 
-        print >> ofi, r"[Icons]"
+        print(r"[Icons]", file=ofi)
         for path in self.windows_exe_files:
-            print >> ofi, r'Name: "{group}\%s";' \
+            print(r'Name: "{group}\%s";' \
                     'Filename: "{app}\%s";' \
-                    'WorkingDir: "{app}"' % (self.name, path)
-        print >> ofi, 'Name: "{group}\Uninstall %s"; Filename: "{uninstallexe}"' % self.name
+                    'WorkingDir: "{app}"' % (self.name, path), file=ofi)
+        print('Name: "{group}\\Uninstall %s"; Filename: "{uninstallexe}"' % self.name, file=ofi)
 
-        print >> ofi, r'[UninstallDelete]'
-        print >> ofi, r'Type: dirifempty; Name: "{app}\img {app}"'
+        print(r'[UninstallDelete]', file=ofi)
+        print(r'Type: dirifempty; Name: "{app}\img {app}"', file=ofi)
 
     def compile(self):
         try:
@@ -92,26 +92,26 @@ Name: "cs"; MessagesFile: "compiler:Languages\Czech.isl"
                 import os
                 os.startfile(self.pathname)
             else:
-                print "Ok, using win32api."
+                print("Ok, using win32api.")
                 win32api.ShellExecute(0, "compile",
                         self.pathname,
                         None,
                         None,
                         0)
         else:
-            print "Cool, you have ctypes installed."
+            print("Cool, you have ctypes installed.")
             res = ctypes.windll.shell32.ShellExecuteA(0, "compile",
                     self.pathname,
                     None,
                     None,
                     0)
             if res < 32:
-                raise RuntimeError, "ShellExecute failed, error %d" % res
+                raise RuntimeError("ShellExecute failed, error %d" % res)
 
 
 ################################################################
 
-from py2exe.build_exe import py2exe
+from py2exe.distutils_buildexe import py2exe
 
 class build_installer(py2exe):
     # This class first builds the exe file(s), then creates a Windows installer.
@@ -125,9 +125,9 @@ class build_installer(py2exe):
                 self.dist_dir,
                 self.windows_exe_files,
                 self.lib_files)
-        print "*** creating the inno setup script***"
+        print("*** creating the inno setup script***")
         script.create()
-        print "*** compiling the inno setup script***"
+        print("*** compiling the inno setup script***")
         script.compile()
         # Note: By default the final setup.exe will be in an Output subdirectory.
 
@@ -140,9 +140,6 @@ setup(
         zipfile = "lib/library.zip",
         packages = ['gui'],
         data_files = [
-            ('phonon_backend', [
-                'C:\\Python27\\Lib\\site-packages\\PyQt4\\plugins\\phonon_backend\\phonon_ds94.dll'
-                ]),
             ('.', ['README', 'LISEZMOI', 'COPYING', 'Changelog',
                 #'C:\\WINDOWS\\system32\\msvcp90.dll']),
                 #'C:\\WINDOWS\\WinSxS\\x86_Microsoft.VC90.CRT_1fc8b3b9a1e18e3b_9.0.30729.1_x-ww_6f74963e\\msvcp90.dll']),
