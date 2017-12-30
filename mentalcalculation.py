@@ -35,6 +35,7 @@
 
 import sys
 import os
+import urllib.request, urllib.parse, urllib.error
 import platform
 WINDOWS = platform.system() == 'Windows'
 if WINDOWS:
@@ -54,11 +55,11 @@ try:
 except ImportError:
     print('Error: you need PyQt5 to run this software', file=sys.stderr)
     sys.exit(1)
-IS_PHONON_AVAILABLE = True
+IS_SOUND_AVAILABLE = True
 try:
-    from PyQt5.phonon import Phonon
+    from PyQt5 import QtMultimedia
 except ImportError:
-    IS_PHONON_AVAILABLE = False
+    IS_SOUND_AVAILABLE = False
 
 from gui import settings, main
 
@@ -68,6 +69,8 @@ appName = 'mentalcalculation'
 appVersion = '0.4'
 
 SHARE_PATH = ''
+if SHARE_PATH == '':
+    SHARE_PATH = os.path.abspath('.')+'/'
 BELL = SHARE_PATH + 'sound/bell.mp3'
 BELL_DURATION = 600
 THREEBELLS = SHARE_PATH + 'sound/3bells.mp3'
@@ -100,7 +103,7 @@ class Settings(QtWidgets.QDialog):
         if IS_SOUND_WORKING:
             self.ui.cb_speech.setEnabled(True)
             self.ui.pm_warning.hide()
-        elif not IS_PHONON_AVAILABLE:
+        elif not IS_SOUND_AVAILABLE:
             self.ui.pm_warning.setToolTip(self.tr('phonon is not working'))
         self.adjustSize()
 
@@ -200,9 +203,9 @@ class Main(QtWidgets.QMainWindow):
 
         self.ui.label.setPixmap(QtGui.QPixmap(WELCOME))
 
-        if IS_PHONON_AVAILABLE:
-            self.player = Phonon.createPlayer(Phonon.AccessibilityCategory, Phonon.MediaSource(''))
-            self.player.stateChanged.connect(self.cleanup)
+        if IS_SOUND_AVAILABLE:
+            self.player = QtMultimedia.QMediaPlayer()
+            #self.player.stateChanged.connect(self.cleanup)
 
         self.importSettings()
         # change background and foreground color if needed
@@ -266,7 +269,7 @@ class Main(QtWidgets.QMainWindow):
             self.annoying_sound = eval(settings.value('Sound/annoying_sound').capitalize())
         global LANG
         if settings.contains('Sound/lang'):
-            LANG = str(settings.value('Sound/lang').toString())
+            LANG = str(settings.value('Sound/lang'))
             if LANG.find('_') > 0:
                 LANG = LANG.replace('_','-').lower()
 
@@ -281,12 +284,11 @@ class Main(QtWidgets.QMainWindow):
             # call home
             try:
                 settings.setValue('uuid', QtCore.QVariant(self.uuid))
-                import urllib.request, urllib.parse, urllib.error
                 ret = urllib.request.urlopen('http://sorobanexam.org/mentalcalculation/ping?uuid=%s' % self.uuid)
                 # stop tracking if url returns 404
                 if ret.getcode() == 404:
                     settings.setValue('uuid', QtCore.QVariant('opt-out'))
-            except IOError:
+            except urllib.error.URLError:
                 pass
 
     def updateFullScreen(self):
@@ -384,11 +386,11 @@ class Main(QtWidgets.QMainWindow):
         if self.started:
             duration = self.timeout
             if self.speech and IS_SOUND_WORKING:
-                self.player.finished.disconnect(self.restartPlay)
-                self.player.finished.connect(self.clearLabel)
-                self.player.setCurrentSource(Phonon.MediaSource(THREEBELLS))
+                self.player.stateChanged.disconnect(self.restartPlay)
+                self.player.setMedia(QtMultimedia.QMediaContent(QtCore.QUrl.fromLocalFile(THREEBELLS)))
                 duration += THREEBELLS_DURATION
                 self.player.play()
+                self.player.stateChanged.connect(self.clearLabel)
             self.isLabelClearable = False
             self.started = False
             self.ui.label.clear()
@@ -404,13 +406,32 @@ class Main(QtWidgets.QMainWindow):
         self.ui.pb_replay.setEnabled(False)
         self.timerUpdateLabel.stop()
         if self.hands_free:
-            if IS_PHONON_AVAILABLE:
-                self.player.finished.disconnect(self.restartPlay)
-                self.player.finished.connect(self.clearLabel)
+            if IS_SOUND_AVAILABLE:
+                self.player.stateChanged.disconnect(self.restartPlay)
             self.timerShowAnswer.stop()
             self.timerRestartPlay.stop()
             self.ui.l_total.hide()
         self.startPlay()
+
+    def downloadSounds(self):
+        self.ui.statusbar.showMessage('Downloading...')
+        self.sounds = {}
+        for i,n in enumerate(self.history):
+            t = '%d' % n
+            if self.neg and i > 1:
+                t = '%+d' % n
+            if self.no_plus_sign and t.startswith('+'):
+                t = t[1:]
+            if self.one_digit:
+                t = ' '.join(list(t)).replace('- ', '-')
+            if t not in self.sounds:
+                url = URL % (APPID, t, LANG)
+                ret = urllib.request.urlopen(url)
+                data = ret.read()
+                with NamedTemporaryFile(prefix='mentalcalculation', suffix='.mp3', delete=False) as f:
+                    f.write(data)
+                    self.sounds[t] = f.name
+        self.ui.statusbar.clearMessage()
 
     def startPlay(self):
         if not self.started:
@@ -430,18 +451,18 @@ class Main(QtWidgets.QMainWindow):
                 self.replay = False
             else:
                 self.makeHistory()
+                self.downloadSounds()
                 self.noscore = False
                 self.ui.pb_replay.setEnabled(False)
             # change pb_start to 'Stop' when starting display
             self.ui.pb_start.setText(self.tr('&Stop'))
             self.ui.pb_start.setToolTip(self.tr('Stop the sequence'))
-            if IS_PHONON_AVAILABLE:
+            if IS_SOUND_AVAILABLE:
                 if self.speech:
                     self.player.stop()
-                    self.player.finished.connect(self.clearLabel)
                 elif self.annoying_sound:
-                    self.player.finished.disconnect(self.clearLabel)
-                    self.player.setCurrentSource(Phonon.MediaSource(ANNOYING_SOUND))
+                    self.player.stateChanged.disconnect(self.clearLabel)
+                    self.player.setMedia(QtMultimedia.QMediaContent(QtCore.QUrl.fromLocalFile(ANNOYING_SOUND)))
             if self.hands_free:
                 self.ui.l_answer.setEnabled(False)
             # wait 1s before starting the display
@@ -453,9 +474,9 @@ class Main(QtWidgets.QMainWindow):
             self.isLabelClearable = False
             self.timerUpdateLabel.stop()
             if self.hands_free:
-                if IS_PHONON_AVAILABLE:
-                    self.player.finished.disconnect(self.restartPlay)
-                    self.player.finished.connect(self.clearLabel)
+                if IS_SOUND_AVAILABLE:
+                    self.player.stateChanged.disconnect(self.restartPlay)
+                    self.player.stateChanged.connect(self.clearLabel)
                 self.timerShowAnswer.stop()
                 self.timerRestartPlay.stop()
                 self.ui.l_answer.setEnabled(True)
@@ -482,10 +503,9 @@ class Main(QtWidgets.QMainWindow):
 
     def pronounceit(self, s):
         self.player.stop()
-        # make sure to use the tmp wav
-        url = URL % (APPID, s, LANG)
-        self.player.setCurrentSource(Phonon.MediaSource(QtCore.QUrl(url)))
+        self.player.setMedia(QtMultimedia.QMediaContent(QtCore.QUrl.fromLocalFile(self.sounds[s])))
         self.player.play()
+        self.player.stateChanged.connect(self.clearLabel)
 
     def updateAnswer(self):
         if self.ui.le_answer.isEnabled():
@@ -515,7 +535,7 @@ class Main(QtWidgets.QMainWindow):
             self.ui.pb_check.setDisabled(True)
             self.ui.label.setPixmap(QtGui.QPixmap(img))
             if self.speech and IS_SOUND_WORKING:
-                self.player.setCurrentSource(Phonon.MediaSource(sound))
+                self.player.setMedia(QtMultimedia.QMediaContent(QtCore.QUrl.fromLocalFile(sound)))
                 self.player.play()
             self.ui.statusbar.showMessage(self.tr('Score: %1/%2').arg(u).arg(v))
             self.shortcut_Enter.activated.disconnect(self.ui.pb_check.click)
@@ -557,12 +577,13 @@ class Main(QtWidgets.QMainWindow):
                 t = '= %d' % self.answer
                 if self.one_digit:
                     t = ' '.join(list(t)).replace('- ', '-')
-                if LANG.startswith('fr'):
-                    t = t.replace('=', u'égal ')
                 if options.verbose:
                     print(t)
-                self.player.finished.disconnect(self.clearLabel)
-                self.player.finished.connect(self.restartPlay)
+                self.player.stateChanged.disconnect(self.clearLabel)
+                self.player.stateChanged.connect(self.restartPlay)
+                self.player.setMedia(QtMultimedia.QMediaContent(QtCore.QUrl(url)))
+                self.player.play()
+                self.player.stateChanged.connect(self.clearLabel)
                 self.pronounceit(t)
             else:
                 QtCore.QTimer.singleShot(self.timeout+2000, self.ui.label.clear)
@@ -579,8 +600,9 @@ class Main(QtWidgets.QMainWindow):
                 duration = self.timeout+2000
                 if self.speech and IS_SOUND_WORKING:
                     self.player.stop()
-                    self.player.setCurrentSource(Phonon.MediaSource(BELL))
+                    self.player.setMedia(QtMultimedia.QMediaContent(QtCore.QUrl.fromLocalFile(BELL)))
                     self.player.play()
+                    self.player.stateChanged.connect(self.clearLabel)
                     duration += BELL_DURATION
 
                 self.ui.label.setText('?')
@@ -615,22 +637,17 @@ class Main(QtWidgets.QMainWindow):
                 if options.verbose:
                     print(t, end=' ')
                 # say it aloud
-                if IS_PHONON_AVAILABLE:
+                if IS_SOUND_AVAILABLE:
                     if self.speech:
                         # pronounce one digit at a time
                         if self.one_digit:
                             t = ' '.join(list(t)).replace('- ', '-')
-                        # fix a bug with french not pronouncing the negative sign
-                        if LANG.startswith('fr'):
-                            t = t.replace('-', 'moins ')
-                        # fix a bug in turkish
-                        elif LANG.startswith('tr'):
-                            t = t.replace('-', 'eksi ')
                         self.pronounceit(t)
                     else:
                         if self.annoying_sound:
                             self.player.seek(0)
                             self.player.play()
+                            #self.player.stateChanged.connect(self.clearLabel)
                         # clear the label after self.flash time
                         QtCore.QTimer.singleShot(self.flash, self.clearLabel)
                 else:
@@ -638,9 +655,12 @@ class Main(QtWidgets.QMainWindow):
 
     def closeEvent(self, event):
         # stop the player
-        if IS_PHONON_AVAILABLE and self.player:
+        if IS_SOUND_AVAILABLE and self.player:
             self.player.stop()
             self.player = None
+        # delete all tmp files
+        for fn in self.sounds.values():
+            os.unlink(fn)
         QtWidgets.QMainWindow.closeEvent(self, event)
 
 
@@ -650,7 +670,7 @@ if __name__ == '__main__':
             default=False, help='be verbose: print in console each number displayed')
     (options,args) = parser.parse_args(sys.argv)
 
-    IS_SOUND_WORKING = IS_PHONON_AVAILABLE
+    IS_SOUND_WORKING = IS_SOUND_AVAILABLE
 
     app = QtWidgets.QApplication(sys.argv)
     app.setApplicationName('Mental Calculation')
