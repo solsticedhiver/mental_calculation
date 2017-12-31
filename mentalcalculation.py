@@ -88,7 +88,7 @@ APPID = '24125E3CEC86D159166858FC5D5B833C43D05EB9'
 APIURL = 'https://api.microsofttranslator.com/v2/Http.svc/Speak'
 LANG = 'en'
 
-data = {'appId': APPID, 'text': '', 'language': LANG, 'format': 'audio/mp3'}
+query = {'appId': APPID, 'text': '', 'language': LANG, 'format': 'audio/mp3'}
 
 class Settings(QtWidgets.QDialog):
     def __init__(self, mysettings, parent=None):
@@ -150,8 +150,8 @@ class Main(QtWidgets.QMainWindow):
         self.ui.setupUi(self)
         self.score = (0,0)
         self.started = False
-        global data
-        self.data = data
+        global query
+        self.query = query
         # default settings
         self.digits = 1
         self.rows = 5
@@ -209,7 +209,7 @@ class Main(QtWidgets.QMainWindow):
 
         if IS_SOUND_AVAILABLE:
             self.player = QtMultimedia.QMediaPlayer()
-            #self.player.stateChanged.connect(self.cleanup)
+            self.player.setAudioRole(QtMultimedia.QAudio.VoiceCommunicationRole)
 
         self.importSettings()
         # change background and foreground color if needed
@@ -422,20 +422,24 @@ class Main(QtWidgets.QMainWindow):
         self.sounds = {}
         for i,n in enumerate(self.history):
             t = '%d' % n
-            if self.neg and i > 1:
+            if self.neg and i > 0:
                 t = '%+d' % n
             if self.no_plus_sign and t.startswith('+'):
                 t = t[1:]
             if self.one_digit:
                 t = ' '.join(list(t)).replace('- ', '-')
             if t not in self.sounds:
-                self.data.update({'text': t, 'language': LANG})
-                url = '%s?%s' % (APIURL, urllib.parse.urlencode(self.data))
+                self.query.update({'text': t, 'language': LANG})
+                url = '%s?%s' % (APIURL, urllib.parse.urlencode(self.query))
                 ret = urllib.request.urlopen(url)
-                data = ret.read()
-                with NamedTemporaryFile(prefix='mentalcalculation', suffix='.mp3', delete=False) as f:
-                    f.write(data)
-                    self.sounds[t] = f.name
+                if ret.getcode() != 200:
+                    print("Error: can't download sound for {}".format(t))
+                    self.sounds[t] = BELL
+                else:
+                    data = ret.read()
+                    with NamedTemporaryFile(prefix='mentalcalculation', suffix='.mp3', delete=False) as f:
+                        f.write(data)
+                        self.sounds[t] = f.name
         self.ui.statusbar.clearMessage()
 
     def startPlay(self):
@@ -468,6 +472,8 @@ class Main(QtWidgets.QMainWindow):
                 elif self.annoying_sound:
                     self.player.stateChanged.disconnect(self.clearLabel)
                     self.player.setMedia(QtMultimedia.QMediaContent(QtCore.QUrl.fromLocalFile(ANNOYING_SOUND)))
+                    self.player.play()
+                    self.player.stateChanged.connect(self.clearLabel)
             if self.hands_free:
                 self.ui.l_answer.setEnabled(False)
             # wait 1s before starting the display
@@ -499,18 +505,15 @@ class Main(QtWidgets.QMainWindow):
                 # reset history
                 self.history = []
 
-    def cleanup(self, newstate, oldstate):
-        if (newstate == Phonon.PausedState or newstate == Phonon.StoppedState) and oldstate == Phonon.PlayingState:
-            if self.tmpwav is not None:
-                self.tmpwav.close()
-                os.remove(self.tmpwav.name)
-                self.tmpwav = None
-
     def pronounceit(self, s):
         self.player.stop()
-        self.player.setMedia(QtMultimedia.QMediaContent(QtCore.QUrl.fromLocalFile(self.sounds[s])))
-        self.player.play()
-        self.player.stateChanged.connect(self.clearLabel)
+        try:
+            self.player.setMedia(QtMultimedia.QMediaContent(QtCore.QUrl.fromLocalFile(self.sounds[s])))
+            self.player.play()
+            self.player.stateChanged.connect(self.clearLabel)
+        except KeyError:
+            print('Error: {} not found in sounds'.format(s))
+            QtCore.QTimer.singleShot(2000, self.clearLabel)
 
     def updateAnswer(self):
         if self.ui.le_answer.isEnabled():
@@ -650,9 +653,10 @@ class Main(QtWidgets.QMainWindow):
                         self.pronounceit(t)
                     else:
                         if self.annoying_sound:
+                            self.player.stateChanged.disconnect(self.clearLabel)
                             self.player.setMedia(QtMultimedia.QMediaContent(QtCore.QUrl.fromLocalFile(ANNOYING_SOUND)))
                             self.player.play()
-                            #self.player.stateChanged.connect(self.clearLabel)
+                            self.player.stateChanged.connect(self.clearLabel)
                         # clear the label after self.flash time
                         QtCore.QTimer.singleShot(self.flash, self.clearLabel)
                 else:
@@ -665,7 +669,10 @@ class Main(QtWidgets.QMainWindow):
             self.player = None
         # delete all tmp files
         for fn in self.sounds.values():
-            os.unlink(fn)
+            try:
+                os.unlink(fn)
+            except FileNotFoundError:
+                pass
         QtWidgets.QMainWindow.closeEvent(self, event)
 
 
