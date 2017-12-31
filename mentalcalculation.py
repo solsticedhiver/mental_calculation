@@ -85,8 +85,10 @@ SAD = SHARE_PATH + 'img/face-sad.png'
 RESTART = SHARE_PATH + 'img/restart.png'
 
 APPID = '24125E3CEC86D159166858FC5D5B833C43D05EB9'
-URL = 'https://api.microsofttranslator.com/v2/Http.svc/Speak?appId=%s&text=%s&language=%s&format=audio/mp3'
+APIURL = 'https://api.microsofttranslator.com/v2/Http.svc/Speak'
 LANG = 'en'
+
+data = {'appId': APPID, 'text': '', 'language': LANG, 'format': 'audio/mp3'}
 
 class Settings(QtWidgets.QDialog):
     def __init__(self, mysettings, parent=None):
@@ -148,6 +150,8 @@ class Main(QtWidgets.QMainWindow):
         self.ui.setupUi(self)
         self.score = (0,0)
         self.started = False
+        global data
+        self.data = data
         # default settings
         self.digits = 1
         self.rows = 5
@@ -319,7 +323,7 @@ class Main(QtWidgets.QMainWindow):
             QtCore.QTimer.singleShot(150, self.ui.label.clear)
 
     def clearLabel(self):
-        if self.isLabelClearable:
+        if self.isLabelClearable and self.player.state() == QtMultimedia.QMediaPlayer.StoppedState:
             self.ui.label.clear()
             # display the next number after timeout
             self.timerUpdateLabel.setInterval(self.timeout)
@@ -425,7 +429,8 @@ class Main(QtWidgets.QMainWindow):
             if self.one_digit:
                 t = ' '.join(list(t)).replace('- ', '-')
             if t not in self.sounds:
-                url = URL % (APPID, t, LANG)
+                self.data.update({'text': t, 'language': LANG})
+                url = '%s?%s' % (APIURL, urllib.parse.urlencode(self.data))
                 ret = urllib.request.urlopen(url)
                 data = ret.read()
                 with NamedTemporaryFile(prefix='mentalcalculation', suffix='.mp3', delete=False) as f:
@@ -645,7 +650,7 @@ class Main(QtWidgets.QMainWindow):
                         self.pronounceit(t)
                     else:
                         if self.annoying_sound:
-                            self.player.seek(0)
+                            self.player.setMedia(QtMultimedia.QMediaContent(QtCore.QUrl.fromLocalFile(ANNOYING_SOUND)))
                             self.player.play()
                             #self.player.stateChanged.connect(self.clearLabel)
                         # clear the label after self.flash time
