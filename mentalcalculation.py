@@ -69,8 +69,7 @@ appName = 'mentalcalculation'
 appVersion = '0.4'
 
 SHARE_PATH = ''
-if SHARE_PATH == '':
-    SHARE_PATH = os.path.abspath('.')+'/'
+SHARE_PATH = os.path.abspath(SHARE_PATH)+'/'
 BELL = SHARE_PATH + 'sound/bell.mp3'
 BELL_DURATION = 600
 THREEBELLS = SHARE_PATH + 'sound/3bells.mp3'
