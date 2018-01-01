@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 
 from distutils.core import setup
 from subprocess import call
@@ -6,8 +6,8 @@ import glob
 import sys
 import mentalcalculation
 
-if sys.version_info[0] > 2:
-    print("This script requires python 2")
+if sys.version_info[0] > 3:
+    print("This script requires python 3")
     exit(1)
 
 dist = setup(name=mentalcalculation.appName,
@@ -20,7 +20,7 @@ dist = setup(name=mentalcalculation.appName,
         packages = ['gui'],
         data_files = [
             ('share/mentalcalculation/i18n', glob.glob('i18n/*.qm')),
-            ('share/doc/mentalcalculation', ['README', 'LISEZMOI', 'COPYING', 'Changelog']),
+            ('share/doc/mentalcalculation', ['README.md', 'COPYING', 'Changelog']),
             ('share/mentalcalculation/img', [
                 'img/soroban.png',
                 'img/warning.png',
@@ -53,7 +53,7 @@ call(("sed -i /^SHARE_PATH/s|''|'%s'| %s" % (installdir+'/share/mentalcalculatio
 # /usr/bin/mentalcalculation.py
 # /usr/share/mentalcalculation/*
 # /usr/share/doc/mentalcalculation/*
-# /usr/lib/python2.*/site-packages/mentalcalculation*
+# /usr/lib/python3.*/site-packages/mentalcalculation*
 #
 # or record the list of installed files and use it to uninstall
 # python setup.py install --record files.txt
