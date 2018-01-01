@@ -503,12 +503,31 @@ class Main(QtWidgets.QMainWindow):
                 ret = urllib.request.urlopen(url)
                 if ret.getcode() != 200:
                     print("Error: can't download sound for {}".format(t))
+                    self.ui.statusbar.showMessage('An error occurred when downloading sound')
                     self.sounds[t] = BELL
                 else:
                     data = ret.read()
                     with NamedTemporaryFile(prefix='mentalcalculation', suffix='.mp3', delete=False) as f:
                         f.write(data)
                         self.sounds[t] = f.name
+
+        if self.hands_free:
+            t = '= %d' % self.answer
+            if self.one_digit:
+                t = ' '.join(list(t)).replace('- ', '-')
+            if t not in self.sounds:
+                self.query.update({'text': t, 'language': LANG})
+                url = '%s?%s' % (APIURL, urllib.parse.urlencode(self.query))
+                ret = urllib.request.urlopen(url)
+                if ret.getcode() != 200:
+                    print("Error: can't download sound for {}".format(t))
+                    self.sounds[t] = BELL
+                else:
+                    data = ret.read()
+                    with NamedTemporaryFile(prefix='mentalcalculation', suffix='.mp3', delete=False) as f:
+                        f.write(data)
+                        self.sounds[t] = f.name
+
         self.ui.statusbar.clearMessage()
 
     def pronounceit(self, s):
@@ -566,16 +585,14 @@ class Main(QtWidgets.QMainWindow):
             if self.speech and IS_SOUND_WORKING:
                 # pronounce one digit at a time
                 t = '= %d' % self.answer
-                if self.one_digit:
-                    t = ' '.join(list(t)).replace('- ', '-')
                 if options.verbose:
                     print(t)
+                if self.one_digit:
+                    t = ' '.join(list(t)).replace('- ', '-')
                 self.player.stateChanged.disconnect(self.clearLabel)
-                self.player.stateChanged.connect(self.restartPlay)
-                self.player.setMedia(QtMultimedia.QMediaContent(QtCore.QUrl(url)))
+                self.player.setMedia(QtMultimedia.QMediaContent(QtCore.QUrl.fromLocalFile(self.sounds[t])))
                 self.player.play()
-                self.player.stateChanged.connect(self.clearLabel)
-                self.pronounceit(t)
+                self.player.stateChanged.connect(self.restartPlay)
             else:
                 QtCore.QTimer.singleShot(self.timeout+2000, self.ui.label.clear)
                 QtCore.QTimer.singleShot(self.timeout+2000, self.ui.l_total.hide)
