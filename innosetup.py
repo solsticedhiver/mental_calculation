@@ -24,7 +24,7 @@ with open('mentalcalculation.py') as f:
         if line.startswith('appVersion'):
             appVersion = line.split('=')[1].strip()
 
-sys.path.append('C:\\Windows\\WinSxS\\x86_microsoft.vc90.crt_1fc8b3b9a1e18e3b_9.0.30729.9279_none_50939ec6bcb7c97c')
+sys.path.append('C:\\Windows\\WinSxS\\x86_microsoft.vc90.crt_1fc8b3b9a1e18e3b_9.0.30729.9317_none_508dca76bcbcfe81')
 
 class InnoScript:
     def __init__(self,
@@ -146,7 +146,7 @@ setup(
             ('.', ['README', 'LISEZMOI', 'COPYING', 'Changelog',
                 #'C:\\WINDOWS\\system32\\msvcp90.dll']),
                 #'C:\\WINDOWS\\WinSxS\\x86_Microsoft.VC90.CRT_1fc8b3b9a1e18e3b_9.0.30729.1_x-ww_6f74963e\\msvcp90.dll']),
-            'C:\\Windows\\WinSxS\\x86_microsoft.vc90.crt_1fc8b3b9a1e18e3b_9.0.30729.9279_none_50939ec6bcb7c97c\\msvcp90.dll']),
+            'C:\\Windows\\WinSxS\\x86_microsoft.vc90.crt_1fc8b3b9a1e18e3b_9.0.30729.9317_none_508dca76bcbcfe81\\msvcp90.dll']),
             ('i18n', glob.glob('i18n/*.qm')),
             ('img', [
                 'img/soroban.png',
