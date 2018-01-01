@@ -29,10 +29,28 @@ else:
     # copy assets in directory
     print(':: Copying assets into target dir')
     try:
-        shutil.copytree('img', 'dist/mentalcalculation/img')
-        shutil.copytree('sound', 'dist/mentalcalculation/sound')
-        shutil.copytree('gui', 'dist/mentalcalculation/gui')
-        shutil.copytree('i18n', 'dist/mentalcalculation/i18n')
+        assets = ['img\\soroban.png',
+            'img\\restart.png',
+            'img\\face-sad.png',
+            'img\\face-smile.png',
+            'img\\soro.ico',
+            'gui\\__init__.py',
+            'gui\\main.py',
+            'gui\\settings.py',
+            'sound\\bad.mp3',
+            'sound\\annoying-sound.mp3',
+            'sound\\good.mp3',
+            'sound\\bell.mp3',
+            'sound\\3bells.mp3',
+            ]
+        os.mkdir('dist\\mentalcalculation\\img')
+        os.mkdir('dist\\mentalcalculation\\sound')
+        os.mkdir('dist\\mentalcalculation\\gui')
+        os.mkdir('dist\\mentalcalculation\\i18n')
+        for a in assets:
+            shutil.copy(a, 'dist\\mentalcalculation\\%s' % a)
+        for q in glob.glob('i18n/*.qm'):
+            shutil.copy(q, 'dist\\mentalcalculation\\%s' % q)
     except FileExistsError:
         pass
 
@@ -134,11 +152,10 @@ __FILES__ = [
 'README.md',
 'Changelog',
 'img/soroban.png',
-'img/warning.png',
 'img/restart.png',
 'img/face-sad.png',
 'img/face-smile.png',
-'img/calculator.png',
+'img/soro.ico',
 'gui/__init__.py',
 'gui/main.py',
 'gui/settings.py',

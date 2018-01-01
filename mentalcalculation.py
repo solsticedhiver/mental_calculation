@@ -284,7 +284,7 @@ class Main(QtWidgets.QMainWindow):
         else:
             import uuid
             self.uuid = str(uuid.uuid4())
-        if self.uuid not in ('', 'no', 'none', 'false', 'No', 'None', 'False', 'opt-out', 'optout'):
+        if self.uuid.lower() not in ('', 'no', 'none', 'false', 'opt-out', 'optout'):
             # call home
             try:
                 settings.setValue('uuid', QtCore.QVariant(self.uuid))
