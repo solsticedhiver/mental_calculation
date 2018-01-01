@@ -15,7 +15,7 @@
   </property>
   <property name="windowIcon">
    <iconset>
-    <normaloff>img/calculator.png</normaloff>img/calculator.png</iconset>
+    <normaloff>img/soro.ico</normaloff>img/soro.ico</iconset>
   </property>
   <layout class="QGridLayout" name="gridLayout_2">
    <item row="0" column="0">

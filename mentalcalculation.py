@@ -444,8 +444,7 @@ class Main(QtWidgets.QMainWindow):
             self.timerUpdateLabel.stop()
             if self.hands_free:
                 if IS_SOUND_AVAILABLE:
-                    self.player.stateChanged.disconnect(self.restartPlay)
-                    self.player.stateChanged.connect(self.clearLabel)
+                    self.player.stateChanged.disconnect(self.clearLabel)
                 self.timerShowAnswer.stop()
                 self.timerRestartPlay.stop()
                 self.ui.l_answer.setEnabled(True)

@@ -23,7 +23,7 @@ else:
     except FileNotFoundError:
         userprofile = os.environ['USERPROFILE'].replace('\\', '\\\\')
         pyinstaller = os.path.sep.join([userprofile, 'AppData\\Local\\Programs\\Python\\Python36\\Scripts\\pyinstaller.exe'])
-        cmd = '%s --noconsole mentalcalculation.py' % pyinstaller
+        cmd = '%s --noconsole -i img/soro.ico mentalcalculation.py' % pyinstaller
         cp = subprocess.run(cmd.split(' '))
 
     # copy assets in directory
