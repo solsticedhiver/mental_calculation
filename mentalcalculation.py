@@ -149,6 +149,7 @@ class Main(QtWidgets.QMainWindow):
         self.ui.setupUi(self)
         self.score = (0,0)
         self.started = False
+        self.sounds = {}
         global query
         self.query = query
         # default settings
