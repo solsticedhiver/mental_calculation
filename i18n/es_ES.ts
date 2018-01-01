@@ -138,13 +138,13 @@ se muestra la solución y seguidamente comienza una nueva secuencia</translation
     </message>
     <message>
         <location filename="mentalcalculation.py" line="543"/>
-        <source>The correct answer is %1</source>
-        <translation>La respuesta correcta es %1</translation>
+        <source>The correct answer is {}</source>
+        <translation>La respuesta correcta es {}</translation>
     </message>
     <message>
         <location filename="mentalcalculation.py" line="510"/>
-        <source>Score: %1/%2</source>
-        <translation>Puntuación: %1/%2</translation>
+        <source>Score: {}/{}</source>
+        <translation>Puntuación: {}/{}</translation>
     </message>
 </context>
 <context>

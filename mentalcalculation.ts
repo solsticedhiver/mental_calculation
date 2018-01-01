@@ -3,72 +3,72 @@
 <context>
     <name>Dialog</name>
     <message>
-        <location filename="settings.py" line="21"/>
+        <location filename="settings.py" line="155"/>
         <source>Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="settings.py" line="34"/>
+        <location filename="settings.py" line="156"/>
         <source>Number of digits for each number</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="settings.py" line="35"/>
+        <location filename="settings.py" line="157"/>
         <source>Number of &amp;digits</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="settings.py" line="54"/>
+        <location filename="settings.py" line="158"/>
         <source>How many to add ?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="settings.py" line="55"/>
+        <location filename="settings.py" line="159"/>
         <source>Number of &amp;rows</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="settings.py" line="73"/>
+        <location filename="settings.py" line="160"/>
         <source>Allow/disallow subtractions</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="settings.py" line="74"/>
+        <location filename="settings.py" line="161"/>
         <source>&amp;Subtractions</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="settings.py" line="80"/>
+        <location filename="settings.py" line="162"/>
         <source>Timeout in ms between number disappearing and next number appearing</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="settings.py" line="81"/>
+        <location filename="settings.py" line="163"/>
         <source>&amp;Timeout (ms)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="settings.py" line="99"/>
+        <location filename="settings.py" line="164"/>
         <source>Time the number is displayed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="settings.py" line="100"/>
+        <location filename="settings.py" line="165"/>
         <source>&amp;Flash (ms)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="settings.py" line="130"/>
+        <location filename="settings.py" line="166"/>
         <source> &lt;p style=&apos;white-space:pre&apos;&gt;&lt;em&gt;&lt;strong&gt;espeak&lt;/strong&gt;&lt;/em&gt; is needed for speech synthesis&lt;/p&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="settings.py" line="131"/>
+        <location filename="settings.py" line="167"/>
         <source>S&amp;peech Synthesis</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="settings.py" line="136"/>
+        <location filename="settings.py" line="168"/>
         <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
@@ -80,29 +80,29 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="settings.py" line="152"/>
+        <location filename="settings.py" line="176"/>
         <source>Pronounce each digit of a number</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="settings.py" line="153"/>
+        <location filename="settings.py" line="177"/>
         <source>One digit at a time</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="settings.py" line="158"/>
+        <location filename="settings.py" line="178"/>
         <source>In this mode, you don&apos;t have to enter an answer, it&apos;s &quot;hands free&quot;;
 the solution is displayed, and a new sequence begins,
 and so on ...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="settings.py" line="161"/>
+        <location filename="settings.py" line="181"/>
         <source>&amp;Continuous &quot;hands-free&quot; mode</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="settings.py" line="165"/>
+        <location filename="settings.py" line="182"/>
         <source>Full screen</source>
         <translation type="unfinished"></translation>
     </message>
@@ -110,115 +110,115 @@ and so on ...</source>
 <context>
     <name>Main</name>
     <message>
-        <location filename="mentalcalculation.py" line="422"/>
+        <location filename="mentalcalculation.py" line="469"/>
         <source>&amp;Stop</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mentalcalculation.py" line="423"/>
+        <location filename="mentalcalculation.py" line="470"/>
         <source>Stop the sequence</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mentalcalculation.py" line="582"/>
+        <location filename="mentalcalculation.py" line="625"/>
         <source>&amp;Start</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mentalcalculation.py" line="583"/>
+        <location filename="mentalcalculation.py" line="626"/>
         <source>Start a sequence</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mentalcalculation.py" line="543"/>
-        <source>The correct answer is %1</source>
+        <location filename="mentalcalculation.py" line="583"/>
+        <source>The correct answer is {}</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mentalcalculation.py" line="510"/>
-        <source>Score: %1/%2</source>
+        <location filename="mentalcalculation.py" line="550"/>
+        <source>Score: {}/{}</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>MainWindow</name>
     <message>
-        <location filename="main.py" line="21"/>
+        <location filename="main.py" line="108"/>
         <source>Mental Calculation</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main.py" line="31"/>
+        <location filename="main.py" line="109"/>
         <source>#</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main.py" line="48"/>
+        <location filename="main.py" line="110"/>
         <source>+99999</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main.py" line="56"/>
+        <location filename="main.py" line="111"/>
         <source>&amp;Your answer</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main.py" line="72"/>
+        <location filename="main.py" line="112"/>
         <source>Type here your answer (the total)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main.py" line="81"/>
+        <location filename="main.py" line="113"/>
         <source>The total is </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main.py" line="88"/>
+        <location filename="main.py" line="114"/>
         <source>Start a sequence</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main.py" line="89"/>
+        <location filename="main.py" line="115"/>
         <source>&amp;Start</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main.py" line="94"/>
+        <location filename="main.py" line="116"/>
         <source>Replay the last sequence</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main.py" line="95"/>
+        <location filename="main.py" line="117"/>
         <source>&amp;Replay</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main.py" line="100"/>
+        <location filename="main.py" line="118"/>
         <source>Check your answer</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main.py" line="101"/>
+        <location filename="main.py" line="119"/>
         <source>&amp;Check</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main.py" line="107"/>
+        <location filename="main.py" line="120"/>
         <source>Go to Setttings dialog</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main.py" line="108"/>
+        <location filename="main.py" line="121"/>
         <source>S&amp;ettings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main.py" line="114"/>
+        <location filename="main.py" line="122"/>
         <source>Exit the program</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main.py" line="115"/>
+        <location filename="main.py" line="123"/>
         <source>&amp;Exit</source>
         <translation type="unfinished"></translation>
     </message>
@@ -226,13 +226,18 @@ and so on ...</source>
 <context>
     <name>Settings</name>
     <message>
-        <location filename="mentalcalculation.py" line="89"/>
+        <location filename="mentalcalculation.py" line="99"/>
         <source>Ok</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mentalcalculation.py" line="90"/>
+        <location filename="mentalcalculation.py" line="100"/>
         <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="mentalcalculation.py" line="110"/>
+        <source>Sound is not working with Pyqt5/QtMultimedia/Gstreamer</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

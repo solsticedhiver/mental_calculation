@@ -106,7 +106,7 @@ class Settings(QtWidgets.QDialog):
             self.ui.cb_speech.setEnabled(True)
             self.ui.pm_warning.hide()
         elif not IS_SOUND_AVAILABLE:
-            self.ui.pm_warning.setToolTip(self.tr('phonon is not working'))
+            self.ui.pm_warning.setToolTip(self.tr('Sound is not working with Pyqt5/QtMultimedia/Gstreamer'))
         self.adjustSize()
 
     def importSettings(self, mysettings):
@@ -538,14 +538,14 @@ class Main(QtWidgets.QMainWindow):
             if msg == ':-)':
                 self.noscore = True
             self.ui.l_total.show()
-            self.ui.l_total.setText(self.tr('The correct answer is %1').arg(self.answer))
+            self.ui.l_total.setText(self.tr('The correct answer is {}').format(self.answer))
             self.ui.le_answer.setDisabled(True)
             self.ui.pb_check.setDisabled(True)
             self.ui.label.setPixmap(QtGui.QPixmap(img))
             if self.speech and IS_SOUND_WORKING:
                 self.player.setMedia(QtMultimedia.QMediaContent(QtCore.QUrl.fromLocalFile(sound)))
                 self.player.play()
-            self.ui.statusbar.showMessage(self.tr('Score: %1/%2').arg(u).arg(v))
+            self.ui.statusbar.showMessage(self.tr('Score: {}/{}').format(u, v))
             self.shortcut_Enter.activated.disconnect(self.ui.pb_check.click)
             self.shortcut_Enter.activated.connect(self.ui.pb_start.click)
 
@@ -578,7 +578,7 @@ class Main(QtWidgets.QMainWindow):
     def showAnswer(self):
         if self.started:
             self.ui.l_total.show()
-            self.ui.l_total.setText(self.tr('The correct answer is %1').arg(self.answer))
+            self.ui.l_total.setText(self.tr('The correct answer is {}').format(self.answer))
             self.ui.label.setText('=%d' % self.answer)
             if self.speech and IS_SOUND_WORKING:
                 # pronounce one digit at a time

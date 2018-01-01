@@ -140,13 +140,13 @@ ainsi de suite ...</translation>
     </message>
     <message>
         <location filename="mentalcalculation.py" line="543"/>
-        <source>The correct answer is %1</source>
-        <translation>La réponse correcte est %1</translation>
+        <source>The correct answer is {}</source>
+        <translation>La réponse correcte est {}</translation>
     </message>
     <message>
         <location filename="mentalcalculation.py" line="510"/>
-        <source>Score: %1/%2</source>
-        <translation>Score: %1/%2</translation>
+        <source>Score: {}/{}</source>
+        <translation>Score: {}/{}</translation>
     </message>
 </context>
 <context>

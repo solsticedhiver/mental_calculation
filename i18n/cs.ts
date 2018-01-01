@@ -138,13 +138,13 @@ and so on ...</source>
     </message>
     <message>
         <location filename="mentalcalculation.py" line="543"/>
-        <source>The correct answer is %1</source>
-        <translation>Správná odpověď je %1</translation>
+        <source>The correct answer is {}</source>
+        <translation>Správná odpověď je {}</translation>
     </message>
     <message>
         <location filename="mentalcalculation.py" line="510"/>
-        <source>Score: %1/%2</source>
-        <translation>Skóre: %1/%2</translation>
+        <source>Score: {}/{}</source>
+        <translation>Skóre: {}/{}</translation>
     </message>
 </context>
 <context>
