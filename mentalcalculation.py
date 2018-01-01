@@ -295,40 +295,6 @@ class Main(QtWidgets.QMainWindow):
             except urllib.error.URLError:
                 pass
 
-    def updateFullScreen(self):
-        self.fullscreen = not self.fullscreen
-        settings = QtCore.QSettings(QtCore.QSettings.IniFormat, QtCore.QSettings.UserScope, '%s' % appName, '%s' % appName)
-        settings.setValue('GUI/fullscreen', QtCore.QVariant(self.fullscreen))
-
-        if self.fullscreen:
-            self.showFullScreen()
-        else:
-            self.showNormal()
-
-    def resizeEvent(self, e):
-        QtWidgets.QMainWindow.resizeEvent(self, e)
-        font = self.ui.label.font()
-        # width is the size of of '+9999' in the current font
-        width = QtGui.QFontMetrics(font).width('+'+'9'*(self.digits+2))
-
-        # the factor to multiply by to use the max. space
-        factor = float(self.ui.gb_number.width())/width
-        newPointSize = min(int(font.pointSize()*factor), self.ui.gb_number.height())
-
-        font.setPointSize(newPointSize)
-        self.ui.label.setFont(font)
-
-        if self.ui.label.pixmap == None and self.ui.label.text() == '':
-            self.ui.label.setText('9'*self.digits)
-            QtCore.QTimer.singleShot(150, self.ui.label.clear)
-
-    def clearLabel(self):
-        if self.isLabelClearable and self.player.state() == QtMultimedia.QMediaPlayer.StoppedState:
-            self.ui.label.clear()
-            # display the next number after timeout
-            self.timerUpdateLabel.setInterval(self.timeout)
-            self.timerUpdateLabel.start()
-
     def changeSettings(self):
         if not self.started:
             mysettings = {}
@@ -386,6 +352,23 @@ class Main(QtWidgets.QMainWindow):
                 self.ui.pb_replay.setEnabled(False)
                 # go to full screen if needed
 
+    def updateFullScreen(self):
+        self.fullscreen = not self.fullscreen
+        settings = QtCore.QSettings(QtCore.QSettings.IniFormat, QtCore.QSettings.UserScope, '%s' % appName, '%s' % appName)
+        settings.setValue('GUI/fullscreen', QtCore.QVariant(self.fullscreen))
+
+        if self.fullscreen:
+            self.showFullScreen()
+        else:
+            self.showNormal()
+
+    def clearLabel(self):
+        if self.isLabelClearable and self.player.state() == QtMultimedia.QMediaPlayer.StoppedState:
+            self.ui.label.clear()
+            # display the next number after timeout
+            self.timerUpdateLabel.setInterval(self.timeout)
+            self.timerUpdateLabel.start()
+
     def restartPlay(self):
         if self.started:
             duration = self.timeout
@@ -416,31 +399,6 @@ class Main(QtWidgets.QMainWindow):
             self.timerRestartPlay.stop()
             self.ui.l_total.hide()
         self.startPlay()
-
-    def downloadSounds(self):
-        self.ui.statusbar.showMessage('Downloading...')
-        self.sounds = {}
-        for i,n in enumerate(self.history):
-            t = '%d' % n
-            if self.neg and i > 0:
-                t = '%+d' % n
-            if self.no_plus_sign and t.startswith('+'):
-                t = t[1:]
-            if self.one_digit:
-                t = ' '.join(list(t)).replace('- ', '-')
-            if t not in self.sounds:
-                self.query.update({'text': t, 'language': LANG})
-                url = '%s?%s' % (APIURL, urllib.parse.urlencode(self.query))
-                ret = urllib.request.urlopen(url)
-                if ret.getcode() != 200:
-                    print("Error: can't download sound for {}".format(t))
-                    self.sounds[t] = BELL
-                else:
-                    data = ret.read()
-                    with NamedTemporaryFile(prefix='mentalcalculation', suffix='.mp3', delete=False) as f:
-                        f.write(data)
-                        self.sounds[t] = f.name
-        self.ui.statusbar.clearMessage()
 
     def startPlay(self):
         if not self.started:
@@ -505,6 +463,54 @@ class Main(QtWidgets.QMainWindow):
                 # reset history
                 self.history = []
 
+    def makeHistory(self):
+        answer = 0
+        self.history = []
+        for i in range(self.rows):
+            a,b = DIGIT[self.digits]
+            neg = False
+            if self.neg:
+                neg = bool(self.randint(0,1))
+            if neg:
+                if answer > a:
+                    b = min(b, answer)
+                else:
+                    neg = False
+            n = self.randint(a, b)
+            # avoid a n - n situation
+            while neg and n == self.history[-1]:
+                n = self.randint(a, b)
+            if neg and answer - n >= 0:
+                n = -n
+            answer += n
+            self.history.append(n)
+        self.answer = answer
+
+    def downloadSounds(self):
+        self.ui.statusbar.showMessage('Downloading...')
+        self.sounds = {}
+        for i,n in enumerate(self.history):
+            t = '%d' % n
+            if self.neg and i > 0:
+                t = '%+d' % n
+            if self.no_plus_sign and t.startswith('+'):
+                t = t[1:]
+            if self.one_digit:
+                t = ' '.join(list(t)).replace('- ', '-')
+            if t not in self.sounds:
+                self.query.update({'text': t, 'language': LANG})
+                url = '%s?%s' % (APIURL, urllib.parse.urlencode(self.query))
+                ret = urllib.request.urlopen(url)
+                if ret.getcode() != 200:
+                    print("Error: can't download sound for {}".format(t))
+                    self.sounds[t] = BELL
+                else:
+                    data = ret.read()
+                    with NamedTemporaryFile(prefix='mentalcalculation', suffix='.mp3', delete=False) as f:
+                        f.write(data)
+                        self.sounds[t] = f.name
+        self.ui.statusbar.clearMessage()
+
     def pronounceit(self, s):
         self.player.stop()
         try:
@@ -551,29 +557,6 @@ class Main(QtWidgets.QMainWindow):
 
             if options.verbose:
                 sys.stdout.flush()
-
-    def makeHistory(self):
-        answer = 0
-        self.history = []
-        for i in range(self.rows):
-            a,b = DIGIT[self.digits]
-            neg = False
-            if self.neg:
-                neg = bool(self.randint(0,1))
-            if neg:
-                if answer > a:
-                    b = min(b, answer)
-                else:
-                    neg = False
-            n = self.randint(a, b)
-            # avoid a n - n situation
-            while neg and n == self.history[-1]:
-                n = self.randint(a, b)
-            if neg and answer - n >= 0:
-                n = -n
-            answer += n
-            self.history.append(n)
-        self.answer = answer
 
     def showAnswer(self):
         if self.started:
@@ -661,6 +644,23 @@ class Main(QtWidgets.QMainWindow):
                         QtCore.QTimer.singleShot(self.flash, self.clearLabel)
                 else:
                     QtCore.QTimer.singleShot(self.flash, self.clearLabel)
+
+    def resizeEvent(self, e):
+        QtWidgets.QMainWindow.resizeEvent(self, e)
+        font = self.ui.label.font()
+        # width is the size of of '+9999' in the current font
+        width = QtGui.QFontMetrics(font).width('+'+'9'*(self.digits+2))
+
+        # the factor to multiply by to use the max. space
+        factor = float(self.ui.gb_number.width())/width
+        newPointSize = min(int(font.pointSize()*factor), self.ui.gb_number.height())
+
+        font.setPointSize(newPointSize)
+        self.ui.label.setFont(font)
+
+        if self.ui.label.pixmap == None and self.ui.label.text() == '':
+            self.ui.label.setText('9'*self.digits)
+            QtCore.QTimer.singleShot(150, self.ui.label.clear)
 
     def closeEvent(self, event):
         # stop the player
