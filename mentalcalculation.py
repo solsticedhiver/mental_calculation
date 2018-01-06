@@ -35,6 +35,7 @@
 
 import sys
 import os
+import json
 import urllib.request, urllib.parse, urllib.error
 import platform
 WINDOWS = platform.system() == 'Windows'
@@ -211,6 +212,9 @@ class Main(QtWidgets.QMainWindow):
             self.player = QtMultimedia.QMediaPlayer()
             self.player.setAudioRole(QtMultimedia.QAudio.VoiceCommunicationRole)
 
+        # add url in statusbar
+        self.ui.statusbar.showMessage('sorobanexam.org')
+
         self.importSettings()
         # change background and foreground color if needed
         stylesheet = []
@@ -220,9 +224,6 @@ class Main(QtWidgets.QMainWindow):
             stylesheet.append('color: %s' % self.font_color)
         if stylesheet != []:
             self.ui.label.setStyleSheet(';'.join(stylesheet))
-
-        # add url in statusbar
-        self.ui.statusbar.showMessage('sorobanexam.org')
 
         if self.fullscreen:
             self.showFullScreen()
@@ -288,7 +289,12 @@ class Main(QtWidgets.QMainWindow):
             # call home
             try:
                 settings.setValue('uuid', QtCore.QVariant(self.uuid))
-                ret = urllib.request.urlopen('http://sorobanexam.org/mentalcalculation/ping?uuid=%s' % self.uuid)
+                url = 'https://www.sorobanexam.org/mentalcalculation/ping?uuid=%s&version=%s' % (self.uuid, appVersion)
+                ret = urllib.request.urlopen(url)
+                if ret.getcode() == 200:
+                    latest_version = json.loads(ret.read())['latest']
+                    if latest_version > appVersion:
+                        self.ui.statusbar.showMessage('A new version is available at www.sorobanexam.org/anzan.html')
                 # stop tracking if url returns 404
                 if ret.getcode() == 404:
                     settings.setValue('uuid', QtCore.QVariant('opt-out'))
