@@ -67,7 +67,7 @@ from gui import settings, main
 DIGIT = dict([(i,(int('1'+'0'*(i-1)), int('9'*i))) for i in range(1,10)])
 
 appName = 'mentalcalculation'
-appVersion = '0.4'
+appVersion = '0.4.0.1'
 
 SHARE_PATH = ''
 SHARE_PATH = os.path.abspath(SHARE_PATH)+'/'
@@ -424,7 +424,8 @@ class Main(QtWidgets.QMainWindow):
                 self.replay = False
             else:
                 self.makeHistory()
-                self.downloadSounds()
+                if self.speech:
+                    self.downloadSounds()
                 self.noscore = False
                 self.ui.pb_replay.setEnabled(False)
             # change pb_start to 'Stop' when starting display
