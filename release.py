@@ -17,13 +17,14 @@ if sys.platform != 'win32':
     print("Error: pyinstaller and Inno Setup can't be run in non Windows platform", file=sys.stderr)
 else:
     # run pyinstaller
-    cmd = 'pyinstaller.exe mentalcalculation.py'
+    args = '--noconsole -i img/soro.ico mentalcalculation.py'
+    cmd = 'pyinstaller.exe %s ' % args
     try:
         cp = subprocess.run(cmd.split(' '))
     except FileNotFoundError:
         userprofile = os.environ['USERPROFILE'].replace('\\', '\\\\')
         pyinstaller = os.path.sep.join([userprofile, 'AppData\\Local\\Programs\\Python\\Python36\\Scripts\\pyinstaller.exe'])
-        cmd = '%s --noconsole -i img/soro.ico mentalcalculation.py' % pyinstaller
+        cmd = '%s %s' % (pyinstaller, args)
         cp = subprocess.run(cmd.split(' '))
 
     # copy assets in directory
