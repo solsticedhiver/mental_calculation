@@ -43,7 +43,7 @@ if WINDOWS:
     sys.stdout = open(os.sep.join([os.getenv('TMP'), 'mentalcalculation.log']), 'ab')
     sys.stderr = open(os.sep.join([os.getenv('TMP'), 'mentalcalculation.log']), 'ab')
 
-from optparse import OptionParser
+import argparse
 from tempfile import mkstemp, NamedTemporaryFile
 try:
     from random import SystemRandom
@@ -461,7 +461,7 @@ class Main(QtWidgets.QMainWindow):
             self.ui.pb_start.setText(self.tr('&Start'))
             self.ui.pb_start.setToolTip(self.tr('Start a sequence'))
             self.ui.label.clear()
-            if options.verbose:
+            if args.verbose:
                 print()
             if self.speech and IS_SOUND_WORKING:
                 self.player.stop()
@@ -580,7 +580,7 @@ class Main(QtWidgets.QMainWindow):
             self.shortcut_Enter.activated.disconnect(self.ui.pb_check.click)
             self.shortcut_Enter.activated.connect(self.ui.pb_start.click)
 
-            if options.verbose:
+            if args.verbose:
                 sys.stdout.flush()
 
     def showAnswer(self):
@@ -591,7 +591,7 @@ class Main(QtWidgets.QMainWindow):
             if self.speech and IS_SOUND_WORKING:
                 # pronounce one digit at a time
                 t = '= %d' % self.answer
-                if options.verbose:
+                if args.verbose:
                     print(t)
                 if self.one_digit:
                     t = ' '.join(list(t)).replace('- ', '-')
@@ -635,7 +635,7 @@ class Main(QtWidgets.QMainWindow):
                     self.ui.pb_settings.setEnabled(True)
                     self.shortcut_Enter.activated.disconnect(self.ui.pb_start.click)
                     self.shortcut_Enter.activated.connect(self.ui.pb_check.click)
-                if options.verbose:
+                if args.verbose:
                     print()
             else:
                 self.count += 1
@@ -648,7 +648,7 @@ class Main(QtWidgets.QMainWindow):
                     t = t[1:]
                 self.ui.label.setText(t)
                 # print the sequence in the console
-                if options.verbose:
+                if args.verbose:
                     print(t, end=' ')
                 # say it aloud
                 if IS_SOUND_AVAILABLE:
@@ -700,10 +700,9 @@ class Main(QtWidgets.QMainWindow):
 
 
 if __name__ == '__main__':
-    parser = OptionParser(usage='usage: %prog [-v]')
-    parser.add_option('-v', '--verbose', action='store_true', dest='verbose',
-            default=False, help='be verbose: print in console each number displayed')
-    (options,args) = parser.parse_args(sys.argv)
+    parser = argparse.ArgumentParser(description='Query Wigle.net via its API')
+    parser.add_argument('-v', '--verbose', action='store_true', help='be verbose: print in console each number displayed')
+    args = parser.parse_args()
 
     IS_SOUND_WORKING = IS_SOUND_AVAILABLE
 
