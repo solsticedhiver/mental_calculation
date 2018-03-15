@@ -421,6 +421,11 @@ class Main(QtWidgets.QMainWindow):
             self.ui.le_answer.setEnabled(False)
             self.ui.pb_check.setEnabled(False)
             self.ui.pb_settings.setEnabled(False)
+            try:
+                self.shortcut_Enter.activated.disconnect(self.ui.pb_check.click)
+            except TypeError:
+                pass
+            self.shortcut_Enter.activated.connect(self.ui.pb_start.click)
             self.count = 0
             # generate sequence
             if self.replay:
@@ -629,7 +634,10 @@ class Main(QtWidgets.QMainWindow):
                     self.ui.le_answer.clear()
                     self.ui.pb_check.setEnabled(True)
                     self.ui.pb_settings.setEnabled(True)
-                    self.shortcut_Enter.activated.disconnect(self.ui.pb_start.click)
+                    try:
+                        self.shortcut_Enter.activated.disconnect(self.ui.pb_start.click)
+                    except TypeError:
+                        pass
                     self.shortcut_Enter.activated.connect(self.ui.pb_check.click)
                 if args.verbose:
                     print()
