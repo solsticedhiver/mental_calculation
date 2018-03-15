@@ -37,6 +37,7 @@ import sys
 import os
 import json
 import urllib.request, urllib.parse, urllib.error
+from threading import Thread
 import platform
 WINDOWS = platform.system() == 'Windows'
 if WINDOWS:
@@ -67,7 +68,7 @@ from gui import settings, main
 DIGIT = dict([(i,(int('1'+'0'*(i-1)), int('9'*i))) for i in range(1,10)])
 
 appName = 'mentalcalculation'
-appVersion = '0.4.0.1'
+appVersion = '0.4.0.2'
 
 SHARE_PATH = ''
 SHARE_PATH = os.path.abspath(SHARE_PATH)+'/'
@@ -87,6 +88,8 @@ RESTART = SHARE_PATH + 'img/restart.png'
 APPID = '24125E3CEC86D159166858FC5D5B833C43D05EB9'
 APIURL = 'https://api.microsofttranslator.com/v2/Http.svc/Speak'
 LANG = 'en'
+
+nb_dleds = 0 # global variable to hold number of downloaded sounds: TODO: do it better ?
 
 query = {'appId': APPID, 'text': '', 'language': LANG, 'format': 'audio/mp3'}
 
@@ -493,9 +496,13 @@ class Main(QtWidgets.QMainWindow):
         self.answer = answer
 
     def downloadSounds(self):
-        self.ui.statusbar.showMessage('Downloading...')
+        nb_dls = len(self.history) + (1 if self.hands_free else 0)
+        self.ui.statusbar.showMessage(self.tr('Downloading ({}/{})...').format(0, nb_dls))
         self.sounds = {}
-        for i,n in enumerate(self.history):
+        threads = []
+        global nb_dleds
+        nb_dleds = 0
+        for i,n in enumerate(set(self.history)):
             t = '%d' % n
             if self.neg and i > 0:
                 t = '%+d' % n
@@ -506,16 +513,9 @@ class Main(QtWidgets.QMainWindow):
             if t not in self.sounds:
                 self.query.update({'text': t, 'language': LANG})
                 url = '%s?%s' % (APIURL, urllib.parse.urlencode(self.query))
-                ret = urllib.request.urlopen(url)
-                if ret.getcode() != 200:
-                    print("Error: can't download sound for {}".format(t))
-                    self.ui.statusbar.showMessage('An error occurred when downloading sound')
-                    self.sounds[t] = BELL
-                else:
-                    data = ret.read()
-                    with NamedTemporaryFile(prefix='mentalcalculation', suffix='.mp3', delete=False) as f:
-                        f.write(data)
-                        self.sounds[t] = f.name
+                t = Thread(target=dl_thread, args=(url, t, self.sounds, self.ui.statusbar, self.tr, nb_dls))
+                t.start()
+                threads.append(t)
 
         if self.hands_free:
             t = '= %d' % self.answer
@@ -524,16 +524,12 @@ class Main(QtWidgets.QMainWindow):
             if t not in self.sounds:
                 self.query.update({'text': t, 'language': LANG})
                 url = '%s?%s' % (APIURL, urllib.parse.urlencode(self.query))
-                ret = urllib.request.urlopen(url)
-                if ret.getcode() != 200:
-                    print("Error: can't download sound for {}".format(t))
-                    self.sounds[t] = BELL
-                else:
-                    data = ret.read()
-                    with NamedTemporaryFile(prefix='mentalcalculation', suffix='.mp3', delete=False) as f:
-                        f.write(data)
-                        self.sounds[t] = f.name
+                t = Thread(target=dl_thread, args=(url, t, self.sounds, self.ui.statusbar, self.tr, nb_dls))
+                t.start()
+                threads.append(t)
 
+        for t in threads:
+            t.join()
         self.ui.statusbar.clearMessage()
 
     def pronounceit(self, s):
@@ -698,9 +694,24 @@ class Main(QtWidgets.QMainWindow):
                 pass
         QtWidgets.QMainWindow.closeEvent(self, event)
 
+def dl_thread(url, t, sounds, statusbar, tr, nb_dls):
+    ret = urllib.request.urlopen(url)
+    if ret.getcode() != 200:
+        print("Error: can't download sound for {}".format(t))
+        statusbar.showMessage('An error occurred when downloading sound')
+        sounds[t] = BELL
+    else:
+        data = ret.read()
+        with NamedTemporaryFile(prefix='mentalcalculation', suffix='.mp3', delete=False) as f:
+            f.write(data)
+            sounds[t] = f.name
+        global nb_dleds
+        nb_dleds += 1
+        statusbar.showMessage(tr('Downloading ({}/{})...').format(nb_dleds, nb_dls))
+
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Query Wigle.net via its API')
+    parser = argparse.ArgumentParser(description='Practice anzan/mentalcalculation')
     parser.add_argument('-v', '--verbose', action='store_true', help='be verbose: print in console each number displayed')
     args = parser.parse_args()
 
