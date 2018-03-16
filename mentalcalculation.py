@@ -503,12 +503,15 @@ class Main(QtWidgets.QMainWindow):
     def downloadSounds(self):
         nb_dls = len(self.history) + (1 if self.hands_free else 0)
         self.ui.statusbar.showMessage(self.tr('Downloading ({}/{})...').format(0, nb_dls))
-        self.sounds = {}
+        #self.sounds = {}
         threads = []
         global nb_dleds
         nb_dleds = 0
-        for i,n in enumerate(set(self.history)):
+        for i,n in enumerate(self.history):
             t = '%d' % n
+            if t in self.sounds and self.sounds[t] != BELL:
+                nb_dls -= 1
+                continue
             if self.neg and i > 0:
                 t = '%+d' % n
             if self.no_plus_sign and t.startswith('+'):
@@ -703,19 +706,34 @@ class Main(QtWidgets.QMainWindow):
         QtWidgets.QMainWindow.closeEvent(self, event)
 
 def dl_thread(url, t, sounds, statusbar, tr, nb_dls):
-    ret = urllib.request.urlopen(url)
-    if ret.getcode() != 200:
-        print("Error: can't download sound for {}".format(t))
-        statusbar.showMessage('An error occurred when downloading sound')
-        sounds[t] = BELL
-    else:
-        data = ret.read()
-        with NamedTemporaryFile(prefix='mentalcalculation', suffix='.mp3', delete=False) as f:
-            f.write(data)
-            sounds[t] = f.name
-        global nb_dleds
-        nb_dleds += 1
-        statusbar.showMessage(tr('Downloading ({}/{})...').format(nb_dleds, nb_dls))
+    global nb_dleds
+    try:
+        ret = urllib.request.urlopen(url)
+        if ret.getcode() != 200:
+            print("Error: can't download sound for {}".format(t))
+            statusbar.showMessage('An error occurred when downloading sound')
+            sounds[t] = BELL
+        else:
+            data = ret.read()
+            with NamedTemporaryFile(prefix='mentalcalculation', suffix='.mp3', delete=False) as f:
+                f.write(data)
+                sounds[t] = f.name
+            nb_dleds += 1
+            statusbar.showMessage(tr('Downloading ({}/{})...').format(nb_dleds, nb_dls))
+    except (urllib.error.URLError, urllib.error.HTTPError) as e:
+        # retry again
+        ret = urllib.request.urlopen(url)
+        if ret.getcode() != 200:
+            print("Error: can't download sound for {}".format(t))
+            statusbar.showMessage('An error occurred when downloading sound')
+            sounds[t] = BELL
+        else:
+            data = ret.read()
+            with NamedTemporaryFile(prefix='mentalcalculation', suffix='.mp3', delete=False) as f:
+                f.write(data)
+                sounds[t] = f.name
+            nb_dleds += 1
+            statusbar.showMessage(tr('Downloading ({}/{})...').format(nb_dleds, nb_dls))
 
 
 if __name__ == '__main__':
