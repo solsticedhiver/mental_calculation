@@ -295,7 +295,7 @@ class Main(QtWidgets.QMainWindow):
                 url = 'https://www.sorobanexam.org/mentalcalculation/ping?uuid=%s&version=%s' % (self.uuid, appVersion)
                 ret = urllib.request.urlopen(url)
                 if ret.getcode() == 200:
-                    latest_version = json.loads(ret.read())['latest']
+                    latest_version = json.loads(ret.read().decode('utf-8'))['latest']
                     if latest_version > appVersion:
                         self.ui.statusbar.showMessage('A new version is available at www.sorobanexam.org/anzan.html')
                 # stop tracking if url returns 404
