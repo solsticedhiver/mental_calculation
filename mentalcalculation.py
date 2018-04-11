@@ -372,7 +372,9 @@ class Main(QtWidgets.QMainWindow):
             self.showNormal()
 
     def clearLabel(self):
-        if self.isLabelClearable and self.player.state() == QtMultimedia.QMediaPlayer.StoppedState:
+        if self.isLabelClearable:
+            if IS_SOUND_AVAILABLE and self.player.state() != QtMultimedia.QMediaPlayer.StoppedState:
+                return
             self.ui.label.clear()
             # display the next number after timeout
             self.timerUpdateLabel.setInterval(self.timeout)
