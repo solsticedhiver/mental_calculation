@@ -292,6 +292,7 @@ class Main(QtWidgets.QMainWindow):
             # call home
             try:
                 settings.setValue('uuid', QtCore.QVariant(self.uuid))
+                #url = 'http://localhost:8080/mentalcalculation/ping?uuid=%s&version=%s' % (self.uuid, appVersion)
                 url = 'https://www.sorobanexam.org/mentalcalculation/ping?uuid=%s&version=%s' % (self.uuid, appVersion)
                 ret = urllib.request.urlopen(url)
                 if ret.getcode() == 200:
