@@ -4,10 +4,16 @@ http://en.wikipedia.org/wiki/Soroban
 
 # Requirements
 
-* for the Windows version: all dependancies are included.
+* for the Windows version: all dependancies are included in the binary version
 * for the source version:
-    - python 3.6
+    - python 3.6 or more recent
     - PyQt5
+
+  You need to generate the python files needed for the gui with the following commands:
+  
+      cd gui
+      pyuic5 settings.ui > settings.py
+      pyuic5 main.ui > main.py
 
 # Configuration file
 *mentalcalculation* saves its settings in a configuration file:

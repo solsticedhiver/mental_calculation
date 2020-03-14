@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # mentalcalculation - version 0.4
-# Copyright (C) 2008-2010, solsTiCe d'Hiver <solstice.dhiver@gmail.com>
+# Copyright (C) 2008-2020, solsTiCe d'Hiver <solstice.dhiver@gmail.com>
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
