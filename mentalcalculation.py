@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
-# mentalcalculation - version 0.4
+# mentalcalculation - version 0.4.1
 # Copyright (C) 2008-2020, solsTiCe d'Hiver <solstice.dhiver@gmail.com>
 
 # This program is free software; you can redistribute it and/or modify
@@ -68,7 +68,7 @@ from gui import settings, main
 DIGIT = dict([(i,(int('1'+'0'*(i-1)), int('9'*i))) for i in range(1,10)])
 
 appName = 'mentalcalculation'
-appVersion = '0.4.0.2'
+appVersion = '0.4.1'
 
 SHARE_PATH = ''
 SHARE_PATH = os.path.abspath(SHARE_PATH)+'/'
@@ -377,6 +377,12 @@ class Main(QtWidgets.QMainWindow):
             if IS_SOUND_AVAILABLE and self.player.state() != QtMultimedia.QMediaPlayer.StoppedState:
                 return
             self.ui.label.clear()
+            # something is wrong: the numbers of call to this function grow over time !
+            # disconnect sender to try to fix this
+            try:
+                self.sender().disconnect()
+            except TypeError as t:
+                pass
             # display the next number after timeout
             self.timerUpdateLabel.setInterval(self.timeout)
             self.timerUpdateLabel.start()
@@ -405,8 +411,11 @@ class Main(QtWidgets.QMainWindow):
         self.ui.pb_replay.setEnabled(False)
         self.timerUpdateLabel.stop()
         if self.hands_free:
-            if IS_SOUND_AVAILABLE:
-                self.player.stateChanged.disconnect(self.restartPlay)
+            if self.speech and IS_SOUND_AVAILABLE:
+                try:
+                    self.player.stateChanged.disconnect(self.restartPlay)
+                except TypeError as t:
+                    pass
             self.timerShowAnswer.stop()
             self.timerRestartPlay.stop()
             self.ui.l_total.hide()
@@ -461,8 +470,11 @@ class Main(QtWidgets.QMainWindow):
             self.isLabelClearable = False
             self.timerUpdateLabel.stop()
             if self.hands_free:
-                if IS_SOUND_AVAILABLE:
-                    self.player.stateChanged.disconnect(self.clearLabel)
+                if self.speech and IS_SOUND_AVAILABLE:
+                    try:
+                        self.player.stateChanged.disconnect(self.clearLabel)
+                    except TypeError as t:
+                        pass
                 self.timerShowAnswer.stop()
                 self.timerRestartPlay.stop()
                 self.ui.l_answer.setEnabled(True)
@@ -673,8 +685,9 @@ class Main(QtWidgets.QMainWindow):
                             self.player.setMedia(QtMultimedia.QMediaContent(QtCore.QUrl.fromLocalFile(ANNOYING_SOUND)))
                             self.player.play()
                             self.player.stateChanged.connect(self.clearLabel)
-                        # clear the label after self.flash time
-                        QtCore.QTimer.singleShot(self.flash, self.clearLabel)
+                        else:
+                            # clear the label after self.flash time
+                            QtCore.QTimer.singleShot(self.flash, self.clearLabel)
                 else:
                     QtCore.QTimer.singleShot(self.flash, self.clearLabel)
 
