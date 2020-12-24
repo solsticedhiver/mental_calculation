@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
-# mentalcalculation - version 0.4.1
+# mentalcalculation - version 0.4.2
 # Copyright (C) 2008-2020, solsTiCe d'Hiver <solstice.dhiver@gmail.com>
 
 # This program is free software; you can redistribute it and/or modify
@@ -34,15 +34,11 @@
 #
 
 import sys
+import pathlib
 import os
 import json
 import urllib.request, urllib.parse, urllib.error
 from threading import Thread
-import platform
-WINDOWS = platform.system() == 'Windows'
-if WINDOWS:
-    sys.stdout = open(os.sep.join([os.getenv('TMP'), 'mentalcalculation.log']), 'ab')
-    sys.stderr = open(os.sep.join([os.getenv('TMP'), 'mentalcalculation.log']), 'ab')
 
 import argparse
 from tempfile import mkstemp, NamedTemporaryFile
@@ -68,30 +64,28 @@ from gui import settings, main
 DIGIT = dict([(i,(int('1'+'0'*(i-1)), int('9'*i))) for i in range(1,10)])
 
 appName = 'mentalcalculation'
-appVersion = '0.4.1'
+appVersion = '0.4.2'
 
-SHARE_PATH = ''
-SHARE_PATH = os.path.abspath(SHARE_PATH)+'/'
-BELL = SHARE_PATH + 'sound/bell.mp3'
+SHARE_PATH = '.'
+SHARE_PATH = pathlib.Path(SHARE_PATH).absolute()
+BELL = str(SHARE_PATH / 'sound/bell.mp3')
 BELL_DURATION = 600
-THREEBELLS = SHARE_PATH + 'sound/3bells.mp3'
+THREEBELLS = str(SHARE_PATH / 'sound/3bells.mp3')
 THREEBELLS_DURATION = 1000
-ANNOYING_SOUND = SHARE_PATH + 'sound/annoying-sound.mp3'
+ANNOYING_SOUND = str(SHARE_PATH / 'sound/annoying-sound.mp3')
 ANNOYING_SOUND_DURATION = 150
-GOOD = SHARE_PATH + 'sound/good.mp3'
-BAD = SHARE_PATH + 'sound/bad.mp3'
-WELCOME = SHARE_PATH + 'img/soroban.png'
-SMILE = SHARE_PATH + 'img/face-smile.png'
-SAD = SHARE_PATH + 'img/face-sad.png'
-RESTART = SHARE_PATH + 'img/restart.png'
+GOOD = str(SHARE_PATH / 'sound/good.mp3')
+BAD = str(SHARE_PATH / 'sound/bad.mp3')
+WELCOME = str(SHARE_PATH / 'img/soroban.png')
+SMILE = str(SHARE_PATH / 'img/face-smile.png')
+SAD = str(SHARE_PATH / 'img/face-sad.png')
+RESTART = str(SHARE_PATH / 'img/restart.png')
 
-APPID = '24125E3CEC86D159166858FC5D5B833C43D05EB9'
-APIURL = 'https://api.microsofttranslator.com/v2/Http.svc/Speak'
+APIURL = 'https://www.sorobanexam.org/tools/tts'
 LANG = 'en'
 
 nb_dleds = 0 # global variable to hold number of downloaded sounds: TODO: do it better ?
 
-query = {'appId': APPID, 'text': '', 'language': LANG, 'format': 'audio/mp3'}
 
 class Settings(QtWidgets.QDialog):
     def __init__(self, mysettings, parent=None):
@@ -154,8 +148,7 @@ class Main(QtWidgets.QMainWindow):
         self.score = (0,0)
         self.started = False
         self.sounds = {}
-        global query
-        self.query = query
+        self.query = {'number': '', 'lang': LANG}
         # default settings
         self.digits = 1
         self.rows = 5
@@ -216,12 +209,12 @@ class Main(QtWidgets.QMainWindow):
             self.player.setAudioRole(QtMultimedia.QAudio.VoiceCommunicationRole)
 
         # add url in statusbar
-        self.ui.statusbar.showMessage('sorobanexam.org')
+        self.ui.statusbar.showMessage('www.sorobanexam.org')
 
         self.importSettings()
         # change background and foreground color if needed
         stylesheet = []
-        if self.background_color is not None:
+        if self.background_color is not None and self.background_color != 'transparent':
             stylesheet.append('background-color: %s' % self.background_color)
         if self.font_color is not None:
             stylesheet.append('color: %s' % self.font_color)
@@ -245,7 +238,7 @@ class Main(QtWidgets.QMainWindow):
 
     def importSettings(self):
         # restore settings from the settings file if the settings exist
-        settings = QtCore.QSettings(QtCore.QSettings.IniFormat, QtCore.QSettings.UserScope, '%s' % appName, '%s' % appName)
+        settings = QtCore.QSettings(QtCore.QSettings.IniFormat, QtCore.QSettings.UserScope, appName, appName)
         if settings.contains('digits'):
             # these value have been written by the program, so then should be ok
             self.digits = int(settings.value('digits'))
@@ -293,7 +286,7 @@ class Main(QtWidgets.QMainWindow):
             try:
                 settings.setValue('uuid', QtCore.QVariant(self.uuid))
                 #url = 'http://localhost:8080/mentalcalculation/ping?uuid=%s&version=%s' % (self.uuid, appVersion)
-                url = 'https://www.sorobanexam.org/mentalcalculation/ping?uuid=%s&version=%s' % (self.uuid, appVersion)
+                url = f'https://www.sorobanexam.org/mentalcalculation/ping?uuid={self.uuid}&version={appVersion}'
                 ret = urllib.request.urlopen(url)
                 if ret.getcode() == 200:
                     latest_version = json.loads(ret.read().decode('utf-8'))['latest']
@@ -340,7 +333,7 @@ class Main(QtWidgets.QMainWindow):
                 self.hands_free = mysettings['hands_free']
                 self.neg = mysettings['neg']
                 # always save settings when closing the settings dialog
-                settings = QtCore.QSettings(QtCore.QSettings.IniFormat, QtCore.QSettings.UserScope, '%s' % appName, '%s' % appName)
+                settings = QtCore.QSettings(QtCore.QSettings.IniFormat, QtCore.QSettings.UserScope, appName, appName)
                 settings.setValue('digits', QtCore.QVariant(self.digits))
                 settings.setValue('rows', QtCore.QVariant(self.rows))
                 settings.setValue('timeout', QtCore.QVariant(self.timeout))
@@ -364,7 +357,7 @@ class Main(QtWidgets.QMainWindow):
 
     def updateFullScreen(self):
         self.fullscreen = not self.fullscreen
-        settings = QtCore.QSettings(QtCore.QSettings.IniFormat, QtCore.QSettings.UserScope, '%s' % appName, '%s' % appName)
+        settings = QtCore.QSettings(QtCore.QSettings.IniFormat, QtCore.QSettings.UserScope, appName, appName)
         settings.setValue('GUI/fullscreen', QtCore.QVariant(self.fullscreen))
 
         if self.fullscreen:
@@ -534,8 +527,9 @@ class Main(QtWidgets.QMainWindow):
             if self.one_digit:
                 t = ' '.join(list(t)).replace('- ', '-')
             if t not in self.sounds:
-                self.query.update({'text': t, 'language': LANG})
-                url = '%s?%s' % (APIURL, urllib.parse.urlencode(self.query))
+                self.query.update({'number': t, 'lang': LANG})
+                query_string = '&'.join(f'{k}={v}' for k,v in self.query.items())
+                url = f'{APIURL}?{query_string}'
                 t = Thread(target=dl_thread, args=(url, t, self.sounds, self.ui.statusbar, self.tr, nb_dls))
                 t.start()
                 threads.append(t)
@@ -545,8 +539,8 @@ class Main(QtWidgets.QMainWindow):
             if self.one_digit:
                 t = ' '.join(list(t)).replace('- ', '-')
             if t not in self.sounds:
-                self.query.update({'text': t, 'language': LANG})
-                url = '%s?%s' % (APIURL, urllib.parse.urlencode(self.query))
+                query_string = '&'.join(f'{k}={v}' for k,v in self.query.items())
+                url = f'{APIURL}?{query_string}'
                 t = Thread(target=dl_thread, args=(url, t, self.sounds, self.ui.statusbar, self.tr, nb_dls))
                 t.start()
                 threads.append(t)
@@ -562,7 +556,7 @@ class Main(QtWidgets.QMainWindow):
             self.player.play()
             self.player.stateChanged.connect(self.clearLabel)
         except KeyError:
-            print('Error: {} not found in sounds'.format(s))
+            print(f'Error: {s} not found in sounds')
             QtCore.QTimer.singleShot(2000, self.clearLabel)
 
     def updateAnswer(self):
@@ -661,7 +655,7 @@ class Main(QtWidgets.QMainWindow):
                     print()
             else:
                 self.count += 1
-                self.ui.gb_number.setTitle('#%d / %s' % (self.count, self.rows))
+                self.ui.gb_number.setTitle(f'#{self.count} / {self.rows}')
                 n = self.history[self.count-1]
                 t = '%d' % n
                 if self.neg and self.count > 1:
@@ -726,7 +720,7 @@ def dl_thread(url, t, sounds, statusbar, tr, nb_dls):
     try:
         ret = urllib.request.urlopen(url)
         if ret.getcode() != 200:
-            print("Error: can't download sound for {}".format(t))
+            print(f"Error: can't download sound for {t}")
             statusbar.showMessage('An error occurred when downloading sound')
             sounds[t] = BELL
         else:
@@ -737,20 +731,15 @@ def dl_thread(url, t, sounds, statusbar, tr, nb_dls):
             nb_dleds += 1
             statusbar.showMessage(tr('Downloading ({}/{})...').format(nb_dleds, nb_dls))
     except (urllib.error.URLError, urllib.error.HTTPError) as e:
-        # retry again
-        ret = urllib.request.urlopen(url)
-        if ret.getcode() != 200:
-            print("Error: can't download sound for {}".format(t))
-            statusbar.showMessage('An error occurred when downloading sound')
-            sounds[t] = BELL
-        else:
-            data = ret.read()
-            with NamedTemporaryFile(prefix='mentalcalculation', suffix='.mp3', delete=False) as f:
-                f.write(data)
-                sounds[t] = f.name
-            nb_dleds += 1
-            statusbar.showMessage(tr('Downloading ({}/{})...').format(nb_dleds, nb_dls))
-
+        print(f"Error: can't download sound for {t}")
+        statusbar.showMessage('An error occurred when downloading sound')
+        # use the bell sound instead
+        with NamedTemporaryFile(prefix='mentalcalculation', suffix='.mp3', delete=False) as f:
+            g = open(BELL, 'rb')
+            # copy the file data
+            f.write(g.read())
+            g.close()
+            sounds[t] = f.name
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Practice anzan/mentalcalculation')
@@ -766,7 +755,7 @@ if __name__ == '__main__':
     locale = QtCore.QLocale()
     LOCALENAME = str(locale.system().name())
     translator = QtCore.QTranslator()
-    translator.load(SHARE_PATH+'i18n/%s' % LOCALENAME, '.')
+    translator.load(str(SHARE_PATH / f'i18n/{LOCALENAME}'), '.')
     app.installTranslator(translator)
 
     if LOCALENAME.find('_') > 0:
