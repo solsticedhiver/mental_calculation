@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
-# mentalcalculation - version 0.4.2
+# mentalcalculation - version 0.4.3
 # Copyright (C) 2008-2020, solsTiCe d'Hiver <solstice.dhiver@gmail.com>
 
 # This program is free software; you can redistribute it and/or modify
@@ -64,7 +64,7 @@ from gui import settings, main
 DIGIT = dict([(i,(int('1'+'0'*(i-1)), int('9'*i))) for i in range(1,10)])
 
 appName = 'mentalcalculation'
-appVersion = '0.4.2'
+appVersion = '0.4.3'
 
 SHARE_PATH = '.'
 SHARE_PATH = pathlib.Path(SHARE_PATH).absolute()
@@ -528,7 +528,7 @@ class Main(QtWidgets.QMainWindow):
                 t = ' '.join(list(t)).replace('- ', '-')
             if t not in self.sounds:
                 self.query.update({'number': t, 'lang': LANG})
-                query_string = '&'.join(f'{k}={v}' for k,v in self.query.items())
+                query_string = '&'.join(f'{k}={urllib.parse.quote(v)}' for k,v in self.query.items())
                 url = f'{APIURL}?{query_string}'
                 t = Thread(target=dl_thread, args=(url, t, self.sounds, self.ui.statusbar, self.tr, nb_dls))
                 t.start()
@@ -539,7 +539,8 @@ class Main(QtWidgets.QMainWindow):
             if self.one_digit:
                 t = ' '.join(list(t)).replace('- ', '-')
             if t not in self.sounds:
-                query_string = '&'.join(f'{k}={v}' for k,v in self.query.items())
+                self.query.update({'number': t, 'lang': LANG})
+                query_string = '&'.join(f'{k}={urllib.parse.quote(v)}' for k,v in self.query.items())
                 url = f'{APIURL}?{query_string}'
                 t = Thread(target=dl_thread, args=(url, t, self.sounds, self.ui.statusbar, self.tr, nb_dls))
                 t.start()
