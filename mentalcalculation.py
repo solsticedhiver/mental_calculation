@@ -1,8 +1,8 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
-# mentalcalculation - version 0.4.3
-# Copyright (C) 2008-2020, solsTiCe d'Hiver <solstice.dhiver@gmail.com>
+# mentalcalculation - version 0.5
+# Copyright (C) 2008-2021, solsTiCe d'Hiver <solstice.dhiver@gmail.com>
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -533,7 +533,7 @@ class Main(QtWidgets.QMainWindow):
 
     def downloadSounds(self):
         nb_dls = len(self.history) + (1 if self.hands_free else 0)
-        self.ui.statusbar.showMessage(self.tr('Downloading ({}/{})...').format(0, nb_dls))
+        self.ui.statusbar.showMessage(self.tr('Downloading {} sounds').format(nb_dls))
         #self.sounds = {}
         threads = []
         global nb_dleds
@@ -753,7 +753,6 @@ def dl_thread(url, t, sounds, statusbar, tr, nb_dls):
                 f.write(data)
                 sounds[t] = f.name
             nb_dleds += 1
-            statusbar.showMessage(tr('Downloading ({}/{})...').format(nb_dleds, nb_dls))
     except (urllib.error.URLError, urllib.error.HTTPError) as e:
         print(f"Error: can't download sound for {t}")
         statusbar.showMessage('An error occurred when downloading sound')
