@@ -64,7 +64,7 @@ from gui import settings, main
 DIGIT = dict([(i,(int('1'+'0'*(i-1)), int('9'*i))) for i in range(1,10)])
 
 appName = 'mentalcalculation'
-appVersion = '0.4.3'
+appVersion = '0.5'
 
 SHARE_PATH = '.'
 SHARE_PATH = pathlib.Path(SHARE_PATH).absolute()
@@ -82,6 +82,15 @@ SAD = str(SHARE_PATH / 'img/face-sad.png')
 RESTART = str(SHARE_PATH / 'img/restart.png')
 
 APIURL = 'https://www.sorobanexam.org/tools/tts'
+#APIURL = 'http://localhost:8080/tools/tts'
+# Google TTS API available voice languages (hard coded). See f'{APIURL}?lang_list=1' for a current version
+LANG_LIST = [
+    "af-ZA", "ar-XA", "bg-BG", "bn-IN", "ca-ES", "cmn-CN", "cmn-TW", "cs-CZ", "da-DK", "de-DE",
+    "el-GR", "en-AU", "en-GB", "en-IN", "en-US", "es-ES", "es-US", "fi-FI", "fil-PH", "fr-CA", "fr-FR",
+    "gu-IN", "hi-IN", "hu-HU", "id-ID", "is-IS", "it-IT", "ja-JP", "kn-IN", "ko-KR", "lv-LV", "ml-IN",
+    "nb-NO", "nl-NL", "pl-PL", "pt-BR", "pt-PT", "ro-RO", "ru-RU", "sk-SK", "sr-RS", "sv-SE", "ta-IN",
+    "te-IN", "th-TH", "tr-TR", "uk-UA", "vi-VN", "yue-HK"
+]
 LANG = 'en'
 
 nb_dleds = 0 # global variable to hold number of downloaded sounds: TODO: do it better ?
@@ -92,8 +101,8 @@ class Settings(QtWidgets.QDialog):
         QtWidgets.QDialog.__init__(self, parent)
         self.ui = settings.Ui_Dialog()
         self.ui.setupUi(self)
-        self.ui.buttonBox.button(QtWidgets.QDialogButtonBox.Ok).setText(self.tr('Ok'));
-        self.ui.buttonBox.button(QtWidgets.QDialogButtonBox.Cancel).setText(self.tr('Cancel'));
+        self.ui.buttonBox.button(QtWidgets.QDialogButtonBox.Ok).setText(self.tr('Ok'))
+        self.ui.buttonBox.button(QtWidgets.QDialogButtonBox.Cancel).setText(self.tr('Cancel'))
         self.importSettings(mysettings)
         self.ui.sb_flash.setEnabled(not self.ui.cb_speech.isChecked())
         self.ui.cb_onedigit.setEnabled(self.ui.cb_speech.isChecked())
@@ -112,6 +121,15 @@ class Settings(QtWidgets.QDialog):
         self.ui.sb_digits.setValue(mysettings['digits'])
         self.ui.sb_rows.setValue(mysettings['rows'])
         self.ui.cb_speech.setChecked(mysettings['speech'])
+        self.ui.cb_language.addItems(LANG_LIST)
+        if mysettings['speech']:
+            try:
+                indx = LANG_LIST.index(mysettings['lang'])
+                self.ui.cb_language.setCurrentIndex(indx)
+            except ValueError:
+                self.ui.cb_language.setCurrentIndex(-1)
+            self.ui.l_language.setEnabled(True)
+            self.ui.cb_language.setEnabled(True)
         self.ui.cb_onedigit.setChecked(mysettings['one_digit'])
         self.ui.cb_fullscreen.setChecked(mysettings['fullscreen'])
         self.ui.cb_handsfree.setChecked(mysettings['hands_free'])
@@ -125,6 +143,7 @@ class Settings(QtWidgets.QDialog):
         mysettings['digits'] = self.ui.sb_digits.value()
         mysettings['rows'] = self.ui.sb_rows.value()
         mysettings['speech'] = self.ui.cb_speech.isChecked()
+        mysettings['lang'] = self.ui.cb_language.currentText()
         mysettings['fullscreen'] = self.ui.cb_fullscreen.isChecked()
         mysettings['hands_free'] = self.ui.cb_handsfree.isChecked()
         mysettings['one_digit'] = self.ui.cb_onedigit.isChecked()
@@ -135,6 +154,8 @@ class Settings(QtWidgets.QDialog):
         sound = self.ui.sb_flash.isEnabled()
         self.ui.sb_flash.setEnabled(not sound)
         self.ui.cb_onedigit.setEnabled(sound)
+        self.ui.l_language.setEnabled(sound)
+        self.ui.cb_language.setEnabled(sound)
 
     def exec_(self):
         ok = QtWidgets.QDialog.exec_(self)
@@ -156,6 +177,8 @@ class Main(QtWidgets.QMainWindow):
         self.timeout = 1500
         self.neg = False
         self.speech = False
+        self.lang = 'en-US'
+        self.lang_list = []
         self.one_digit = False
         self.fullscreen = False
         self.hands_free = False
@@ -268,11 +291,8 @@ class Main(QtWidgets.QMainWindow):
             self.one_digit = eval(settings.value('Sound/one_digit').capitalize())
         if settings.contains('Sound/annoying_sound'):
             self.annoying_sound = eval(settings.value('Sound/annoying_sound').capitalize())
-        global LANG
         if settings.contains('Sound/lang'):
-            LANG = str(settings.value('Sound/lang'))
-            if LANG.find('_') > 0:
-                LANG = LANG.replace('_','-').lower()
+            self.lang = str(settings.value('Sound/lang'))
 
         # uuid
         self.uuid = ''
@@ -310,6 +330,7 @@ class Main(QtWidgets.QMainWindow):
             mysettings['hands_free'] = self.hands_free
             mysettings['one_digit'] = self.one_digit
             mysettings['neg'] = self.neg
+            mysettings['lang'] = self.lang
             s = Settings(mysettings, parent=self)
             s.ui.cb_fullscreen.stateChanged.connect(self.updateFullScreen)
             ok, mysettings = s.exec_()
@@ -332,6 +353,7 @@ class Main(QtWidgets.QMainWindow):
                 self.one_digit = mysettings['one_digit']
                 self.hands_free = mysettings['hands_free']
                 self.neg = mysettings['neg']
+                self.lang = mysettings['lang']
                 # always save settings when closing the settings dialog
                 settings = QtCore.QSettings(QtCore.QSettings.IniFormat, QtCore.QSettings.UserScope, appName, appName)
                 settings.setValue('digits', QtCore.QVariant(self.digits))
@@ -346,9 +368,10 @@ class Main(QtWidgets.QMainWindow):
                 settings.setValue('GUI/background_color', QtCore.QVariant(self.background_color \
                         if self.background_color is not None else 'transparent'))
 
-                settings.setValue('Sound/lang', QtCore.QVariant(LANG))
+                settings.setValue('Sound/lang', QtCore.QVariant(self.lang))
                 settings.setValue('Sound/one_digit', QtCore.QVariant(self.one_digit))
                 settings.setValue('Sound/speech', QtCore.QVariant(self.speech))
+                settings.setValue('Sound/lang', QtCore.QVariant(self.lang))
                 settings.setValue('Sound/annoying_sound', QtCore.QVariant(self.annoying_sound))
 
                 # disable replay button
@@ -527,7 +550,7 @@ class Main(QtWidgets.QMainWindow):
             if self.one_digit:
                 t = ' '.join(list(t)).replace('- ', '-')
             if t not in self.sounds:
-                self.query.update({'number': t, 'lang': LANG})
+                self.query.update({'number': t, 'lang': self.lang})
                 query_string = '&'.join(f'{k}={urllib.parse.quote(v)}' for k,v in self.query.items())
                 url = f'{APIURL}?{query_string}'
                 t = Thread(target=dl_thread, args=(url, t, self.sounds, self.ui.statusbar, self.tr, nb_dls))
@@ -539,7 +562,7 @@ class Main(QtWidgets.QMainWindow):
             if self.one_digit:
                 t = ' '.join(list(t)).replace('- ', '-')
             if t not in self.sounds:
-                self.query.update({'number': t, 'lang': LANG})
+                self.query.update({'number': t, 'lang': self.lang})
                 query_string = '&'.join(f'{k}={urllib.parse.quote(v)}' for k,v in self.query.items())
                 url = f'{APIURL}?{query_string}'
                 t = Thread(target=dl_thread, args=(url, t, self.sounds, self.ui.statusbar, self.tr, nb_dls))

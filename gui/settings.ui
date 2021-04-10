@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>442</width>
-    <height>211</height>
+    <height>239</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -295,7 +295,7 @@
                <bool>false</bool>
               </property>
               <property name="toolTip">
-               <string> &lt;p style='white-space:pre'&gt;&lt;em&gt;&lt;strong&gt;espeak&lt;/strong&gt;&lt;/em&gt; is needed for speech synthesis&lt;/p&gt;</string>
+               <string>An internet connection is required</string>
               </property>
               <property name="text">
                <string>S&amp;peech Synthesis</string>
@@ -333,7 +333,28 @@ p, li { white-space: pre-wrap; }
             </item>
            </layout>
           </item>
-          <item row="1" column="0">
+          <item row="2" column="0">
+           <layout class="QHBoxLayout" name="horizontalLayout_8">
+            <item>
+             <widget class="QLabel" name="l_language">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+              <property name="text">
+               <string>Language</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QComboBox" name="cb_language">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item row="3" column="0">
            <widget class="QCheckBox" name="cb_onedigit">
             <property name="enabled">
              <bool>false</bool>
@@ -348,6 +369,19 @@ p, li { white-space: pre-wrap; }
           </item>
          </layout>
         </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
        </item>
        <item>
         <widget class="QCheckBox" name="cb_handsfree">
@@ -367,19 +401,6 @@ and so on ...</string>
           <string>Full screen</string>
          </property>
         </widget>
-       </item>
-       <item>
-        <spacer name="verticalSpacer">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>185</width>
-           <height>17</height>
-          </size>
-         </property>
-        </spacer>
        </item>
        <item>
         <widget class="QDialogButtonBox" name="buttonBox">
