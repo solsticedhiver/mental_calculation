@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
-# mentalcalculation - version 0.5
+# mentalcalculation - version 0.5.1
 # Copyright (C) 2008-2021, solsTiCe d'Hiver <solstice.dhiver@gmail.com>
 
 # This program is free software; you can redistribute it and/or modify
@@ -38,6 +38,8 @@ import pathlib
 import os
 import json
 import urllib.request, urllib.parse, urllib.error
+import certifi
+import ssl
 from threading import Thread
 
 import argparse
@@ -64,7 +66,7 @@ from gui import settings, main
 DIGIT = dict([(i,(int('1'+'0'*(i-1)), int('9'*i))) for i in range(1,10)])
 
 appName = 'mentalcalculation'
-appVersion = '0.5'
+appVersion = '0.5.1'
 
 SHARE_PATH = '.'
 SHARE_PATH = pathlib.Path(SHARE_PATH).absolute()
@@ -95,6 +97,7 @@ LANG = 'en'
 
 nb_dleds = 0 # global variable to hold number of downloaded sounds: TODO: do it better ?
 
+ssl_context = ssl.create_default_context(cafile=certifi.where())
 
 class Settings(QtWidgets.QDialog):
     def __init__(self, mysettings, parent=None):
@@ -307,7 +310,7 @@ class Main(QtWidgets.QMainWindow):
                 settings.setValue('uuid', QtCore.QVariant(self.uuid))
                 #url = 'http://localhost:8080/mentalcalculation/ping?uuid=%s&version=%s' % (self.uuid, appVersion)
                 url = f'https://www.sorobanexam.org/mentalcalculation/ping?uuid={self.uuid}&version={appVersion}'
-                ret = urllib.request.urlopen(url)
+                ret = urllib.request.urlopen(url, context=ssl_context)
                 if ret.getcode() == 200:
                     latest_version = json.loads(ret.read().decode('utf-8'))['latest']
                     if latest_version > appVersion:
@@ -742,7 +745,7 @@ class Main(QtWidgets.QMainWindow):
 def dl_thread(url, t, sounds, statusbar, tr, nb_dls):
     global nb_dleds
     try:
-        ret = urllib.request.urlopen(url)
+        ret = urllib.request.urlopen(url, context=ssl_context)
         if ret.getcode() != 200:
             print(f"Error: can't download sound for {t}")
             statusbar.showMessage('An error occurred when downloading sound')
