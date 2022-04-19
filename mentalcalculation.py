@@ -42,6 +42,12 @@ import certifi
 import ssl
 from threading import Thread
 
+import platform
+WINDOWS = platform.system() == 'Windows'
+if WINDOWS:
+    sys.stdout = open(os.sep.join([os.getenv('TMP'), 'mentalcalculation.log']), 'ab')
+    sys.stderr = open(os.sep.join([os.getenv('TMP'), 'mentalcalculation.log']), 'ab')
+
 import argparse
 from tempfile import mkstemp, NamedTemporaryFile
 try:
@@ -83,16 +89,14 @@ SMILE = str(SHARE_PATH / 'img/face-smile.png')
 SAD = str(SHARE_PATH / 'img/face-sad.png')
 RESTART = str(SHARE_PATH / 'img/restart.png')
 
-APIURL = 'https://www.sorobanexam.org/tools/tts'
-#APIURL = 'http://localhost:8080/tools/tts'
-# Google TTS API available voice languages (hard coded). See f'{APIURL}?lang_list=1' for a current version
-LANG_LIST = [
-    "af-ZA", "ar-XA", "bg-BG", "bn-IN", "ca-ES", "cmn-CN", "cmn-TW", "cs-CZ", "da-DK", "de-DE",
-    "el-GR", "en-AU", "en-GB", "en-IN", "en-US", "es-ES", "es-US", "fi-FI", "fil-PH", "fr-CA", "fr-FR",
-    "gu-IN", "hi-IN", "hu-HU", "id-ID", "is-IS", "it-IT", "ja-JP", "kn-IN", "ko-KR", "lv-LV", "ml-IN",
-    "nb-NO", "nl-NL", "pl-PL", "pt-BR", "pt-PT", "ro-RO", "ru-RU", "sk-SK", "sr-RS", "sv-SE", "ta-IN",
-    "te-IN", "th-TH", "tr-TR", "uk-UA", "vi-VN", "yue-HK"
-]
+LANG_LIST = ( 'af', 'am', 'an', 'ar', 'as', 'az', 'ba', 'be', 'bg', 'bn', 'bpy', 'bs', 'ca', 'chr-US-Qaaa-x-west', 'cmn', 'cmn-latn-pinyin',
+    'cs', 'cv', 'cy', 'da', 'de', 'el', 'en-029', 'en-gb', 'en-gb-scotland', 'en-gb-x-gbclan', 'en-gb-x-gbcwmd', 'en-gb-x-rp', 'en-us',
+    'en-us-nyc', 'eo', 'es', 'es-419', 'et', 'eu', 'fa', 'fa-latn', 'fi', 'fr-be', 'fr-ch', 'fr-fr', 'ga', 'gd', 'gn', 'grc', 'gu',
+    'hak', 'haw', 'he', 'hi', 'hr', 'ht', 'hu', 'hy', 'hyw', 'ia', 'id', 'io', 'is', 'it', 'ja', 'jbo', 'ka', 'kk', 'kl', 'kn', 'ko',
+    'kok', 'ku', 'ky', 'la', 'lb', 'lfn', 'lt', 'ltg', 'lv', 'mi', 'mk', 'ml', 'mr', 'ms', 'mt', 'my', 'nb', 'nci', 'ne', 'nl',
+    'nog', 'om', 'or', 'pa', 'pap', 'piqd', 'pl', 'pt', 'pt-br', 'py', 'qdb', 'qu', 'quc', 'qya', 'ro', 'ru', 'ru-lv', 'sd', 'shn',
+    'si', 'sjn', 'sk', 'sl', 'smj', 'sq', 'sr', 'sv', 'sw', 'ta', 'te', 'th', 'tk', 'tn', 'tr', 'tt', 'ug', 'uk', 'ur', 'uz',
+    'vi', 'vi-vn-x-central', 'vi-vn-x-south', 'yue', 'yue', )
 LANG = 'en'
 
 nb_dleds = 0 # global variable to hold number of downloaded sounds: TODO: do it better ?
@@ -463,8 +467,6 @@ class Main(QtWidgets.QMainWindow):
                 self.replay = False
             else:
                 self.makeHistory()
-                if self.speech:
-                    self.downloadSounds()
                 self.noscore = False
                 self.ui.pb_replay.setEnabled(False)
             # change pb_start to 'Stop' when starting display
@@ -534,57 +536,20 @@ class Main(QtWidgets.QMainWindow):
             self.history.append(n)
         self.answer = answer
 
-    def downloadSounds(self):
-        nb_dls = len(self.history) + (1 if self.hands_free else 0)
-        self.ui.statusbar.showMessage(self.tr('Downloading {} sounds').format(nb_dls))
-        #self.sounds = {}
-        threads = []
-        global nb_dleds
-        nb_dleds = 0
-        for i,n in enumerate(self.history):
-            t = '%d' % n
-            if t in self.sounds and self.sounds[t] != BELL:
-                nb_dls -= 1
-                continue
-            if self.neg and i > 0:
-                t = '%+d' % n
-            if self.no_plus_sign and t.startswith('+'):
-                t = t[1:]
-            if self.one_digit:
-                t = ' '.join(list(t)).replace('- ', '-')
-            if t not in self.sounds:
-                self.query.update({'number': t, 'lang': self.lang})
-                query_string = '&'.join(f'{k}={urllib.parse.quote(v)}' for k,v in self.query.items())
-                url = f'{APIURL}?{query_string}'
-                t = Thread(target=dl_thread, args=(url, t, self.sounds, self.ui.statusbar, self.tr, nb_dls))
-                t.start()
-                threads.append(t)
-
-        if self.hands_free:
-            t = '= %d' % self.answer
-            if self.one_digit:
-                t = ' '.join(list(t)).replace('- ', '-')
-            if t not in self.sounds:
-                self.query.update({'number': t, 'lang': self.lang})
-                query_string = '&'.join(f'{k}={urllib.parse.quote(v)}' for k,v in self.query.items())
-                url = f'{APIURL}?{query_string}'
-                t = Thread(target=dl_thread, args=(url, t, self.sounds, self.ui.statusbar, self.tr, nb_dls))
-                t.start()
-                threads.append(t)
-
-        for t in threads:
-            t.join()
-        self.ui.statusbar.clearMessage()
-
     def pronounceit(self, s):
         self.player.stop()
-        try:
-            self.player.setMedia(QtMultimedia.QMediaContent(QtCore.QUrl.fromLocalFile(self.sounds[s])))
-            self.player.play()
-            self.player.stateChanged.connect(self.clearLabel)
-        except KeyError:
-            print(f'Error: {s} not found in sounds')
-            QtCore.QTimer.singleShot(2000, self.clearLabel)
+        p = QtCore.QProcess(self)
+        # Create a tmp wav file that it is later played by Phonon back end
+        self.tmpwav = NamedTemporaryFile(suffix='.wav', prefix='mentalcalculation_', delete=False)
+        p.start(ESPEAK_CMD, ['-v', LANG, '-s',  '%d' % ESPEAK_SPEED,'-w', self.tmpwav.name, "'%s'" % s])
+        p.waitForFinished()
+        # so that it works also on Windows ! wtf !
+        self.tmpwav.close()
+        self.player.stop()
+        # make sure to use the tmp wav
+        self.player.setMedia(QtMultimedia.QMediaContent(QtCore.QUrl.fromLocalFile(self.tmpwav.name)))
+        self.player.play()
+        self.player.stateChanged.connect(self.clearLabel)
 
     def updateAnswer(self):
         if self.ui.le_answer.isEnabled():
@@ -742,31 +707,6 @@ class Main(QtWidgets.QMainWindow):
                 pass
         QtWidgets.QMainWindow.closeEvent(self, event)
 
-def dl_thread(url, t, sounds, statusbar, tr, nb_dls):
-    global nb_dleds
-    try:
-        ret = urllib.request.urlopen(url, context=ssl_context)
-        if ret.getcode() != 200:
-            print(f"Error: can't download sound for {t}")
-            statusbar.showMessage('An error occurred when downloading sound')
-            sounds[t] = BELL
-        else:
-            data = ret.read()
-            with NamedTemporaryFile(prefix='mentalcalculation', suffix='.mp3', delete=False) as f:
-                f.write(data)
-                sounds[t] = f.name
-            nb_dleds += 1
-    except (urllib.error.URLError, urllib.error.HTTPError) as e:
-        print(f"Error: can't download sound for {t}")
-        statusbar.showMessage('An error occurred when downloading sound')
-        # use the bell sound instead
-        with NamedTemporaryFile(prefix='mentalcalculation', suffix='.mp3', delete=False) as f:
-            g = open(BELL, 'rb')
-            # copy the file data
-            f.write(g.read())
-            g.close()
-            sounds[t] = f.name
-
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Practice anzan/mentalcalculation')
     parser.add_argument('-v', '--verbose', action='store_true', help='be verbose: print in console each number displayed')
@@ -776,6 +716,25 @@ if __name__ == '__main__':
 
     app = QtWidgets.QApplication(sys.argv)
     app.setApplicationName('Mental Calculation')
+
+    if WINDOWS:
+        programFiles = [os.getenv('ProgramFiles(x86)'), os.getenv('ProgramFiles')]
+        ESPEAK_CMD_LIST = [os.path.join(p, 'eSpeak\command_line\espeak.exe') for p in programFiles if p is not None]
+    else:
+        ESPEAK_CMD_LIST = ['/usr/bin/espeak', '/usr/local/bin/espeak']
+
+    # check espeak in the default location
+    IS_ESPEAK_INSTALLED = False
+    ESPEAK_CMD = ''
+    i = 0
+    while not IS_ESPEAK_INSTALLED and i < len(ESPEAK_CMD_LIST):
+        if os.path.isfile(ESPEAK_CMD_LIST[i]):
+            IS_ESPEAK_INSTALLED = True
+            ESPEAK_CMD = ESPEAK_CMD_LIST[i]
+            break
+        i += 1
+
+    IS_SOUND_WORKING = IS_ESPEAK_INSTALLED and IS_SOUND_WORKING
 
     # initialize locale and load translation files if available
     locale = QtCore.QLocale()
@@ -788,6 +747,8 @@ if __name__ == '__main__':
         LANG = LOCALENAME.replace('_', '-').lower()
     else:
         LANG = LOCALENAME
+
+    ESPEAK_SPEED = 170 # the default of espeak
 
     # create main gui and display settings dialog
     f = Main()
