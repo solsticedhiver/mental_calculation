@@ -1,6 +1,10 @@
 *Mental calculation* a simple tool made, to practice *anzan* - mental calculation made by visualizing a soroban, the japanese abacus.
 
+It flashes number and you have to provide the result of the operation (addition and/or subtraction). You are free to use or not anzan for doing the calculation of course, because this is your mental processing the operation.
+
 http://en.wikipedia.org/wiki/Soroban
+
+<img src="screenshots/mentalcalculation.png">
 
 # Requirements
 
