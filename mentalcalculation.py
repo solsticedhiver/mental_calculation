@@ -84,7 +84,7 @@ SAD = str(SHARE_PATH / 'img/face-sad.png')
 RESTART = str(SHARE_PATH / 'img/restart.png')
 
 APIURL = 'https://www.sorobanexam.org/tools/tts'
-#APIURL = 'http://localhost:8080/tools/tts'
+#APIURL = 'http://127.0.0.1:5000/tools/tts'
 # Google TTS API available voice languages (hard coded). See f'{APIURL}?lang_list=1' for a current version
 LANG_LIST = [
     "af-ZA", "ar-XA", "bg-BG", "bn-IN", "ca-ES", "cmn-CN", "cmn-TW", "cs-CZ", "da-DK", "de-DE",
@@ -542,33 +542,37 @@ class Main(QtWidgets.QMainWindow):
         global nb_dleds
         nb_dleds = 0
         for i,n in enumerate(self.history):
-            t = '%d' % n
-            if t in self.sounds and self.sounds[t] != BELL:
+            s = '%d' % n
+            if s in self.sounds and self.sounds[s] != BELL:
                 nb_dls -= 1
                 continue
             if self.neg and i > 0:
-                t = '%+d' % n
+                s = '%+d' % n
             if self.no_plus_sign and t.startswith('+'):
-                t = t[1:]
+                s = s[1:]
             if self.one_digit:
-                t = ' '.join(list(t)).replace('- ', '-')
-            if t not in self.sounds:
-                self.query.update({'number': t, 'lang': self.lang})
+                s = ' '.join(list(s)).replace('- ', '-')
+            s = s.replace('-', '−').replace('  ', ' ') # use unicode - to get correct pronunciation
+            if s not in self.sounds:
+                self.query.update({'number': s, 'lang': self.lang})
                 query_string = '&'.join(f'{k}={urllib.parse.quote(v)}' for k,v in self.query.items())
                 url = f'{APIURL}?{query_string}'
-                t = Thread(target=dl_thread, args=(url, t, self.sounds, self.ui.statusbar, self.tr, nb_dls))
+                t = Thread(target=dl_thread, args=(url, s, self.sounds, self.ui.statusbar, self.tr, nb_dls))
                 t.start()
                 threads.append(t)
 
         if self.hands_free:
-            t = '= %d' % self.answer
+            s = '%d' % self.answer
             if self.one_digit:
-                t = ' '.join(list(t)).replace('- ', '-')
-            if t not in self.sounds:
-                self.query.update({'number': t, 'lang': self.lang})
+                s = ' '.join(list(s)).replace('- ', '−')
+            s = '= %s' % s
+            s = s.replace('-', '−').replace('  ', ' ') # use unicode - to get correct pronunciation
+            print(s)
+            if s not in self.sounds:
+                self.query.update({'number': s, 'lang': self.lang})
                 query_string = '&'.join(f'{k}={urllib.parse.quote(v)}' for k,v in self.query.items())
                 url = f'{APIURL}?{query_string}'
-                t = Thread(target=dl_thread, args=(url, t, self.sounds, self.ui.statusbar, self.tr, nb_dls))
+                t = Thread(target=dl_thread, args=(url, s, self.sounds, self.ui.statusbar, self.tr, nb_dls))
                 t.start()
                 threads.append(t)
 
@@ -630,11 +634,13 @@ class Main(QtWidgets.QMainWindow):
             self.ui.label.setText('=%d' % self.answer)
             if self.speech and IS_SOUND_WORKING:
                 # pronounce one digit at a time
-                t = '= %d' % self.answer
-                if args.verbose:
-                    print(t)
+                t = '%d' % self.answer
                 if self.one_digit:
                     t = ' '.join(list(t)).replace('- ', '-')
+                t = '= %s' % t
+                if args.verbose:
+                    print(t)
+                t = t.replace('-', '−').replace('  ', ' ') # use unicode - to get correct pronunciation
                 self.player.stateChanged.disconnect(self.clearLabel)
                 self.player.setMedia(QtMultimedia.QMediaContent(QtCore.QUrl.fromLocalFile(self.sounds[t])))
                 self.player.play()
@@ -699,6 +705,7 @@ class Main(QtWidgets.QMainWindow):
                         # pronounce one digit at a time
                         if self.one_digit:
                             t = ' '.join(list(t)).replace('- ', '-')
+                        t = t.replace('-', '−').replace('  ', ' ') # use unicode - to get correct pronunciation
                         self.pronounceit(t)
                     else:
                         if self.annoying_sound:
