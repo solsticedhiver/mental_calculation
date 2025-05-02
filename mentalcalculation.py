@@ -558,7 +558,7 @@ class Main(QtWidgets.QMainWindow):
                 self.query.update({'number': s, 'lang': self.lang})
                 query_string = '&'.join(f'{k}={urllib.parse.quote(v)}' for k,v in self.query.items())
                 url = f'{APIURL}?{query_string}'
-                t = Thread(target=dl_thread, args=(url, s, self.sounds, self.ui.statusbar, self.tr, nb_dls))
+                t = Thread(target=dl_thread, args=(url, s, self.sounds, self.ui.statusbar, self.tr, nb_dls, self.uuid))
                 t.start()
                 threads.append(t)
 
@@ -750,10 +750,14 @@ class Main(QtWidgets.QMainWindow):
                 pass
         QtWidgets.QMainWindow.closeEvent(self, event)
 
-def dl_thread(url, t, sounds, statusbar, tr, nb_dls):
+def dl_thread(url, t, sounds, statusbar, tr, nb_dls, uuid):
     global nb_dleds
     try:
-        ret = urllib.request.urlopen(url, context=ssl_context)
+        headers = {}
+        if uuid.lower() not in ('', 'no', 'none', 'false', 'opt-out', 'optout'):
+            headers = {'X-Distinct-ID': uuid}
+        req = urllib.request.Request(url, headers = headers)
+        ret = urllib.request.urlopen(req, context=ssl_context)
         if ret.getcode() != 200:
             print(f"Error: can't download sound for {t}")
             statusbar.showMessage('An error occurred when downloading sound')
