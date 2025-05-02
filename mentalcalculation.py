@@ -87,11 +87,12 @@ APIURL = 'https://www.sorobanexam.org/tools/tts'
 #APIURL = 'http://127.0.0.1:5000/tools/tts'
 # Google TTS API available voice languages (hard coded). See f'{APIURL}?lang_list=1' for a current version
 LANG_LIST = [
-    "af-ZA", "ar-XA", "bg-BG", "bn-IN", "ca-ES", "cmn-CN", "cmn-TW", "cs-CZ", "da-DK", "de-DE",
-    "el-GR", "en-AU", "en-GB", "en-IN", "en-US", "es-ES", "es-US", "fi-FI", "fil-PH", "fr-CA", "fr-FR",
-    "gu-IN", "hi-IN", "hu-HU", "id-ID", "is-IS", "it-IT", "ja-JP", "kn-IN", "ko-KR", "lv-LV", "ml-IN",
-    "nb-NO", "nl-NL", "pl-PL", "pt-BR", "pt-PT", "ro-RO", "ru-RU", "sk-SK", "sr-RS", "sv-SE", "ta-IN",
-    "te-IN", "th-TH", "tr-TR", "uk-UA", "vi-VN", "yue-HK"
+    "af-ZA", "am-ET", "ar-XA", "bg-BG", "bn-IN", "ca-ES", "cmn-CN", "cmn-TW", "cs-CZ", "da-DK", "de-DE",
+    "el-GR", "en-AU", "en-GB", "en-IN", "en-US", "es-ES", "es-US", "et-EE", "eu-ES", "fi-FI", "fil-PH",
+    "fr-CA", "fr-FR", "gl-ES", "gu-IN", "he-IL", "hi-IN", "hu-HU", "id-ID", "is-IS", "it-IT", "ja-JP",
+    "kn-IN", "ko-KR", "lt-LT", "lv-LV", "ml-IN", "mr-IN", "ms-MY", "nb-NO", "nl-BE", "nl-NL", "pa-IN",
+    "pl-PL", "pt-BR", "pt-PT", "ro-RO", "ru-RU", "sk-SK", "sr-RS", "sv-SE", "sw-KE", "ta-IN", "te-IN",
+    "th-TH", "tr-TR", "uk-UA", "ur-IN", "vi-VN", "yue-HK"
 ]
 LANG = 'en'
 
