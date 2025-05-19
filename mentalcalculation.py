@@ -551,12 +551,14 @@ class Main(QtWidgets.QMainWindow):
                 s = '%+d' % n
             if self.no_plus_sign and t.startswith('+'):
                 s = s[1:]
+            else:
+                s = s.replace('+', '+ ')
             if self.one_digit:
                 s = ' '.join(list(s)).replace('- ', '-')
             s = s.replace('-', '−').replace('  ', ' ') # use unicode - to get correct pronunciation
             if s not in self.sounds:
                 self.query.update({'number': s, 'lang': self.lang})
-                query_string = '&'.join(f'{k}={urllib.parse.quote(v)}' for k,v in self.query.items())
+                query_string = '&'.join(f'{k}={urllib.parse.quote_plus(v)}' for k,v in self.query.items())
                 url = f'{APIURL}?{query_string}'
                 t = Thread(target=dl_thread, args=(url, s, self.sounds, self.ui.statusbar, self.tr, nb_dls, self.uuid))
                 t.start()
@@ -706,7 +708,7 @@ class Main(QtWidgets.QMainWindow):
                         # pronounce one digit at a time
                         if self.one_digit:
                             t = ' '.join(list(t)).replace('- ', '-')
-                        t = t.replace('-', '−').replace('  ', ' ') # use unicode - to get correct pronunciation
+                        t = t.replace('-', '−').replace('  ', ' ').replace('+', '+ ') # use unicode - to get correct pronunciation
                         self.pronounceit(t)
                     else:
                         if self.annoying_sound:
