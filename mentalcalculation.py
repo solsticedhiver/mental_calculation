@@ -570,12 +570,12 @@ class Main(QtWidgets.QMainWindow):
                 s = ' '.join(list(s)).replace('- ', '−')
             s = '= %s' % s
             s = s.replace('-', '−').replace('  ', ' ') # use unicode - to get correct pronunciation
-            print(s)
+            #print(s)
             if s not in self.sounds:
                 self.query.update({'number': s, 'lang': self.lang})
                 query_string = '&'.join(f'{k}={urllib.parse.quote(v)}' for k,v in self.query.items())
                 url = f'{APIURL}?{query_string}'
-                t = Thread(target=dl_thread, args=(url, s, self.sounds, self.ui.statusbar, self.tr, nb_dls))
+                t = Thread(target=dl_thread, args=(url, s, self.sounds, self.ui.statusbar, self.tr, nb_dls, self.uuid))
                 t.start()
                 threads.append(t)
 
