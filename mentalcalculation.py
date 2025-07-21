@@ -37,10 +37,11 @@ import sys
 import pathlib
 import os
 import json
-import urllib.request, urllib.parse, urllib.error
+import urllib.parse, urllib.error
 import certifi
 import ssl
 from threading import Thread
+import requests
 
 import argparse
 from tempfile import mkstemp, NamedTemporaryFile
@@ -83,8 +84,9 @@ SMILE = str(SHARE_PATH / 'img/face-smile.png')
 SAD = str(SHARE_PATH / 'img/face-sad.png')
 RESTART = str(SHARE_PATH / 'img/restart.png')
 
-APIURL = 'https://www.sorobanexam.org/tools/tts'
-#APIURL = 'http://127.0.0.1:5000/tools/tts'
+HOST = 'https://www.sorobanexam.org'
+#HOST = 'http://127.0.0.1:5000'
+APIURL = f'{HOST}/tools/tts'
 # Google TTS API available voice languages (hard coded). See f'{APIURL}?lang_list=1' for a current version
 LANG_LIST = [
     "af-ZA", "am-ET", "ar-XA", "bg-BG", "bn-IN", "ca-ES", "cmn-CN", "cmn-TW", "cs-CZ", "da-DK", "de-DE",
@@ -98,7 +100,7 @@ LANG = 'en'
 
 nb_dleds = 0 # global variable to hold number of downloaded sounds: TODO: do it better ?
 
-ssl_context = ssl.create_default_context(cafile=certifi.where())
+session = requests.Session()
 
 class Settings(QtWidgets.QDialog):
     def __init__(self, mysettings, parent=None):
@@ -309,17 +311,16 @@ class Main(QtWidgets.QMainWindow):
             # call home
             try:
                 settings.setValue('uuid', QtCore.QVariant(self.uuid))
-                #url = 'http://localhost:8080/mentalcalculation/ping?uuid=%s&version=%s' % (self.uuid, appVersion)
-                url = f'https://www.sorobanexam.org/mentalcalculation/ping?uuid={self.uuid}&version={appVersion}'
-                ret = urllib.request.urlopen(url, context=ssl_context)
-                if ret.getcode() == 200:
-                    latest_version = json.loads(ret.read().decode('utf-8'))['latest']
+                url = f'{HOST}/mentalcalculation/ping?uuid={self.uuid}&version={appVersion}'
+                ret = session.get(url)
+                if ret.status_code == 200:
+                    latest_version = ret.json()['latest']
                     if latest_version > appVersion:
                         self.ui.statusbar.showMessage('A new version is available at www.sorobanexam.org/anzan.html')
                 # stop tracking if url returns 404
-                if ret.getcode() == 404:
+                if ret.status_code == 404:
                     settings.setValue('uuid', QtCore.QVariant('opt-out'))
-            except urllib.error.URLError:
+            except (urllib.error.URLError, requests.exceptions.RequestException) :
                 pass
 
     def changeSettings(self):
@@ -758,19 +759,18 @@ def dl_thread(url, t, sounds, statusbar, tr, nb_dls, uuid):
         headers = {}
         if uuid.lower() not in ('', 'no', 'none', 'false', 'opt-out', 'optout'):
             headers = {'X-Distinct-ID': uuid}
-        req = urllib.request.Request(url, headers = headers)
-        ret = urllib.request.urlopen(req, context=ssl_context)
-        if ret.getcode() != 200:
+        ret = session.get(url, headers=headers)
+        if ret.status_code != 200:
             print(f"Error: can't download sound for {t}")
             statusbar.showMessage('An error occurred when downloading sound')
             sounds[t] = BELL
         else:
-            data = ret.read()
+            data = ret.content
             with NamedTemporaryFile(prefix='mentalcalculation', suffix='.mp3', delete=False) as f:
                 f.write(data)
                 sounds[t] = f.name
             nb_dleds += 1
-    except (urllib.error.URLError, urllib.error.HTTPError) as e:
+    except (urllib.error.URLError, urllib.error.HTTPError, requests.exceptions.RequestException) as e:
         print(f"Error: can't download sound for {t}")
         statusbar.showMessage('An error occurred when downloading sound')
         # use the bell sound instead
