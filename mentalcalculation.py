@@ -756,9 +756,9 @@ class Main(QtWidgets.QMainWindow):
 def dl_thread(url, t, sounds, statusbar, tr, nb_dls, uuid):
     global nb_dleds
     try:
-        headers = {}
+        headers = {'X-Custom-Ua': f'MentalCalculation/{appVersion} ({sys.platform.capitalize()})'}
         if uuid.lower() not in ('', 'no', 'none', 'false', 'opt-out', 'optout'):
-            headers = {'X-Distinct-ID': uuid}
+            headers['X-Distinct-ID'] = uuid
         ret = session.get(url, headers=headers)
         if ret.status_code != 200:
             print(f"Error: can't download sound for {t}")
